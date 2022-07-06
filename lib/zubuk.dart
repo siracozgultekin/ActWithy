@@ -12,6 +12,11 @@ class _ZubState extends State<Zub> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('zub'),),
+      body: Column(
+        children: [
+          Text('data')
+        ],
+      ),
     );
   }
 }
