@@ -10,6 +10,6 @@ class Zubeyde extends StatefulWidget {
 class _ZubeydeState extends State<Zubeyde> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold();
   }
 }
