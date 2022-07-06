@@ -1,16 +1,15 @@
+import 'package:actwithy/pages/welcomePage.dart';
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(const MyApp());
+void main(){
+  runApp(MyApp());
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+<<<<<<< Updated upstream
       title: 'cig kofteci sensei',
       theme: ThemeData(
         // This is the theme of your application.
@@ -110,6 +109,10 @@ class _MyHomePageState extends State<MyHomePage> {
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
+=======
+      debugShowCheckedModeBanner: false,
+      home: WelcomePage(),
+>>>>>>> Stashed changes
     );
   }
 }
