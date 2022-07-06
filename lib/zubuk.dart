@@ -10,6 +10,8 @@ class Zub extends StatefulWidget {
 class _ZubState extends State<Zub> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      appBar: AppBar(title: Text('zub'),),
+    );
   }
 }
