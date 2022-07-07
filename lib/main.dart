@@ -1,4 +1,6 @@
-import 'package:actwithy/pages/profilePage.dart';
+
+import 'package:actwithy/pages/creatingPage.dart';
+
 import 'package:actwithy/pages/welcomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,7 +22,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ProfilePage(),
+      home: CreatingPage(),
     );;
   }
 }
