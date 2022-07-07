@@ -100,11 +100,7 @@ packages:
     source: hosted
     version: "3.3.19"
   firebase_core:
-<<<<<<< Updated upstream
-    dependency: transitive
-=======
     dependency: "direct main"
->>>>>>> Stashed changes
     description:
       name: firebase_core
       url: "https://pub.dartlang.org"

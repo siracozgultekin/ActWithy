@@ -8,8 +8,6 @@ class AuthService{
   String uid='';
   Future<bool> register(String email, String pass, String username, String name,String surname) async {
     bool result = false;
-    print('Register basarili...');
-
     await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: pass)
         .then((value) async {
       String uid = value.user!.uid;
