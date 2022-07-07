@@ -1,14 +1,25 @@
+import 'package:actwithy/pages/homePage.dart';
 import 'package:actwithy/services/authService.dart';
 import 'package:flutter/material.dart';
 
 import 'loginPage.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
   TextEditingController usernameController = TextEditingController();
+
   TextEditingController emailController = TextEditingController();
+
   TextEditingController nameController = TextEditingController();
+
   TextEditingController surnameController = TextEditingController();
+
   TextEditingController passwordController1 = TextEditingController();
+
   TextEditingController passwordController2 = TextEditingController();
 
   GlobalKey<FormState> _myKey = GlobalKey<FormState>();
@@ -312,9 +323,8 @@ class RegisterPage extends StatelessWidget {
                         );
                         ScaffoldMessenger.of(context).deactivate();
                         //sleep(const Duration(seconds:1));
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => LoginPage()));
-
+                       Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                            HomePage()), (Route<dynamic> route) => false);
                       }
                     },
                     child: Text(
@@ -341,7 +351,7 @@ class RegisterPage extends StatelessWidget {
                       ),
                       TextButton(
                           onPressed: () {
-                            Navigator.push(context,
+                            Navigator.pushReplacement(context,
                                 MaterialPageRoute(builder: (context) => LoginPage()));
                           },
                           child: Text(

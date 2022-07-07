@@ -29,9 +29,11 @@ class AuthService{
         "registerDate": Timestamp.now(),
         "lastSeen": Timestamp.now(),
       };
+      print("Result: $result");
       await FirebaseFirestore.instance.collection('users').doc(uid).set(usermap)
           .onError((error, stackTrace) {
         result = false;
+        print("İLGİLİ HATA:::: $error");
       });
       result = true;
     }).onError((error, stackTrace) {
