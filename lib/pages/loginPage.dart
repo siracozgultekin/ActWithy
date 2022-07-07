@@ -166,7 +166,7 @@ class LoginPage extends StatelessWidget {
                         ),
                         TextButton(
                             onPressed: () {
-                              Navigator.push(context,
+                              Navigator.pushReplacement(context,
                                   MaterialPageRoute(builder: (context) => RegisterPage()));
                             },
                             child: Text(
