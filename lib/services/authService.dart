@@ -22,12 +22,13 @@ class AuthService{
         "surname":surname,
         "kullaniciadi": username,
         "bio": "bio",
-        "ppURL": "ppUrl",
-        "backgroundURL": "bgUrl",
+        "ppURL": "ppURL",
+        "backgroundURL": "bgURL",
         "friends":friends,
         "posts": posts,
         "registerDate": Timestamp.now(),
         "lastSeen": Timestamp.now(),
+        "postCount": 0,
       };
       print("Result: $result");
       await FirebaseFirestore.instance.collection('users').doc(uid).set(usermap)
