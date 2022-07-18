@@ -15,6 +15,8 @@ class UserModel {
   int postCount;
   Timestamp registerDate;
   Timestamp lastSeen;
+  String lastPostID;
+  Timestamp lastPostStamp;
 
   UserModel(
       {
@@ -32,6 +34,8 @@ class UserModel {
         required  this.postCount,
         required this.registerDate,
         required this.lastSeen,
+        required this.lastPostID,
+        required this.lastPostStamp,
       });
 
   factory UserModel.fromSnapshot(DocumentSnapshot doc) {
@@ -62,6 +66,8 @@ class UserModel {
         surname: doc['surname'],
         userUID: doc['userUID'],
         postCount: doc['postCount'],
+        lastPostID : doc["lastPostID"],
+        lastPostStamp : doc["lastPostStamp"],
       );
 
 
