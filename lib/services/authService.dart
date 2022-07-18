@@ -8,8 +8,6 @@ class AuthService{
   String uid='';
   Future<bool> register(String email, String pass, String username, String name,String surname) async {
     bool result = false;
-    print('Register basarili...');
-
     await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: pass)
         .then((value) async {
       String uid = value.user!.uid;
@@ -24,16 +22,19 @@ class AuthService{
         "surname":surname,
         "kullaniciadi": username,
         "bio": "bio",
-        "ppURL": "ppUrl",
-        "backgroundURL": "bgUrl",
+        "ppURL": "ppURL",
+        "backgroundURL": "bgURL",
         "friends":friends,
         "posts": posts,
         "registerDate": Timestamp.now(),
         "lastSeen": Timestamp.now(),
+        "postCount": 0,
       };
+      print("Result: $result");
       await FirebaseFirestore.instance.collection('users').doc(uid).set(usermap)
           .onError((error, stackTrace) {
         result = false;
+        print("İLGİLİ HATA:::: $error");
       });
       result = true;
     }).onError((error, stackTrace) {

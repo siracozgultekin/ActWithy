@@ -1,10 +1,9 @@
-import 'package:actwithy/Models/ActivityModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PostModel{
   String postUID;
   Timestamp date;
-  ActivityModel activity;
+  List<String> activityUID;
   int heartCounter;
   int brokenHeartCounter;
   int joyCounter;
@@ -12,12 +11,27 @@ class PostModel{
   int angryCounter;
 
   PostModel(
-      this.postUID,
-      this.date,
-      this.activity,
-      this.heartCounter,
-      this.brokenHeartCounter,
-      this.joyCounter,
-      this.sobCounter,
-      this.angryCounter);
+     { required this.postUID,
+
+        required this.date,
+        required  this.activityUID,
+        required  this.heartCounter,
+        required  this.brokenHeartCounter,
+        required  this.joyCounter,
+        required  this.sobCounter,
+        required  this.angryCounter});
+
+  Map<String, dynamic> createMap() {
+    Map<String, dynamic> map = {
+      'postUID':'',
+      'activityUID':this.activityUID,
+      'heartCounter':this.heartCounter,
+      'brokenHeartCounter':this.brokenHeartCounter,
+      'joyCounter':this.joyCounter,
+      'sobCounter':this.sobCounter,
+      'angryCounter':this.angryCounter,
+    };
+    return map;
+  }
+
 }

@@ -19,7 +19,6 @@ class UserModel {
   Timestamp lastPostStamp;
 
   UserModel(
-
       {
       required  this.userUID,
         required this.email,
