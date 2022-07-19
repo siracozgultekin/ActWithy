@@ -7,13 +7,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class CreatingPage extends StatefulWidget {
-  const CreatingPage({Key? key}) : super(key: key);
+  PostModel postModel;
+  CreatingPage({required this.postModel});
+
 
   @override
   State<CreatingPage> createState() => _CreatingPageState();
 }
 
 class _CreatingPageState extends State<CreatingPage> {
+
+
+
+
   TextEditingController locationKey= TextEditingController();
   final searchController = TextEditingController();
   List<String> items=['Seçiniz...','İşe gidecek','Sinemaya gidecek','Ders çalışacak','Yemek yiyecek'];
@@ -327,10 +333,19 @@ class _CreatingPageState extends State<CreatingPage> {
                           child: Text("Clear",style: TextStyle(fontWeight: FontWeight.bold,color: Colors.red),),
                         ),
                         InkWell(
-                          onTap: ()async{
+                          onTap: ()async {
                             //ActivityModel activityObj= ActivityModel(activityType:selectedItem!, time:hoursANDminutes, location:locationKey.text,);
                             //TODO bir tane activity varsa önce post oluştur.
-                            await PostServices().createActivity(selectedItem!, myTimeStamp,locationKey.text);
+                          String ActId=  await PostServices().createActivity(selectedItem!, myTimeStamp,locationKey.text);
+
+                          if(widget.postModel.postUID=="postUID"){
+                            //TODO Databasede yeni post oluşturmamız gerekiyor.
+                            widget.postModel =  await PostServices().createPost();
+                          }
+
+                          widget.postModel.activityUID.add(ActId);
+                          await PostServices().updatePost(widget.postModel);
+                          print("actvty:  ${widget.postModel.activityUID}");
                           },
                           child: Text("Submit",style: TextStyle(fontWeight: FontWeight.bold,color: Colors.green[600]),),
                         ),

@@ -38,6 +38,29 @@ class UserModel {
         required this.lastPostStamp,
       });
 
+
+  Map<String, dynamic> createMap() {
+    Map<String, dynamic> map = {
+    "userUID":this.userUID,
+     "email":this.email,
+     "password":this.password,
+     "name":this.name,
+     "surname":this.surname,
+     "username":this.username,
+     "bio":this.bio,
+     "ppURL":this.ppURL,
+     "backgroundURL":this.backgroundURL,
+    "friends":this.friends,
+     "posts":this.posts,
+     "postCount":this.postCount,
+     "registerDate":this.registerDate,
+     "lastSeen":this.lastSeen,
+     "lastPostID":this.lastPostID,
+     "lastPostStamp":this.lastPostStamp,
+    };
+    return map;
+  }
+
   factory UserModel.fromSnapshot(DocumentSnapshot doc) {
 /*
     List<String> fr = [];
@@ -69,7 +92,6 @@ class UserModel {
         lastPostID : doc["lastPostID"],
         lastPostStamp : doc["lastPostStamp"],
       );
-
 
   }
 

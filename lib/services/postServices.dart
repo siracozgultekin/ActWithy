@@ -13,7 +13,7 @@ CollectionReference users = FirebaseFirestore.instance.collection('users');
 CollectionReference posts = FirebaseFirestore.instance.collection('posts');
 CollectionReference activities = FirebaseFirestore.instance.collection('activities');
 
- Future<void> createActivity(String selectedItem, Timestamp time, String location) async{
+ Future<String> createActivity(String selectedItem, Timestamp time, String location) async{
    /* await activities.add(model.createMap()).then((value) async {
      String postId = value.id;
      await activities.doc(postId).update({'activityUID': postId,});
@@ -22,7 +22,7 @@ CollectionReference activities = FirebaseFirestore.instance.collection('activiti
      print('myID:$myId');
    });
    */
-
+String returnID="";
    await activities.add({
     "activityType" : selectedItem,
      "location" : location,
@@ -30,9 +30,35 @@ CollectionReference activities = FirebaseFirestore.instance.collection('activiti
      //TODO participant parametresi oluşturup CreatingPage'den participants'a değer yolla.
     // "participants" : participants,
    }).then((value) async {
+     returnID=value.id;
      await activities.doc(value.id).update({"activityUID":value.id});
    });
+return returnID;
+  }
 
+  Future<void> updatePost(PostModel postModel) async{
+   await posts.doc(postModel.postUID).set(postModel.createMap());
+
+  }
+
+  Future<PostModel> createPost()async{
+   String id = "";
+   await posts.add({
+     "date": Timestamp.now(),
+     "activityUID":[],
+     'heartCounter':0,
+     'brokenHeartCounter':0,
+     'joyCounter':0,
+     'sobCounter':0,
+     'angryCounter':0,
+   }).then((value) async{
+     await posts.doc(value.id).update({"postUID":value.id});
+     id=value.id;
+   });
+
+   DocumentSnapshot dc= await users.doc(myId).get();
+   await users.doc(myId).update({"lastPostStamp": Timestamp.now(), "lastPostID": id, "postCount":dc["postCount"]+1 ,"posts":dc["posts"]+[id]});
+   return PostModel.fromSnapshot(await posts.doc(id).get());
   }
 
   Future<List<UserModel>> getAllProfiles(String search) async {
@@ -68,5 +94,21 @@ CollectionReference activities = FirebaseFirestore.instance.collection('activiti
       }
     }
     return models;
+  }
+
+  Future<bool> checkDailyPost()async{
+   bool result= false;
+   DocumentSnapshot dc= await users.doc(myId).get();
+   if(dc["lastPostStamp"]!= null && dc["lastPostStamp"].toDate().year== DateTime.now().year && dc["lastPostStamp"].toDate().month== DateTime.now().month && dc["lastPostStamp"].toDate().day== DateTime.now().day){
+      result = true;
+   }
+   return result;
+  }
+
+  Future<PostModel> getDailyPost()async{
+    DocumentSnapshot ds= await users.doc(myId).get();
+  String lastpostid= ds['lastPostID'];
+    DocumentSnapshot lp= await posts.doc(lastpostid).get();
+  return PostModel.fromSnapshot(lp);
   }
 }

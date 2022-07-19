@@ -17,7 +17,7 @@ class SearchPeoplePage extends SearchDelegate {
   @override
   ThemeData appBarTheme(BuildContext context) {
     return Theme.of(context).copyWith(
-      hintColor: Colors.white.withOpacity(0.5),
+      hintColor: Colors.white.withOpacity(0.8),
       appBarTheme: AppBarTheme(
         backgroundColor: Color(0XFF48B2FA),
         elevation: 0,
@@ -55,11 +55,11 @@ class SearchPeoplePage extends SearchDelegate {
   @override
   Widget buildResults(BuildContext context) {
     return FutureBuilder(
-      future: PostServices().getAllProfiles(query.toLowerCase()),
+      future: PostServices().getFriendsProfiles(query.toLowerCase()),
       builder: (context, AsyncSnapshot snap) {
         if(!snap.hasData){
           print("HATA");
-          return CircularProgressIndicator();
+          return CircularProgressIndicator(color: Colors.red,);
         } else {
           return ListView.builder(
               itemCount: snap.data.length,
@@ -91,7 +91,7 @@ class SearchPeoplePage extends SearchDelegate {
                         padding: const EdgeInsets.all(8.0),
                         child: Container(alignment: AlignmentDirectional.centerStart,
                             height: MediaQuery.of(context).size.height*0.075,
-                            child: Text(result.name,style: TextStyle(fontSize: 17,color: Colors.white),)),
+                            child: Text(result.name,style: TextStyle(fontSize: 17,color: Colors.black),)),
                       ),
                     ],
                   ),
