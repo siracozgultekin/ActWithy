@@ -59,7 +59,7 @@ class SearchPeoplePage extends SearchDelegate {
       builder: (context, AsyncSnapshot snap) {
         if(!snap.hasData){
           print("HATA");
-          return Icon(Icons.error,color: Colors.red,);
+          return CircularProgressIndicator();
         } else {
           return ListView.builder(
               itemCount: snap.data.length,
