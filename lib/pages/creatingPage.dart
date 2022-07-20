@@ -1,31 +1,27 @@
 import 'package:actwithy/Models/ActivityModel.dart';
 import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
-import 'package:actwithy/pages/searchDelegatePage.dart';
+import 'package:actwithy/pages/participantSearchPage.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class CreatingPage extends StatefulWidget {
-<<<<<<< Updated upstream
-  const CreatingPage({Key? key}) : super(key: key);
-=======
+
   PostModel postModel;
   CreatingPage({required this.postModel});
->>>>>>> Stashed changes
+
 
   @override
   State<CreatingPage> createState() => _CreatingPageState();
 }
 
 class _CreatingPageState extends State<CreatingPage> {
-<<<<<<< Updated upstream
+
   TextEditingController locationKey= TextEditingController();
-=======
   final controller = ScrollController();
 
   TextEditingController locationKey = TextEditingController();
->>>>>>> Stashed changes
   final searchController = TextEditingController();
   List<String> items = [
     'Seçiniz...',
@@ -278,20 +274,10 @@ class _CreatingPageState extends State<CreatingPage> {
                                       IconButton(
                                           padding: EdgeInsets.only(left: 8),
                                           constraints: BoxConstraints(),
-<<<<<<< Updated upstream
                                           onPressed: (){
-                                         showSearch(context: context, delegate: SearchPeoplePage());
+                                         showSearch(context: context, delegate: ParticipantSearchPage());
                                       }, icon: Icon(Icons.person_add_alt_1_outlined)),
-=======
-                                          onPressed: () {
-                                            showSearch(
-                                                context: context,
-                                                delegate:
-                                                    ParticipantSearchPage());
-                                          },
-                                          icon: Icon(
-                                              Icons.person_add_alt_1_outlined)),
->>>>>>> Stashed changes
+
                                     ],
                                   ),
                                 ),
@@ -353,12 +339,7 @@ class _CreatingPageState extends State<CreatingPage> {
                           ),
                         ),
                         InkWell(
-<<<<<<< Updated upstream
-                          onTap: ()async{
-                            //ActivityModel activityObj= ActivityModel(activityType:selectedItem!, time:hoursANDminutes, location:locationKey.text,);
-                            //TODO bir tane activity varsa önce post oluştur.
-                            await PostServices().createActivity(selectedItem!, myTimeStamp,locationKey.text);
-=======
+
                           onTap: () async {
                             //ActivityModel activityObj= ActivityModel(activityType:selectedItem!, time:hoursANDminutes, location:locationKey.text,);
                             //TODO bir tane activity varsa önce post oluştur.
@@ -376,7 +357,6 @@ class _CreatingPageState extends State<CreatingPage> {
                             print("activity: ${widget.postModel.activityUID}");
                             setState((){ length =newLength;});
 
->>>>>>> Stashed changes
                           },
                           child: Text(
                             "Submit",
