@@ -108,12 +108,31 @@ return returnID;
   }
 
   Future<PostModel> getDailyPost()async{
+   /*bool check = await checkDailyPost();
+   if(check){
+     return PostModel(postUID: "postUID", date: Timestamp.now(), activityUID: [], heartCounter: 0, brokenHeartCounter: 0, joyCounter: 0, sobCounter: 0, angryCounter: 0);
+   }*/
     DocumentSnapshot ds= await users.doc(myId).get();
   String lastpostid= ds['lastPostID'];
     DocumentSnapshot lp= await posts.doc(lastpostid).get();
   return PostModel.fromSnapshot(lp);
   }
+ Future<List<ActivityModel>> getDailyActivities()async{
+   PostModel postModel = await getDailyPost();
+   List<String> actIDs = postModel.activityUID;
+   List<ActivityModel> activitiesList = [];
+   print("activitiesListYUKARI: ${activitiesList}");
 
+   for (String id in actIDs){
+
+     DocumentSnapshot  dc=await activities.doc(id).get();
+     print("id: ${dc["activityUID"]}");
+     activitiesList.add(ActivityModel.fromSnapshot(dc));
+   }
+   print("activitiesList: ${activitiesList}");
+
+return activitiesList;
+}
 
   Future<List<PostModel>> getFriendsPosts() async{
     List<PostModel> postsList = [];
@@ -132,42 +151,5 @@ return returnID;
     return postsList;
   }
 
-
- 
-
-  Future<List<UserModel>> getFriendsProfiles(String search) async {
-    List<UserModel> models = [];
-    QuerySnapshot query = await users.where('friends', arrayContains: myId ).get();
-    String temp = "";
-    for(var doc in query.docs){
-      temp = doc['name'];
-      temp=temp.toLowerCase();
-
-
-      if(temp.contains(search)){
-        models.add(UserModel.fromSnapshot(doc));
-      }
-    }
-    return models;
-  }
-
-  Future<bool> checkDailyPost()async{
-   bool result= false;
-   DocumentSnapshot dc= await users.doc(myId).get();
-   if(dc["lastPostStamp"]!= null && dc["lastPostStamp"].toDate().year== DateTime.now().year && dc["lastPostStamp"].toDate().month== DateTime.now().month && dc["lastPostStamp"].toDate().day== DateTime.now().day){
-      result = true;
-   }
-   return result;
-  }
-
-  Future<PostModel> getDailyPost()async{
-    DocumentSnapshot ds= await users.doc(myId).get();
-  String lastpostid= ds['lastPostID'];
-    DocumentSnapshot lp= await posts.doc(lastpostid).get();
-  return PostModel.fromSnapshot(lp);
-  }
-
-
- 
 }
 
