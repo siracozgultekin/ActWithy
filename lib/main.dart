@@ -1,4 +1,5 @@
 
+import 'package:actwithy/pages/LandingPage.dart';
 import 'package:actwithy/pages/creatingPage.dart';
 
 import 'package:actwithy/pages/welcomePage.dart';
@@ -22,7 +23,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: WelcomePage(),
+      home: LandingPage(),
     );;
   }
 }

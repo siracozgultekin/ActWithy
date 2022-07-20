@@ -11,20 +11,23 @@ class PostModel{
   int angryCounter;
 
   PostModel(
-     { required this.postUID,
-
+      { required this.postUID,
         required this.date,
-        required  this.activityUID,
-        required  this.heartCounter,
-        required  this.brokenHeartCounter,
-        required  this.joyCounter,
-        required  this.sobCounter,
-        required  this.angryCounter});
+        required this.activityUID,
+        required this.heartCounter,
+        required this.brokenHeartCounter,
+        required this.joyCounter,
+        required this.sobCounter,
+        required this.angryCounter
+      });
+
+
 
   Map<String, dynamic> createMap() {
     Map<String, dynamic> map = {
-      'postUID':'',
+      'postUID':this.postUID,
       'activityUID':this.activityUID,
+      'date' :this.date,
       'heartCounter':this.heartCounter,
       'brokenHeartCounter':this.brokenHeartCounter,
       'joyCounter':this.joyCounter,
@@ -33,5 +36,21 @@ class PostModel{
     };
     return map;
   }
+  factory PostModel.fromSnapshot(DocumentSnapshot doc) {
 
+
+    return PostModel(
+      postUID: doc['postUID'],
+      date: doc['date'],
+      activityUID: doc['activityUID'].cast<String>(),
+      heartCounter: doc["heartCounter"],
+      brokenHeartCounter: doc['brokenHeartCounter'],
+      joyCounter: doc['joyCounter'],
+      sobCounter: doc['sobCounter'],
+      angryCounter: doc['angryCounter'],
+
+    );
+
+
+  }
 }

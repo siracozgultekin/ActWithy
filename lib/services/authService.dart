@@ -29,6 +29,8 @@ class AuthService{
         "registerDate": Timestamp.now(),
         "lastSeen": Timestamp.now(),
         "postCount": 0,
+        "lastPostID":"lastPostID",
+        "lastPostStamp":null,
       };
       print("Result: $result");
       await FirebaseFirestore.instance.collection('users').doc(uid).set(usermap)
