@@ -2,11 +2,11 @@ import 'package:actwithy/Models/UserModel.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:flutter/material.dart';
 
-class SearchPeoplePage extends SearchDelegate {
+class ParticipantSearchPage extends SearchDelegate {
 
   final String? hintText;
   final TextStyle? hintTextColor;
-  SearchPeoplePage({this.hintText,this.hintTextColor});
+  ParticipantSearchPage({this.hintText,this.hintTextColor});
   List<String> searchTerms= [
     'apple',
     'banana',

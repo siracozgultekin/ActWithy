@@ -1,5 +1,6 @@
 import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/pages/creatingPage.dart';
+import 'package:actwithy/pages/searchPage.dart';
 import 'package:actwithy/services/authService.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -48,6 +49,26 @@ class _HomePageState extends State<HomePage> {
           child: Center(
             child: Text(
               "Log Out",
+              style: TextStyle(color: Color(0xFF9AC6C5)),
+            ),
+          ),
+          style: ElevatedButton.styleFrom(
+            primary: Color(0xff4C6170),
+            shape: new RoundedRectangleBorder(
+              borderRadius: new BorderRadius.circular(30.0),
+            ),
+            minimumSize: Size(200, 35),
+          ),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            showSearch(context: context, delegate: SearchPage());
+
+
+          },
+          child: Center(
+            child: Text(
+              "Search",
               style: TextStyle(color: Color(0xFF9AC6C5)),
             ),
           ),

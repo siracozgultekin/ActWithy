@@ -1,7 +1,7 @@
 import 'package:actwithy/Models/ActivityModel.dart';
 import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
-import 'package:actwithy/pages/searchDelegatePage.dart';
+import 'package:actwithy/pages/participantSearchPage.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -287,7 +287,7 @@ class _CreatingPageState extends State<CreatingPage> {
                                           padding: EdgeInsets.only(left:8),
                                           constraints: BoxConstraints(),
                                           onPressed: (){
-                                         showSearch(context: context, delegate: SearchPeoplePage());
+                                         showSearch(context: context, delegate: ParticipantSearchPage());
                                       }, icon: Icon(Icons.person_add_alt_1_outlined)),
                                     ],
                                   ),
