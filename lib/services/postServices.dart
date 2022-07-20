@@ -49,5 +49,62 @@ CollectionReference activities = FirebaseFirestore.instance.collection('activiti
   }
 
 
+<<<<<<< Updated upstream
 
 }
+=======
+  Future<List<UserModel>> getFriendsProfiles(String search) async {
+    List<UserModel> models = [];
+    DocumentSnapshot myDoc = await users.doc(myId).get();
+    List<String> friendsList = myDoc["friends"].cast<String>(); //friend ids
+    String temp = "";
+    for(String friendID in friendsList){
+      DocumentSnapshot friendDoc = await users.doc(friendID).get();
+      temp = friendDoc['name'];
+      temp=temp.toLowerCase();
+
+      if(temp.contains(search)){
+        models.add(UserModel.fromSnapshot(friendDoc));
+      }
+    }
+    return models;
+  }
+
+  Future<bool> checkDailyPost()async{
+   bool result= false;
+   DocumentSnapshot dc= await users.doc(myId).get();
+   if(dc["lastPostStamp"]!= null && dc["lastPostStamp"].toDate().year== DateTime.now().year && dc["lastPostStamp"].toDate().month== DateTime.now().month && dc["lastPostStamp"].toDate().day== DateTime.now().day){
+      result = true;
+   }
+   return result;
+  }
+
+  Future<PostModel> getDailyPost()async{
+    DocumentSnapshot ds= await users.doc(myId).get();
+  String lastpostid= ds['lastPostID'];
+    DocumentSnapshot lp= await posts.doc(lastpostid).get();
+  return PostModel.fromSnapshot(lp);
+  }
+
+
+  Future<List<PostModel>> getFriendsPosts() async{
+    List<PostModel> postsList = [];
+    DocumentSnapshot myDoc = await users.doc(myId).get();
+    List<String> friendsList = myDoc["friends"].cast<String>(); //friend ids
+
+    for(String friendID in friendsList){
+      DocumentSnapshot friendDoc = await users.doc(friendID).get();
+      List<String> friendsPosts = friendDoc["posts"].cast<String>(); //friend's post ids
+      for (String postID in friendsPosts){
+        DocumentSnapshot postDoc = await posts.doc(postID).get();
+        postsList.add(PostModel.fromSnapshot(postDoc));
+      }
+    }
+    postsList.sort((a,b) => a.date.compareTo(b.date));
+    return postsList;
+  }
+
+
+ 
+}
+>>>>>>> Stashed changes
