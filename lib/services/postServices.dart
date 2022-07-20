@@ -50,4 +50,79 @@ CollectionReference activities = FirebaseFirestore.instance.collection('activiti
 
 
 
+<<<<<<< Updated upstream
 }
+=======
+  Future<List<UserModel>> getFriendsProfiles(String search) async {
+    List<UserModel> models = [];
+    DocumentSnapshot myDoc = await users.doc(myId).get();
+    List<String> friendsList = myDoc["friends"].cast<String>(); //friend ids
+    String temp = "";
+    for(String friendID in friendsList){
+      DocumentSnapshot friendDoc = await users.doc(friendID).get();
+      temp = friendDoc['name'];
+      temp=temp.toLowerCase();
+
+      if(temp.contains(search)){
+        models.add(UserModel.fromSnapshot(friendDoc));
+      }
+    }
+    return models;
+  }
+
+  Future<bool> checkDailyPost()async{
+   bool result= false;
+   DocumentSnapshot dc= await users.doc(myId).get();
+   if(dc["lastPostStamp"]!= null && dc["lastPostStamp"].toDate().year== DateTime.now().year && dc["lastPostStamp"].toDate().month== DateTime.now().month && dc["lastPostStamp"].toDate().day== DateTime.now().day){
+      result = true;
+   }
+   return result;
+  }
+
+  Future<PostModel> getDailyPost()async{
+   /*bool check = await checkDailyPost();
+   if(check){
+     return PostModel(postUID: "postUID", date: Timestamp.now(), activityUID: [], heartCounter: 0, brokenHeartCounter: 0, joyCounter: 0, sobCounter: 0, angryCounter: 0);
+   }*/
+    DocumentSnapshot ds= await users.doc(myId).get();
+  String lastpostid= ds['lastPostID'];
+    DocumentSnapshot lp= await posts.doc(lastpostid).get();
+  return PostModel.fromSnapshot(lp);
+  }
+ Future<List<ActivityModel>> getDailyActivities()async{
+   PostModel postModel = await getDailyPost();
+   List<String> actIDs = postModel.activityUID;
+   List<ActivityModel> activitiesList = [];
+   print("activitiesListYUKARI: ${activitiesList}");
+
+   for (String id in actIDs){
+
+     DocumentSnapshot  dc=await activities.doc(id).get();
+     print("id: ${dc["activityUID"]}");
+     activitiesList.add(ActivityModel.fromSnapshot(dc));
+   }
+   print("activitiesList: ${activitiesList}");
+
+return activitiesList;
+}
+
+  Future<List<PostModel>> getFriendsPosts() async{
+    List<PostModel> postsList = [];
+    DocumentSnapshot myDoc = await users.doc(myId).get();
+    List<String> friendsList = myDoc["friends"].cast<String>(); //friend ids
+
+    for(String friendID in friendsList){
+      DocumentSnapshot friendDoc = await users.doc(friendID).get();
+      List<String> friendsPosts = friendDoc["posts"].cast<String>(); //friend's post ids
+      for (String postID in friendsPosts){
+        DocumentSnapshot postDoc = await posts.doc(postID).get();
+        postsList.add(PostModel.fromSnapshot(postDoc));
+      }
+    }
+    postsList.sort((a,b) => a.date.compareTo(b.date));
+    return postsList;
+  }
+
+}
+
+>>>>>>> Stashed changes
