@@ -79,7 +79,10 @@ return returnID;
     return models;
   }
 
-
+  Future<void> addParticipant(ActivityModel activityModel, UserModel participant)async{
+    DocumentSnapshot doc = await activities.doc(activityModel.activityUID).get();
+    activities.doc(activityModel.activityUID).update({"participants" : doc["participants"] + [participant.userUID]});
+  }
 
   Future<List<UserModel>> getFriendsProfiles(String search) async {
     List<UserModel> models = [];
