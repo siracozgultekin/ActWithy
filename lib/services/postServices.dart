@@ -1,3 +1,4 @@
+
 import 'package:actwithy/Models/ActivityModel.dart';
 import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
@@ -61,23 +62,7 @@ return returnID;
    return PostModel.fromSnapshot(await posts.doc(id).get());
   }
 
-  Future<List<UserModel>> getAllProfiles(String search) async {
-    List<UserModel> models = [];
-    QuerySnapshot query = await users.where('name', isLessThanOrEqualTo: search + 'z').orderBy('name',descending: false).get();
-    String temp = "";
-    for(var doc in query.docs){
-      temp = doc['name'];
-      temp=temp.toLowerCase();
-      print('temp: $temp');
-      print('aranan kelime: $search');
 
-      if(temp.contains(search)){
-        print('iceriyor: $search');
-        models.add(UserModel.fromSnapshot(doc));
-      }
-    }
-    return models;
-  }
 
   Future<void> addParticipant(ActivityModel activityModel, UserModel participant)async{
     DocumentSnapshot doc = await activities.doc(activityModel.activityUID).get();
@@ -96,6 +81,7 @@ return returnID;
 
       if(temp.contains(search)){
         models.add(UserModel.fromSnapshot(friendDoc));
+
       }
     }
     return models;
@@ -111,15 +97,18 @@ return returnID;
   }
 
   Future<PostModel> getDailyPost()async{
+
    /*bool check = await checkDailyPost();
    if(check){
      return PostModel(postUID: "postUID", date: Timestamp.now(), activityUID: [], heartCounter: 0, brokenHeartCounter: 0, joyCounter: 0, sobCounter: 0, angryCounter: 0);
    }*/
+
     DocumentSnapshot ds= await users.doc(myId).get();
   String lastpostid= ds['lastPostID'];
     DocumentSnapshot lp= await posts.doc(lastpostid).get();
   return PostModel.fromSnapshot(lp);
   }
+
  Future<List<ActivityModel>> getDailyActivities()async{
    PostModel postModel = await getDailyPost();
    List<String> actIDs = postModel.activityUID;
@@ -155,4 +144,5 @@ return activitiesList;
   }
 
 }
+
 
