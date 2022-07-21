@@ -7,22 +7,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class CreatingPage extends StatefulWidget {
-
   PostModel postModel;
   CreatingPage({required this.postModel});
-<<<<<<< Updated upstream
-
-
-=======
   static List<UserModel> participants = [];
->>>>>>> Stashed changes
   @override
   State<CreatingPage> createState() => _CreatingPageState();
 }
 
 class _CreatingPageState extends State<CreatingPage> {
-
-  TextEditingController locationKey= TextEditingController();
   final controller = ScrollController();
   TextEditingController locationKey = TextEditingController();
   final searchController = TextEditingController();
@@ -79,14 +71,6 @@ class _CreatingPageState extends State<CreatingPage> {
           ),
         ),
       ),
-<<<<<<< Updated upstream
-      body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Column(
-=======
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -94,7 +78,6 @@ class _CreatingPageState extends State<CreatingPage> {
             Padding(
               padding: const EdgeInsets.only(top: 15.0),
               child: Column(
->>>>>>> Stashed changes
                 children: [
                   Text(
                     "Create",
@@ -108,11 +91,7 @@ class _CreatingPageState extends State<CreatingPage> {
                   ),
                   Container(
                     width: MediaQuery.of(context).size.width * 0.9,
-<<<<<<< Updated upstream
-                    height: MediaQuery.of(context).size.height * 0.39,
-=======
                     height: MediaQuery.of(context).size.height * 0.35,
->>>>>>> Stashed changes
                     decoration: BoxDecoration(
                         color: Color(0XFFD6E6F1),
                         borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -448,245 +427,6 @@ class _CreatingPageState extends State<CreatingPage> {
                   ),
                 ],
               ),
-<<<<<<< Updated upstream
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.035,
-              ),
-              Column(
-                children: [
-                  Text(
-                    "Create",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  Divider(
-                    thickness: 1,
-                    color: Colors.black,
-                    indent: MediaQuery.of(context).size.width * 0.4,
-                    endIndent: MediaQuery.of(context).size.width * 0.4,
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    height: MediaQuery.of(context).size.height * 0.3,
-                    decoration: BoxDecoration(
-                        color: Color(0XFFD6E6F1),
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                    child: SingleChildScrollView(
-                      physics: ClampingScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.25,
-                                        child: Text(
-                                          "Activity Type:",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        )),
-                                    SizedBox(
-                                        width: 200,
-                                        child: Center(
-                                          child: DropdownButton<String>(
-                                            value: selectedItem,
-                                            items: items
-                                                .map((item) => DropdownMenuItem(
-                                                    value: item,
-                                                    child: Text(
-                                                      item,
-                                                      style: TextStyle(
-                                                          fontSize: 15),
-                                                    )))
-                                                .toList(),
-                                            onChanged: (item) => setState(
-                                                () => selectedItem = item),
-                                          ),
-                                        )),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 8.0, bottom: 8.0),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.25,
-                                          child: Text(
-                                            "Time:",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold),
-                                          )),
-                                      Expanded(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              '${hours}:${minutes}',
-                                              style: TextStyle(fontSize: 15),
-                                            ),
-                                            IconButton(
-                                              onPressed: () async {
-                                                TimeOfDay? newTime =
-                                                    await showTimePicker(
-                                                  context: context,
-                                                  initialTime: time,
-                                                );
-                                                if (newTime == null) {
-                                                  return;
-                                                }
-                                                ;
-                                                setState(() => time = newTime);
-                                              },
-                                              icon: Icon(Icons.expand_more),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.25,
-                                        child: Text(
-                                          "Location:",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        )),
-                                    SizedBox(
-                                        height: 20,
-                                        width: 200,
-                                        child: TextFormField(
-                                          controller: locationKey,
-                                        )),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 15.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        "Participants",
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      IconButton(
-                                          padding: EdgeInsets.only(left: 8),
-                                          constraints: BoxConstraints(),
-                                          onPressed: (){
-                                         showSearch(context: context, delegate: ParticipantSearchPage());
-                                      }, icon: Icon(Icons.person_add_alt_1_outlined)),
-
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  color: Colors.red,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.7,
-                                  constraints: BoxConstraints(
-                                    minHeight:
-                                        MediaQuery.of(context).size.height *
-                                            0.1,
-                                    maxHeight:
-                                        MediaQuery.of(context).size.height *
-                                            0.4,
-                                  ),
-                                  child: ListView.builder(
-                                      itemCount: 3,
-                                      //itemCount: ActivityModel().participants.length,
-                                      itemBuilder: (context, index) => Column(
-                                            children: [
-                                              Container(
-                                                height: 30,
-                                                width: 200,
-                                                color: Colors.green,
-                                              ),
-                                              Divider(
-                                                height: 5,
-                                                thickness: 2,
-                                              ),
-                                            ],
-                                          )),
-                                ),
-                                Container(
-                                  // divider görevi gören widget.
-                                  color: Colors.black,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.7,
-                                  height: 5,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        bottom: 2, top: 2, left: 20, right: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        InkWell(
-                          onTap: () {},
-                          child: Text(
-                            "Clear",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, color: Colors.red),
-                          ),
-                        ),
-                        InkWell(
-
-                          onTap: () async {
-                            //ActivityModel activityObj= ActivityModel(activityType:selectedItem!, time:hoursANDminutes, location:locationKey.text,);
-                            //TODO bir tane activity varsa önce post oluştur.
-                            String ActId = await PostServices().createActivity(
-                                selectedItem!, myTimeStamp, locationKey.text);
-
-                            if (widget.postModel.postUID == "postUID") {
-                              //TODO Databasede yeni post oluşturmamız gerekiyor.
-                              widget.postModel =
-                                  await PostServices().createPost();
-                            }
-
-                            widget.postModel.activityUID.add(ActId);
-                            await PostServices().updatePost(widget.postModel);
-                            print("activity: ${widget.postModel.activityUID}");
-                            setState((){ length =newLength;});
-
-                          },
-                          child: Text(
-                            "Submit",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green[600]),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-=======
             ),
             SizedBox(
               height: MediaQuery.of(context).size.height * 0.035,
@@ -747,7 +487,6 @@ class _CreatingPageState extends State<CreatingPage> {
               ],
             ),
           ],
->>>>>>> Stashed changes
         ),
       ),
     );
@@ -893,25 +632,6 @@ class _CreatingPageState extends State<CreatingPage> {
             ));
   }
 
-<<<<<<< Updated upstream
-  Widget ListViewTile (ActivityModel activityObj) {
-
-    return Column(
-      children: [
-        Container(
-          child: Column(
-            children: [
-              Padding(
-                padding:
-                const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment:
-                        MainAxisAlignment
-                            .spaceBetween,
-=======
   Widget ListViewTile(ActivityModel activityObj) {
     return FutureBuilder(
         future: PostServices()
@@ -974,7 +694,6 @@ class _CreatingPageState extends State<CreatingPage> {
                         ),
                       ),
                       Row(
->>>>>>> Stashed changes
                         children: [
                           Row(
                             children: [
@@ -1010,9 +729,6 @@ class _CreatingPageState extends State<CreatingPage> {
                                     decoration: BoxDecoration(
                                       color: Colors.green,
                                       shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                        image: NetworkImage(participantList[1].ppURL),
-                                      ),
                                     ),
                                   ),
                                 ],

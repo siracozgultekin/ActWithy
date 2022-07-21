@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 class ParticipantSearchPage extends SearchDelegate {
 
+  static List<String> participants = [];
   final String? hintText;
   final TextStyle? hintTextColor;
   ParticipantSearchPage({this.hintText,this.hintTextColor});
@@ -15,6 +16,12 @@ class ParticipantSearchPage extends SearchDelegate {
     'watermelon',
     'strawberry'
   ];
+
+  List<String> getParticipants(){
+    List<String> returnList = participants;
+    participants =  [];
+    return returnList;
+  }
   @override
   ThemeData appBarTheme(BuildContext context) {
     return Theme.of(context).copyWith(
@@ -67,16 +74,12 @@ class ParticipantSearchPage extends SearchDelegate {
               itemBuilder: ((context, index) {
                 var result = snap.data[index] as UserModel;
                 return InkWell(
-<<<<<<< Updated upstream
-                  onTap: (){},
-=======
                   onTap: (){
                     CreatingPage.participants.add(result);
                     participants.add(result.userUID);
                     print(participants);
                     query = '';
                   },
->>>>>>> Stashed changes
                   child: Row(
                     children: [
                       Padding(

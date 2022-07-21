@@ -8,14 +8,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 class PostServices {
   String myId = FirebaseAuth.instance.currentUser!.uid;
-<<<<<<< Updated upstream
-CollectionReference users = FirebaseFirestore.instance.collection('users');
-CollectionReference posts = FirebaseFirestore.instance.collection('posts');
-CollectionReference activities = FirebaseFirestore.instance.collection('activities');
-
- Future<String> createActivity(String selectedItem, Timestamp time, String location) async{
-   /* await activities.add(model.createMap()).then((value) async {
-=======
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   CollectionReference posts = FirebaseFirestore.instance.collection('posts');
   CollectionReference activities =
@@ -24,7 +16,6 @@ CollectionReference activities = FirebaseFirestore.instance.collection('activiti
   Future<String> createActivity(String selectedItem, Timestamp time,
       String location, List<String> participants) async {
     /* await activities.add(model.createMap()).then((value) async {
->>>>>>> Stashed changes
      String postId = value.id;
      await activities.doc(postId).update({'activityUID': postId,});
      PostModel obj=PostModel(date:Timestamp.now(), activityUID:postId, heartCounter, brokenHeartCounter, joyCounter, sobCounter, angryCounter)
@@ -32,20 +23,6 @@ CollectionReference activities = FirebaseFirestore.instance.collection('activiti
      print('myID:$myId');
    });
    */
-<<<<<<< Updated upstream
-String returnID="";
-   await activities.add({
-    "activityType" : selectedItem,
-     "location" : location,
-     "time" : time,
-     //TODO participant parametresi oluşturup CreatingPage'den participants'a değer yolla.
-    // "participants" : participants,
-   }).then((value) async {
-     returnID=value.id;
-     await activities.doc(value.id).update({"activityUID":value.id});
-   });
-return returnID;
-=======
     String returnID = "";
     await activities.add({
       "activityType": selectedItem,
@@ -58,7 +35,6 @@ return returnID;
       await activities.doc(value.id).update({"activityUID": value.id});
     });
     return returnID;
->>>>>>> Stashed changes
   }
 
   Future<void> updatePost(PostModel postModel) async {
@@ -90,27 +66,6 @@ return returnID;
     return PostModel.fromSnapshot(await posts.doc(id).get());
   }
 
-<<<<<<< Updated upstream
-  Future<List<UserModel>> getAllProfiles(String search) async {
-    List<UserModel> models = [];
-    QuerySnapshot query = await users.where('name', isLessThanOrEqualTo: search + 'z').orderBy('name',descending: false).get();
-    String temp = "";
-    for(var doc in query.docs){
-      temp = doc['name'];
-      temp=temp.toLowerCase();
-      print('temp: $temp');
-      print('aranan kelime: $search');
-
-      if(temp.contains(search)){
-        print('iceriyor: $search');
-        models.add(UserModel.fromSnapshot(doc));
-      }
-    }
-    return models;
-  }
-
-
-=======
   Future<void> addParticipant(
       ActivityModel activityModel, UserModel participant) async {
     activityModel.participants.add(participant.userUID);
@@ -120,7 +75,6 @@ return returnID;
         .doc(activityModel.activityUID)
         .update({"participants": activityModel.participants});
   }
->>>>>>> Stashed changes
 
   Future<List<UserModel>> getFriendsProfiles(String search) async {
     List<UserModel> models = [];
@@ -188,12 +142,7 @@ return returnID;
     return activitiesList;
   }
 
-<<<<<<< Updated upstream
-
-  Future<List<PostModel>> getFriendsPosts() async{
-=======
   Future<List<PostModel>> getFriendsPosts() async {
->>>>>>> Stashed changes
     List<PostModel> postsList = [];
     DocumentSnapshot myDoc = await users.doc(myId).get();
     List<String> friendsList = myDoc["friends"].cast<String>(); //friend ids
@@ -210,47 +159,4 @@ return returnID;
     postsList.sort((a, b) => a.date.compareTo(b.date));
     return postsList;
   }
-<<<<<<< Updated upstream
-
-
- 
-
-  Future<List<UserModel>> getFriendsProfiles(String search) async {
-    List<UserModel> models = [];
-    QuerySnapshot query = await users.where('friends', arrayContains: myId ).get();
-    String temp = "";
-    for(var doc in query.docs){
-      temp = doc['name'];
-      temp=temp.toLowerCase();
-
-
-      if(temp.contains(search)){
-        models.add(UserModel.fromSnapshot(doc));
-      }
-    }
-    return models;
-  }
-
-  Future<bool> checkDailyPost()async{
-   bool result= false;
-   DocumentSnapshot dc= await users.doc(myId).get();
-   if(dc["lastPostStamp"]!= null && dc["lastPostStamp"].toDate().year== DateTime.now().year && dc["lastPostStamp"].toDate().month== DateTime.now().month && dc["lastPostStamp"].toDate().day== DateTime.now().day){
-      result = true;
-   }
-   return result;
-  }
-
-  Future<PostModel> getDailyPost()async{
-    DocumentSnapshot ds= await users.doc(myId).get();
-  String lastpostid= ds['lastPostID'];
-    DocumentSnapshot lp= await posts.doc(lastpostid).get();
-  return PostModel.fromSnapshot(lp);
-  }
-
-
- 
 }
-
-=======
-}
->>>>>>> Stashed changes
