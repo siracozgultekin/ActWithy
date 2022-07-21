@@ -14,7 +14,7 @@ CollectionReference users = FirebaseFirestore.instance.collection('users');
 CollectionReference posts = FirebaseFirestore.instance.collection('posts');
 CollectionReference activities = FirebaseFirestore.instance.collection('activities');
 
- Future<String> createActivity(String selectedItem, Timestamp time, String location) async{
+ Future<String> createActivity(String selectedItem, Timestamp time, String location, List<String> participants) async{
    /* await activities.add(model.createMap()).then((value) async {
      String postId = value.id;
      await activities.doc(postId).update({'activityUID': postId,});
@@ -23,13 +23,13 @@ CollectionReference activities = FirebaseFirestore.instance.collection('activiti
      print('myID:$myId');
    });
    */
-String returnID="";
+  String returnID="";
    await activities.add({
     "activityType" : selectedItem,
      "location" : location,
      "time" : time,
      //TODO participant parametresi oluşturup CreatingPage'den participants'a değer yolla.
-    // "participants" : participants,
+     "participants" : participants,
    }).then((value) async {
      returnID=value.id;
      await activities.doc(value.id).update({"activityUID":value.id});
@@ -65,8 +65,10 @@ return returnID;
 
 
   Future<void> addParticipant(ActivityModel activityModel, UserModel participant)async{
-    DocumentSnapshot doc = await activities.doc(activityModel.activityUID).get();
-    activities.doc(activityModel.activityUID).update({"participants" : doc["participants"] + [participant.userUID]});
+   activityModel.participants.add(participant.userUID);
+
+    //DocumentSnapshot doc = await activities.doc(activityModel.activityUID).get();
+    activities.doc(activityModel.activityUID).update({"participants" : activityModel.participants});
   }
 
   Future<List<UserModel>> getFriendsProfiles(String search) async {

@@ -5,14 +5,16 @@ class ActivityModel{
   String activityType;
   Timestamp time;
   String location;
-  // List<String> participants; //stores user uids
+  List<String> participants; //stores user uids
+
 
   ActivityModel(
       {required this.activityType,
      required this.activityUID,
     required  this.time,
      required this.location,
-        //  required this.participants
+      required this.participants
+
    });
 
 
@@ -22,7 +24,7 @@ class ActivityModel{
       'activityType':activityType,
       'time':this.time,
       'location':this.location,
-      //   'participants':this.participants
+  'participants':this.participants
     };
     return map;
   }
@@ -35,7 +37,8 @@ class ActivityModel{
      activityType: doc['activityType'],
      time: doc['time'],
      location: doc["location"],
-     //   participants: doc['participants'].cast<String>(),
+   participants: doc['participants'].cast<String>(),
+
 
    );
 }}
