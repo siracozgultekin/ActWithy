@@ -1,5 +1,10 @@
 import 'package:actwithy/Models/UserModel.dart';
+
+import 'package:actwithy/pages/profilePage.dart';
 import 'package:actwithy/services/postServices.dart';
+import 'package:actwithy/services/searchService.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 
 class SearchPage extends SearchDelegate {
@@ -7,13 +12,7 @@ class SearchPage extends SearchDelegate {
   final String? hintText;
   final TextStyle? hintTextColor;
   SearchPage({this.hintText,this.hintTextColor});
-  List<String> searchTerms= [
-    'apple',
-    'banana',
-    'pear',
-    'watermelon',
-    'strawberry'
-  ];
+
   @override
   ThemeData appBarTheme(BuildContext context) {
     return Theme.of(context).copyWith(
@@ -54,19 +53,29 @@ class SearchPage extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
+
+
     return FutureBuilder(
-      future: PostServices().getAllProfiles(query.toLowerCase()),
+      future: SearchService().getAllProfiles(query.toLowerCase()),
+
       builder: (context, AsyncSnapshot snap) {
         if(!snap.hasData){
           print("HATA");
           return CircularProgressIndicator(color: Colors.red,);
         } else {
           return ListView.builder(
+
+            //TODO current user görünmemeli
+            //TODO startsWith diyebiliriz
               itemCount: snap.data.length,
               itemBuilder: ((context, index) {
                 var result = snap.data[index] as UserModel;
+
                 return InkWell(
-                  onTap: (){},
+                  onTap: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage(user: result)));
+                  },
+
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -98,22 +107,7 @@ class SearchPage extends SearchDelegate {
                             ),
                           ],
                         ),
-                        ElevatedButton(
-                          onPressed: () {},
-                          child: Center(
-                            child: Text(
-                              "Arkadaş Ekle",
-                              style: TextStyle(color: Color(0xFF9AC6C5)),
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            primary: Color(0xff4C6170),
-                            shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0),
-                            ),
-                            minimumSize: Size(100, 35),
-                          ),
-                        ),
+
                       ],
                     ),
                   ),
@@ -131,7 +125,9 @@ class SearchPage extends SearchDelegate {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Container(
-          child: Text("Kişileri aramayı dene",textAlign:TextAlign.center ,style: TextStyle(fontSize: 17,color: Colors.grey),)),
+
+          child: Text("Try searcing people",textAlign:TextAlign.center ,style: TextStyle(fontSize: 17,color: Colors.grey),)),
+
     );
   }
 }
