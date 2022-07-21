@@ -81,11 +81,20 @@ return returnID;
 
       if(temp.contains(search)){
         models.add(UserModel.fromSnapshot(friendDoc));
-
       }
     }
     return models;
   }
+
+
+  //TODO profil sahibinin arkadaşlarını model olarak dönüştür
+  Future<List<UserModel>> getFriends (List<String> friends) async {
+    List<UserModel> models = [];
+
+    return models;
+
+  }
+
 
   Future<bool> checkDailyPost()async{
    bool result= false;
@@ -140,6 +149,19 @@ return activitiesList;
       }
     }
     postsList.sort((a,b) => a.date.compareTo(b.date));
+    return postsList;
+  }
+
+  Future<List<PostModel>> getMyPosts()async{
+    List<PostModel> postsList = [];
+    DocumentSnapshot myDoc = await users.doc(myId).get();
+    List<String> myPostIDs = myDoc["posts"].cast<String>();
+
+    for (String postID in myPostIDs){
+      DocumentSnapshot postDoc = await posts.doc(postID).get();
+      postsList.add(PostModel.fromSnapshot(postDoc));
+    }
+
     return postsList;
   }
 
