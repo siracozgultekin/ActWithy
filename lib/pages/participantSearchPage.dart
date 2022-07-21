@@ -1,4 +1,5 @@
 import 'package:actwithy/Models/UserModel.dart';
+import 'package:actwithy/pages/creatingPage.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:flutter/material.dart';
 
@@ -74,7 +75,7 @@ class ParticipantSearchPage extends SearchDelegate {
                 var result = snap.data[index] as UserModel;
                 return InkWell(
                   onTap: (){
-
+                    CreatingPage.participants.add(result);
                     participants.add(result.userUID);
                     print(participants);
                     query = '';
