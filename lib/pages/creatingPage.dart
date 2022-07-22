@@ -774,7 +774,7 @@ class _CreatingPageState extends State<CreatingPage> {
         });
   }
 
-  EditingPopUp(ActivityModel activityModel) {
+  EditingPopUp(ActivityModel activityModel) async {
     TimeOfDay time = TimeOfDay(hour: 12, minute: 30);
 
     var hours = time.hour.toString().padLeft(2, '0');
@@ -782,6 +782,8 @@ class _CreatingPageState extends State<CreatingPage> {
     String? selectedItem = activityModel.activityType;
 
     TextEditingController locationKey = TextEditingController();
+
+    List<UserModel> activityParticipants = await PostServices().getParticipants(activityModel);
 
     return showDialog(
         context: context,
@@ -792,7 +794,7 @@ class _CreatingPageState extends State<CreatingPage> {
               title: Text("Edit Activity",style: TextStyle(fontSize: 25, color: Color(0xFF2D3A43)),),
               content:Container(
                 width: MediaQuery.of(context).size.width * 0.7,
-                height: MediaQuery.of(context).size.height * 0.35,
+                height: MediaQuery.of(context).size.height * 0.5,
                 decoration: BoxDecoration(
                     color: Color(0XFFD6E6F1),
                     borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -927,7 +929,6 @@ class _CreatingPageState extends State<CreatingPage> {
                                             context: context,
                                             delegate:
                                             ParticipantSearchPage());
-                                        //setState((){CreatingPage.participants = CreatingPage.participants;});
                                       },
                                       icon: Icon(
                                           Icons.person_add_alt_1_outlined)),
@@ -953,8 +954,7 @@ class _CreatingPageState extends State<CreatingPage> {
                                 child: ListView.builder(
                                     shrinkWrap: true,
                                     itemCount:
-                                    CreatingPage.participants.length,
-                                    //itemCount: ActivityModel().participants.length,
+                                    activityParticipants.length,
                                     itemBuilder: (context, index) => Column(
                                       children: [
                                         Padding(
@@ -989,8 +989,7 @@ class _CreatingPageState extends State<CreatingPage> {
                                                         .size
                                                         .height *
                                                         0.05,
-                                                    decoration: CreatingPage
-                                                        .participants[
+                                                    decoration: activityParticipants[
                                                     index]
                                                         .ppURL ==
                                                         'ppURL'
@@ -1007,7 +1006,7 @@ class _CreatingPageState extends State<CreatingPage> {
                                                         fit: BoxFit
                                                             .cover,
                                                         image: NetworkImage(
-                                                            '${CreatingPage.participants[index].ppURL}'),
+                                                            activityParticipants[index].ppURL),
                                                       ),
                                                     ),
                                                   ),
@@ -1023,8 +1022,7 @@ class _CreatingPageState extends State<CreatingPage> {
                                                           AlignmentDirectional
                                                               .centerStart,
                                                           child: Text(
-                                                            CreatingPage
-                                                                .participants[
+                                                            activityParticipants[
                                                             index]
                                                                 .name,
                                                             style: TextStyle(
@@ -1041,17 +1039,12 @@ class _CreatingPageState extends State<CreatingPage> {
                                                           child:
                                                           InkWell(
                                                             onTap: () {
-                                                              ParticipantSearchPage
-                                                                  .participants
-                                                                  .remove(CreatingPage
-                                                                  .participants[index]
-                                                                  .userUID);
+                                                              activityModel.participants.removeAt(index);
                                                               setState(
                                                                       () {
-                                                                    CreatingPage
-                                                                        .participants
-                                                                        .removeAt(index);
+                                                                        activityParticipants.removeAt(index);
                                                                   });
+                                                              print(" kalan participantlar ${activityModel.participants} ve ${activityParticipants}");
                                                             },
                                                             child: Text(
                                                               "Cancel",
@@ -1085,12 +1078,21 @@ class _CreatingPageState extends State<CreatingPage> {
                     onTap: () {
                       Navigator.pop(context);
                     },
-                    child: Text("Cancel")),
+                    child: Text("Cancel ",style: TextStyle(fontSize: 20,
+                        color: Colors
+                            .red,
+                        fontWeight:
+                        FontWeight.w700),)),
                 InkWell(
                     onTap: () {
                       Navigator.pop(context);
                     },
-                    child: Text("Save")),
+                    child: Text(" Save",style: TextStyle(
+                      fontSize: 20,
+                        color: Colors
+                            .green,
+                        fontWeight:
+                        FontWeight.w700),)),
               ],
             );
           },
