@@ -2,6 +2,7 @@ import 'package:actwithy/Models/ActivityModel.dart';
 import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
 import 'package:actwithy/pages/participantSearchPage.dart';
+import 'package:actwithy/pages/profilePage.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -26,13 +27,7 @@ class _CreatingPageState extends State<CreatingPage> {
     'Yemek yiyecek(eliminen)'
   ];
   String? selectedItem = 'Seçiniz...';
-  List<String> searchT = [
-    'apple',
-    'banana',
-    'pear',
-    'watermelon',
-    'strawberry'
-  ];
+
   TimeOfDay time = TimeOfDay(hour: 12, minute: 30);
   String date = DateTime.now().toString().substring(0, 10);
   List<String> matchQuery = [];
@@ -492,129 +487,109 @@ class _CreatingPageState extends State<CreatingPage> {
     );
   }
 
-  EditingPopUp() {
+  ParticipantPopUp(List<UserModel> participantList) {
     return showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              contentPadding: EdgeInsets.all(10),
-              title: Text("Title"),
+              contentPadding: EdgeInsets.only(left: 10, right: 10),
+              title: Center(
+                  child: Text(
+                "Participants",
+                style: TextStyle(fontSize: 25, color: Color(0xFF2D3A43)),
+              )),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0))),
               content: Container(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("İşe gidiyor"),
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.all(0.0),
-                                      child: InkWell(
-                                          child:
-                                              Icon(Icons.watch_later_outlined)),
-                                    ),
-                                    Text("09.30"),
-                                  ],
-                                )
-                              ],
-                            ),
-                          ), // activity and clock
-                          // delete and edit icons
-                        ],
+                height: MediaQuery.of(context).size.height * 0.5,
+                width: MediaQuery.of(context).size.width * 0.7,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(
+                        height: 10,
                       ),
-                    ),
-                    Row(
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.location_on),
-                            SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.25,
-                                child: Text("Hacettepe Teknokent",
-                                    overflow: TextOverflow.ellipsis)),
-                          ],
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 8.0, right: 8.0),
-                          child: Row(
-                            children: [
-                              Container(
-                                height: 20,
-                                width: 20,
+                      ListView.builder(
+                        shrinkWrap: true,
+                        scrollDirection: Axis.vertical,
+                        physics: ClampingScrollPhysics(),
+                        itemCount: participantList.length,
+                        itemBuilder: (context, index) {
+                          UserModel user = participantList[index];
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+                            child: InkWell(
+                              onTap: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage(user: user,)));
+                              },
+                              child: Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.green,
-                                  shape: BoxShape.circle,
+
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: Color(0XFFD6E6F1),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 3.0, right: 3.0),
-                                child: Container(
-                                  height: 20,
-                                  width: 20,
-                                  decoration: BoxDecoration(
-                                    color: Colors.green,
-                                    shape: BoxShape.circle,
+                                child: Padding(
+                                  padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        height: 40,
+                                        width: 40,
+                                        decoration: BoxDecoration(
+                                          color: Colors.green,
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(
+                                            image: NetworkImage(user.ppURL),
+                                          ),
+                                        ),
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        10, 0, 5, 0),
+                                                child: Text(
+                                                  user.username,
+                                                  style: TextStyle(
+                                                      color: Color(0xFF2D3A43),
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 20),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        10, 0, 5, 0),
+                                                child: Text(
+                                                  "${user.name} ${user.surname}",
+                                                  style: TextStyle(
+                                                      color: Color(0xFF4C6170),
+                                                      fontSize: 15),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                              Container(
-                                height: 20,
-                                width: 20,
-                                decoration: BoxDecoration(
-                                  color: Colors.green,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("+2 kişi"),
-                            Row(
-                              children: [
-                                Container(
-                                  height: 5,
-                                  width: 5,
-                                  decoration: BoxDecoration(
-                                    color: Colors.black,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 2.0, right: 2),
-                                  child: Container(
-                                    height: 5,
-                                    width: 5,
-                                    decoration: BoxDecoration(
-                                      color: Colors.black,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  height: 5,
-                                  width: 5,
-                                  decoration: BoxDecoration(
-                                    color: Colors.black,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                              ],
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
               actions: [
@@ -622,12 +597,7 @@ class _CreatingPageState extends State<CreatingPage> {
                     onTap: () {
                       Navigator.pop(context);
                     },
-                    child: Text("Cancel")),
-                InkWell(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text("Save")),
+                    child: Text("Ok")),
               ],
             ));
   }
@@ -684,7 +654,7 @@ class _CreatingPageState extends State<CreatingPage> {
                                   child: InkWell(
                                     child: Icon(Icons.edit),
                                     onTap: () {
-                                      EditingPopUp();
+                                      EditingPopUp(activityObj);
                                     },
                                   ),
                                 ),
@@ -701,81 +671,97 @@ class _CreatingPageState extends State<CreatingPage> {
                               Text("${activityObj.location}"),
                             ],
                           ),
-                          if (activityObj.participants.length >= 1)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Container(
-                                height: 20,
-                                width: 20,
-                                decoration: BoxDecoration(
-                                  color: Colors.green,
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    image: NetworkImage(participantList[0].ppURL),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          if (activityObj.participants.length >= 2)
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                left: 4.0,
-                              ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    height: 20,
-                                    width: 20,
-                                    decoration: BoxDecoration(
-                                      color: Colors.green,
-                                      shape: BoxShape.circle,
+                          InkWell(
+                            onTap: () {
+                              ParticipantPopUp(participantList);
+
+                            },
+                            child: Row(
+                              children: [
+                                if (activityObj.participants.length >= 1)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: Container(
+                                      height: 20,
+                                      width: 20,
+                                      decoration: BoxDecoration(
+                                        color: Colors.green,
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                          image: NetworkImage(
+                                              participantList[0].ppURL),
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          if (activityObj.participants.length > 2)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("+${activityObj.participants.length - 2}"),
-                                  Row(
-                                    children: [
-                                      Container(
-                                        height: 5,
-                                        width: 5,
-                                        decoration: BoxDecoration(
-                                          color: Colors.black,
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 2.0, right: 2),
-                                        child: Container(
-                                          height: 5,
-                                          width: 5,
+                                if (activityObj.participants.length >= 2)
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 4.0,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          height: 20,
+                                          width: 20,
                                           decoration: BoxDecoration(
-                                            color: Colors.black,
-                                            shape: BoxShape.circle,
-                                          ),
+                                              color: Colors.green,
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                image: NetworkImage(
+                                                    participantList[1].ppURL),
+                                              )),
                                         ),
-                                      ),
-                                      Container(
-                                        height: 5,
-                                        width: 5,
-                                        decoration: BoxDecoration(
-                                          color: Colors.black,
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ],
-                              ),
+                                if (activityObj.participants.length > 2)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                            "+${activityObj.participants.length - 2}"),
+                                        Row(
+                                          children: [
+                                            Container(
+                                              height: 5,
+                                              width: 5,
+                                              decoration: BoxDecoration(
+                                                color: Colors.black,
+                                                shape: BoxShape.circle,
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 2.0, right: 2),
+                                              child: Container(
+                                                height: 5,
+                                                width: 5,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              ),
+                                            ),
+                                            Container(
+                                              height: 5,
+                                              width: 5,
+                                              decoration: BoxDecoration(
+                                                color: Colors.black,
+                                                shape: BoxShape.circle,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
                             ),
+                          ),
                         ],
                       ),
                     ],
@@ -786,5 +772,328 @@ class _CreatingPageState extends State<CreatingPage> {
             );
           }
         });
+  }
+
+  EditingPopUp(ActivityModel activityModel) {
+    TimeOfDay time = TimeOfDay(hour: 12, minute: 30);
+
+    var hours = time.hour.toString().padLeft(2, '0');
+    var minutes = time.minute.toString().padLeft(2, '0');
+    String? selectedItem = activityModel.activityType;
+
+    TextEditingController locationKey = TextEditingController();
+
+    return showDialog(
+        context: context,
+        builder: (context) => StatefulBuilder(
+          builder: (context,setState){
+            return AlertDialog(
+              contentPadding: EdgeInsets.all(10),
+              title: Text("Edit Activity",style: TextStyle(fontSize: 25, color: Color(0xFF2D3A43)),),
+              content:Container(
+                width: MediaQuery.of(context).size.width * 0.7,
+                height: MediaQuery.of(context).size.height * 0.35,
+                decoration: BoxDecoration(
+                    color: Color(0XFFD6E6F1),
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                child: SingleChildScrollView(
+                  physics: ClampingScrollPhysics(),
+                  scrollDirection: Axis.vertical,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                    width:
+                                    MediaQuery.of(context).size.width *
+                                        0.25,
+                                    child: Text(
+                                      "Activity Type:",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    )),
+                                SizedBox(
+                                    width: MediaQuery.of(context).size.width*0.38,
+                                    child: Center(
+                                      child: DropdownButton<String>(
+                                        isExpanded: true,
+                                        value: selectedItem,
+                                        items: items
+                                            .map((item) => DropdownMenuItem(
+                                            value: item,
+                                            child: Text(
+                                              item,
+                                              style: TextStyle(
+                                                  fontSize: 15),
+                                            )))
+                                            .toList(),
+                                        onChanged: (item) {
+                                          setState(
+                                                  () => selectedItem = item);
+                                        }
+
+                                        ,
+                                      ),
+                                    )),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 8.0, bottom: 8.0),
+                              child: Row(
+                                children: [
+                                  Container(
+                                      width: MediaQuery.of(context)
+                                          .size
+                                          .width *
+                                          0.25,
+                                      child: Text(
+                                        "Time:",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      )),
+                                  Expanded(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          '${hours}:${minutes}',
+                                          style: TextStyle(fontSize: 15),
+                                        ),
+                                        IconButton(
+                                          onPressed: () async {
+                                            TimeOfDay? newTime =
+                                            await showTimePicker(
+                                              context: context,
+                                              initialTime: time,
+                                            );
+                                            if (newTime == null) {
+                                              return;
+                                            }
+                                            ;
+                                            setState(() {time = newTime;
+                                            hours = time.hour.toString().padLeft(2, '0');
+                                            minutes = time.minute.toString().padLeft(2, '0');} );
+                                          },
+                                          icon: Icon(Icons.expand_more),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                Container(
+                                    width:
+                                    MediaQuery.of(context).size.width *
+                                        0.25,
+                                    child: Text(
+                                      "Location:",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    )),
+                                SizedBox(
+                                    height: 20,
+                                    width: 150,
+                                    child: TextFormField(
+                                      controller: locationKey..text = activityModel.location,
+                                      //initialValue: activityModel.location,
+                                    )),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 15.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Participants",
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  IconButton(
+                                      padding: EdgeInsets.only(left: 8),
+                                      constraints: BoxConstraints(),
+                                      onPressed: () {
+                                        showSearch(
+                                            context: context,
+                                            delegate:
+                                            ParticipantSearchPage());
+                                        //setState((){CreatingPage.participants = CreatingPage.participants;});
+                                      },
+                                      icon: Icon(
+                                          Icons.person_add_alt_1_outlined)),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              width:
+                              MediaQuery.of(context).size.width * 0.75,
+                              constraints: BoxConstraints(
+                                minHeight:
+                                MediaQuery.of(context).size.height *
+                                    0.1,
+                                maxHeight:
+                                MediaQuery.of(context).size.height *
+                                    0.4,
+                              ),
+                              decoration: BoxDecoration(
+                                  color: Color(0XFFD6E6F1),
+                                  borderRadius: BorderRadius.circular(15)),
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount:
+                                    CreatingPage.participants.length,
+                                    //itemCount: ActivityModel().participants.length,
+                                    itemBuilder: (context, index) => Column(
+                                      children: [
+                                        Padding(
+                                          padding:
+                                          const EdgeInsets.fromLTRB(
+                                              15, 10, 15, 0),
+                                          child: Container(
+                                            height:
+                                            MediaQuery.of(context)
+                                                .size
+                                                .height *
+                                                0.07,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                BorderRadius
+                                                    .circular(15),
+                                                color: Colors.white),
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                  const EdgeInsets
+                                                      .all(8.0),
+                                                  child: Container(
+                                                    height: MediaQuery.of(
+                                                        context)
+                                                        .size
+                                                        .height *
+                                                        0.05,
+                                                    width: MediaQuery.of(
+                                                        context)
+                                                        .size
+                                                        .height *
+                                                        0.05,
+                                                    decoration: CreatingPage
+                                                        .participants[
+                                                    index]
+                                                        .ppURL ==
+                                                        'ppURL'
+                                                        ? BoxDecoration(
+                                                        shape: BoxShape
+                                                            .circle,
+                                                        color: Colors
+                                                            .grey)
+                                                        : BoxDecoration(
+                                                      shape: BoxShape
+                                                          .circle,
+                                                      image:
+                                                      DecorationImage(
+                                                        fit: BoxFit
+                                                            .cover,
+                                                        image: NetworkImage(
+                                                            '${CreatingPage.participants[index].ppURL}'),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                    children: [
+                                                      Container(
+                                                          alignment:
+                                                          AlignmentDirectional
+                                                              .centerStart,
+                                                          child: Text(
+                                                            CreatingPage
+                                                                .participants[
+                                                            index]
+                                                                .name,
+                                                            style: TextStyle(
+                                                                fontSize:
+                                                                17,
+                                                                color: Colors
+                                                                    .black),
+                                                          )),
+                                                      Padding(
+                                                          padding: const EdgeInsets
+                                                              .only(
+                                                              right:
+                                                              8.0),
+                                                          child:
+                                                          InkWell(
+                                                            onTap: () {
+                                                              ParticipantSearchPage
+                                                                  .participants
+                                                                  .remove(CreatingPage
+                                                                  .participants[index]
+                                                                  .userUID);
+                                                              setState(
+                                                                      () {
+                                                                    CreatingPage
+                                                                        .participants
+                                                                        .removeAt(index);
+                                                                  });
+                                                            },
+                                                            child: Text(
+                                                              "Cancel",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .red,
+                                                                  fontWeight:
+                                                                  FontWeight.w700),
+                                                            ),
+                                                          )),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    )),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("Cancel")),
+                InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("Save")),
+              ],
+            );
+          },
+        ));
   }
 }

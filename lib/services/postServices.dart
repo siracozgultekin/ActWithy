@@ -1,3 +1,4 @@
+
 import 'package:actwithy/Models/ActivityModel.dart';
 import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
@@ -8,14 +9,16 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 class PostServices {
   String myId = FirebaseAuth.instance.currentUser!.uid;
+
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   CollectionReference posts = FirebaseFirestore.instance.collection('posts');
   CollectionReference activities =
-      FirebaseFirestore.instance.collection('activities');
+  FirebaseFirestore.instance.collection('activities');
 
   Future<String> createActivity(String selectedItem, Timestamp time,
       String location, List<String> participants) async {
     /* await activities.add(model.createMap()).then((value) async {
+
      String postId = value.id;
      await activities.doc(postId).update({'activityUID': postId,});
      PostModel obj=PostModel(date:Timestamp.now(), activityUID:postId, heartCounter, brokenHeartCounter, joyCounter, sobCounter, angryCounter)
@@ -23,6 +26,7 @@ class PostServices {
      print('myID:$myId');
    });
    */
+
     String returnID = "";
     await activities.add({
       "activityType": selectedItem,
@@ -35,6 +39,7 @@ class PostServices {
       await activities.doc(value.id).update({"activityUID": value.id});
     });
     return returnID;
+
   }
 
   Future<void> updatePost(PostModel postModel) async {
@@ -74,6 +79,7 @@ class PostServices {
     activities
         .doc(activityModel.activityUID)
         .update({"participants": activityModel.participants});
+
   }
 
   Future<List<UserModel>> getFriendsProfiles(String search) async {
@@ -93,13 +99,38 @@ class PostServices {
     return models;
   }
 
-  Future<bool> checkDailyPost() async {
-    bool result = false;
-    DocumentSnapshot dc = await users.doc(myId).get();
-    if (dc["lastPostStamp"] != null &&
-        dc["lastPostStamp"].toDate().year == DateTime.now().year &&
-        dc["lastPostStamp"].toDate().month == DateTime.now().month &&
-        dc["lastPostStamp"].toDate().day == DateTime.now().day) {
+
+  //TODO profil sahibinin arkadaşlarını model olarak dönüştür
+  Future<List<UserModel>> getFriends (List<String> friends) async {
+    List<UserModel> models = [];
+
+    for (String friendID in friends) {
+      models.add(UserModel.fromSnapshot(await users.doc(friendID).get()));
+    }
+
+    return models;
+
+  }
+
+  Future<List<PostModel>> getPosts(String profileID) async {
+
+    List<PostModel> post = [];
+    DocumentSnapshot dc = await users.doc(profileID).get();
+    List<String> postList = dc["posts"].cast<String>();
+
+    for (String postID in postList){
+      DocumentSnapshot postDoc = await posts.doc(postID).get();
+      post.add(PostModel.fromSnapshot(postDoc));
+    }
+    return post;
+
+  }
+
+
+  Future<bool> checkDailyPost()async{
+   bool result= false;
+   DocumentSnapshot dc= await users.doc(myId).get();
+   if(dc["lastPostStamp"]!= null && dc["lastPostStamp"].toDate().year== DateTime.now().year && dc["lastPostStamp"].toDate().month== DateTime.now().month && dc["lastPostStamp"].toDate().day== DateTime.now().day){
       result = true;
     }
     return result;
@@ -107,7 +138,8 @@ class PostServices {
 
   Future<PostModel> getDailyPost() async {
     bool check = await checkDailyPost();
-   if(check){
+
+   if(!check){
      return PostModel(postUID: "postUID", date: Timestamp.now(), activityUID: [], heartCounter: 0, brokenHeartCounter: 0, joyCounter: 0, sobCounter: 0, angryCounter: 0);
    }
 
@@ -149,12 +181,8 @@ class PostServices {
 
     for (String friendID in friendsList) {
       DocumentSnapshot friendDoc = await users.doc(friendID).get();
-<<<<<<< Updated upstream
-      List<String> friendsPosts =
-          friendDoc["posts"].cast<String>(); //friend's post ids
-=======
+
       List<String> friendsPosts = friendDoc["posts"].cast<String>(); //friend's post ids
->>>>>>> Stashed changes
       for (String postID in friendsPosts) {
         DocumentSnapshot postDoc = await posts.doc(postID).get();
         DenemeModel deneme = DenemeModel(post: PostModel.fromSnapshot(postDoc));
@@ -173,10 +201,7 @@ class PostServices {
     postsList.sort((a, b) => a.post.date.compareTo(b.post.date));
     return postsList;
   }
-<<<<<<< Updated upstream
-=======
-
-  Future<List<PostModel>> getMyPosts()async{
+Future<List<PostModel>> getMyPosts()async{
     List<PostModel> postsList = [];
     DocumentSnapshot myDoc = await users.doc(myId).get();
     List<String> myPostIDs = myDoc["posts"].cast<String>();
@@ -188,10 +213,11 @@ class PostServices {
 
     return postsList;
   }
+  
 Future<DocumentSnapshot> getMyDoc()async{
   DocumentSnapshot myDoc = await users.doc(myId).get();
   return myDoc;
->>>>>>> Stashed changes
+}
 }
 // Future<List<PostModel>> getMyFriendsPosts() async{
 //     List<PostModel> postList=[];
@@ -218,6 +244,29 @@ Future<DocumentSnapshot> getMyDoc()async{
     }
     return activityModels;
   }
+
+
+  
+
+  Future<List<UserModel>> getAllParticipants(List<String> actIDs) async {
+
+    List<UserModel> participants = [] ;
+
+    for (String id in actIDs) {
+      DocumentSnapshot actDoc = await activities.doc(id).get();
+      var actPartList = ActivityModel.fromSnapshot(actDoc).participants;
+
+      for (String part in actPartList) {
+        DocumentSnapshot partDoc = await users.doc(part).get();
+        participants.add(UserModel.fromSnapshot(partDoc));
+      }
+    }
+
+    return participants;
+
+  }
+
+
 }
 
 class DenemeModel {
