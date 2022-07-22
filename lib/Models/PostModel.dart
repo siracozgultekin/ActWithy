@@ -1,9 +1,11 @@
+import 'package:actwithy/Models/ActivityModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PostModel{
   String postUID;
   Timestamp date;
   List<String> activityUID;
+
   int heartCounter;
   int brokenHeartCounter;
   int joyCounter;
