@@ -104,7 +104,25 @@ class PostServices {
   Future<List<UserModel>> getFriends (List<String> friends) async {
     List<UserModel> models = [];
 
+    for (String friendID in friends) {
+      models.add(UserModel.fromSnapshot(await users.doc(friendID).get()));
+    }
+
     return models;
+
+  }
+
+  Future<List<PostModel>> getPosts(String profileID) async {
+
+    List<PostModel> post = [];
+    DocumentSnapshot dc = await users.doc(profileID).get();
+    List<String> postList = dc["posts"].cast<String>();
+
+    for (String postID in postList){
+      DocumentSnapshot postDoc = await posts.doc(postID).get();
+      post.add(PostModel.fromSnapshot(postDoc));
+    }
+    return post;
 
   }
 
@@ -185,5 +203,7 @@ class PostServices {
 
     return postsList;
   }
+
+
 
 }
