@@ -1,9 +1,11 @@
+import 'package:actwithy/Models/ActivityModel.dart';
 import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:actwithy/services/searchService.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ProfilePage extends StatefulWidget {
   final UserModel user;
@@ -42,6 +44,8 @@ class _ProfilePageState extends State<ProfilePage> {
   Color bgColor = Color(0xFFD6E6F1); //light blue
   Color appbarColor = Color(0xFF48B2FA); //neon blue
   Color textColor = Color(0xFF2D3A43);
+  NumberFormat formatter = new NumberFormat("00");
+  
   @override
   Widget build(BuildContext context) {
 
@@ -125,10 +129,10 @@ class _ProfilePageState extends State<ProfilePage> {
             top: MediaQuery.of(context).size.height*0.21,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Column(
+              child: Column( //TODO wrap with sized box
                 children: [
-                  Text('${user.name}', style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold, color: textColor),),
-                  Text('${user.surname}', style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold, color: textColor),),
+                  Text('${user.name}', style: TextStyle(fontSize: MediaQuery.of(context).size.width*0.036,fontWeight: FontWeight.bold, color: textColor),),
+                  Text('${user.surname}', style: TextStyle(fontSize: MediaQuery.of(context).size.width*0.036,fontWeight: FontWeight.bold, color: textColor),),
                 ],
               ),
             ),
@@ -158,7 +162,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   }
                 });
               },
-              child: Text(isMyPage? "Edit Profile":buttonText,style: TextStyle(color: negativeColor),),
+              child: Text(isMyPage? "Edit Profile":buttonText,style: TextStyle(color: negativeColor,fontSize: MediaQuery.of(context).size.width*0.028),),
               style: ElevatedButton.styleFrom(
                 primary: selectedColor,
                 shape: new RoundedRectangleBorder(
@@ -233,12 +237,14 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget ToDoWidget() {
+
+    String selectedPostID = user.lastPostID;
     return
 
       SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: FutureBuilder(
-            future: PostServices().getMyPosts(),
+            future: PostServices().getPosts(user.userUID),
           builder: (context, AsyncSnapshot snap) {
               if(!snap.hasData) {
                 return CircularProgressIndicator();
@@ -252,18 +258,32 @@ class _ProfilePageState extends State<ProfilePage> {
                       itemCount: snap.data.length,
                         itemBuilder: (context, index) {
                         PostModel post = snap.data[index] as PostModel;
-                        return Column(
-                          children: [
-                            Container(
-                              height: 65,
-                              width: 200,
-                              color: Colors.white38,
-                              child: Text(post.postUID),
-                            )
-                          ],
+
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              InkWell(
+                                onTap : (){
+                                  selectedPostID = post.postUID;
+                                  //TODO ikinci tap'ta postu kapat
+                                  //TODO aynı anda sadece bir tane post açık kalabilir
+                                  //TODO sayfaya ilk girişte mutlaka son post açık kalmalı
+                                },
+                                child:  Container(
+                                  decoration: BoxDecoration(
+                                    color: negativeColor,
+                                      borderRadius: BorderRadius.all(Radius.circular(25))
+                                  ),
+                                  width: MediaQuery.of(context).size.width*0.95,
+       /*TODO == yap   */                        child: selectedPostID!=post.postUID ?
+                                  OpenPost(post) : ClosedPost(post),
+                                ),
+                              )
+                            ],
+                          ),
                         );
                         },
-
                     ),
                   ],
                 );
@@ -316,6 +336,92 @@ class _ProfilePageState extends State<ProfilePage> {
     ;
   }
 
+  Widget OpenPost(PostModel post) {
+    var postDate = post.date.toDate();
+    var day = postDate.day;
+    var month = postDate.month;
+    var year = postDate.year;
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundImage: NetworkImage(user.ppURL),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text("@${user.username}",style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: textColor
+                                ),),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text("${user.name} ${user.surname}", style: TextStyle(
+                                    color: textColor
+                                ),),
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                  Text("${formatter.format(day)}/${formatter.format(month)}/${year}",style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: MediaQuery.of(context).size.width*0.04,
+                  ),),
+                ],
+              ),
+              Column(
+                //TODO get activities of the post
+                children: [
+
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget ClosedPost(PostModel post) {
+    var postDate = post.date.toDate();
+    int day = postDate.day;
+    var month = postDate.month;
+    var year = postDate.year;
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Icon(Icons.calendar_today, color: textColor, size: MediaQuery.of(context).size.width*0.1),
+          Text("${formatter.format(day)}-${formatter.format(month)}-${year}",
+            style: TextStyle(color: textColor,
+              fontWeight: FontWeight.bold,
+              fontSize: MediaQuery.of(context).size.width*0.045,
+            ), ),
+          //TODO iki kişiden fazlasını artı olarak göster
+        ],
+      ),
+    );
+  }
 
 }
 
