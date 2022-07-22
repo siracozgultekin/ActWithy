@@ -119,10 +119,10 @@ class PostServices {
   }
 
   Future<PostModel> getDailyPost() async {
-    /*bool check = await checkDailyPost();
-   if(check){
+    bool check = await checkDailyPost();
+   if(!check){
      return PostModel(postUID: "postUID", date: Timestamp.now(), activityUID: [], heartCounter: 0, brokenHeartCounter: 0, joyCounter: 0, sobCounter: 0, angryCounter: 0);
-   }*/
+   }
 
     DocumentSnapshot ds = await users.doc(myId).get();
     String lastpostid = ds['lastPostID'];
