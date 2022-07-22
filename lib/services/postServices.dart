@@ -204,6 +204,22 @@ class PostServices {
     return postsList;
   }
 
+  Future<List<UserModel>> getAllParticipants(List<String> actIDs) async {
 
+    List<UserModel> participants = [] ;
+
+    for (String id in actIDs) {
+      DocumentSnapshot actDoc = await activities.doc(id).get();
+      var actPartList = ActivityModel.fromSnapshot(actDoc).participants;
+
+      for (String part in actPartList) {
+        DocumentSnapshot partDoc = await users.doc(part).get();
+        participants.add(UserModel.fromSnapshot(partDoc));
+      }
+    }
+
+    return participants;
+
+  }
 
 }
