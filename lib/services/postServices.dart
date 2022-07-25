@@ -12,8 +12,7 @@ class PostServices {
 
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   CollectionReference posts = FirebaseFirestore.instance.collection('posts');
-  CollectionReference activities =
-  FirebaseFirestore.instance.collection('activities');
+  CollectionReference activities = FirebaseFirestore.instance.collection('activities');
 
   Future<String> createActivity(String selectedItem, Timestamp time,
       String location, List<String> participants) async {
@@ -213,12 +212,13 @@ Future<List<PostModel>> getMyPosts()async{
 
     return postsList;
   }
+
   
 Future<DocumentSnapshot> getMyDoc()async{
   DocumentSnapshot myDoc = await users.doc(myId).get();
   return myDoc;
 }
-}
+
 // Future<List<PostModel>> getMyFriendsPosts() async{
 //     List<PostModel> postList=[];
 //     DocumentSnapshot myDoc= await users.doc(myId).get();
@@ -246,7 +246,7 @@ Future<DocumentSnapshot> getMyDoc()async{
   }
 
 
-  
+
 
   Future<List<UserModel>> getAllParticipants(List<String> actIDs) async {
 
