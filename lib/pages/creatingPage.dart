@@ -1,6 +1,7 @@
 import 'package:actwithy/Models/ActivityModel.dart';
 import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
+import 'package:actwithy/pages/editParticipantSearchPage.dart';
 import 'package:actwithy/pages/participantSearchPage.dart';
 import 'package:actwithy/pages/profilePage.dart';
 import 'package:actwithy/services/postServices.dart';
@@ -210,9 +211,12 @@ class _CreatingPageState extends State<CreatingPage> {
                                           constraints: BoxConstraints(),
                                           onPressed: () {
                                             showSearch(
-                                                context: context,
-                                                delegate:
-                                                    ParticipantSearchPage());
+                                                    context: context,
+                                                    delegate:
+                                                        ParticipantSearchPage())
+                                                .then((value) {
+                                              setState(() {});
+                                            });
                                             //setState((){CreatingPage.participants = CreatingPage.participants;});
                                           },
                                           icon: Icon(
@@ -222,14 +226,14 @@ class _CreatingPageState extends State<CreatingPage> {
                                 ),
                                 Container(
                                   width:
-                                      MediaQuery.of(context).size.width * 0.75,
+                                      MediaQuery.of(context).size.width * 0.65,
                                   constraints: BoxConstraints(
                                     minHeight:
                                         MediaQuery.of(context).size.height *
                                             0.1,
-                                    maxHeight:
-                                        MediaQuery.of(context).size.height *
-                                            0.4,
+                                    // maxHeight:
+                                    //     MediaQuery.of(context).size.height *
+                                    //         0.4,
                                   ),
                                   decoration: BoxDecoration(
                                       color: Color(0XFFD6E6F1),
@@ -373,7 +377,15 @@ class _CreatingPageState extends State<CreatingPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         InkWell(
-                          onTap: () {},
+                          onTap: () {
+                            setState(() {
+                              selectedItem = 'Seçiniz...';
+                              locationKey.text = "";
+                              time = TimeOfDay(hour: 12, minute: 30);
+                              CreatingPage.participants = [];
+                              ParticipantSearchPage.participants = [];
+                            });
+                          },
                           child: Text(
                             "Clear",
                             style: TextStyle(
@@ -407,6 +419,9 @@ class _CreatingPageState extends State<CreatingPage> {
                             setState(() {
                               length = newLength;
                               CreatingPage.participants = [];
+                              selectedItem = 'Seçiniz...';
+                              locationKey.text = "";
+                              time = TimeOfDay(hour: 12, minute: 30);
                             });
                           },
                           child: Text(
@@ -519,17 +534,22 @@ class _CreatingPageState extends State<CreatingPage> {
                           return Padding(
                             padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                             child: InkWell(
-                              onTap: (){
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => ProfilePage(user: user,)));
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ProfilePage(
+                                              user: user,
+                                            )));
                               },
                               child: Container(
                                 decoration: BoxDecoration(
-
                                   borderRadius: BorderRadius.circular(12),
                                   color: Color(0XFFD6E6F1),
                                 ),
                                 child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(5, 5, 5, 5),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(5, 5, 5, 5),
                                   child: Row(
                                     children: [
                                       Container(
@@ -557,7 +577,8 @@ class _CreatingPageState extends State<CreatingPage> {
                                                   user.username,
                                                   style: TextStyle(
                                                       color: Color(0xFF2D3A43),
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                       fontSize: 20),
                                                 ),
                                               ),
@@ -597,7 +618,14 @@ class _CreatingPageState extends State<CreatingPage> {
                     onTap: () {
                       Navigator.pop(context);
                     },
-                    child: Text("Ok")),
+                    child: Text(
+                      "Ok",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Color(0xFF2D3A43),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )),
               ],
             ));
   }
@@ -647,14 +675,22 @@ class _CreatingPageState extends State<CreatingPage> {
                               children: [
                                 Container(
                                   padding: EdgeInsets.only(left: 10),
-                                  child: InkWell(child: Icon(Icons.close)),
+                                  child: InkWell(
+                                      onTap: () async{
+                                        widget.postModel.activityUID.remove(activityObj.activityUID);
+                                        await PostServices().updatePost(widget.postModel).then((value) {
+                                          setState(() {});
+                                        });
+                                      }, child: Icon(Icons.close)),
                                 ),
                                 Container(
                                   padding: EdgeInsets.all(0.0),
                                   child: InkWell(
                                     child: Icon(Icons.edit),
                                     onTap: () {
-                                      EditingPopUp(activityObj);
+                                      EditingPopUp(activityObj).then((value) {
+                                        setState(() {});
+                                      });
                                     },
                                   ),
                                 ),
@@ -674,7 +710,6 @@ class _CreatingPageState extends State<CreatingPage> {
                           InkWell(
                             onTap: () {
                               ParticipantPopUp(participantList);
-
                             },
                             child: Row(
                               children: [
@@ -775,327 +810,384 @@ class _CreatingPageState extends State<CreatingPage> {
   }
 
   EditingPopUp(ActivityModel activityModel) async {
-    TimeOfDay time = TimeOfDay(hour: 12, minute: 30);
+    DateTime activityTime = activityModel.time.toDate();
+    TimeOfDay time =
+        TimeOfDay(hour: activityTime.hour, minute: activityTime.minute);
 
     var hours = time.hour.toString().padLeft(2, '0');
     var minutes = time.minute.toString().padLeft(2, '0');
+
     String? selectedItem = activityModel.activityType;
 
-    TextEditingController locationKey = TextEditingController();
+    TextEditingController locationKey =
+        TextEditingController(text: activityModel.location);
 
-    List<UserModel> activityParticipants = await PostServices().getParticipants(activityModel);
+    List<UserModel> activityParticipants =
+        await PostServices().getParticipants(activityModel);
 
     return showDialog(
         context: context,
         builder: (context) => StatefulBuilder(
-          builder: (context,setState){
-            return AlertDialog(
-              contentPadding: EdgeInsets.all(10),
-              title: Text("Edit Activity",style: TextStyle(fontSize: 25, color: Color(0xFF2D3A43)),),
-              content:Container(
-                width: MediaQuery.of(context).size.width * 0.7,
-                height: MediaQuery.of(context).size.height * 0.5,
-                decoration: BoxDecoration(
-                    color: Color(0XFFD6E6F1),
-                    borderRadius: BorderRadius.all(Radius.circular(10))),
-                child: SingleChildScrollView(
-                  physics: ClampingScrollPhysics(),
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Row(
+              builder: (context, setState) {
+                return AlertDialog(
+                  contentPadding: EdgeInsets.all(10),
+                  title: Text(
+                    "Edit Activity",
+                    style: TextStyle(fontSize: 25, color: Color(0xFF2D3A43)),
+                  ),
+                  content: Container(
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    height: MediaQuery.of(context).size.height * 0.5,
+                    decoration: BoxDecoration(
+                        color: Color(0XFFD6E6F1),
+                        borderRadius: BorderRadius.all(Radius.circular(10))),
+                    child: SingleChildScrollView(
+                      physics: ClampingScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
                               children: [
-                                Container(
-                                    width:
-                                    MediaQuery.of(context).size.width *
-                                        0.25,
-                                    child: Text(
-                                      "Activity Type:",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    )),
-                                SizedBox(
-                                    width: MediaQuery.of(context).size.width*0.38,
-                                    child: Center(
-                                      child: DropdownButton<String>(
-                                        isExpanded: true,
-                                        value: selectedItem,
-                                        items: items
-                                            .map((item) => DropdownMenuItem(
-                                            value: item,
-                                            child: Text(
-                                              item,
-                                              style: TextStyle(
-                                                  fontSize: 15),
-                                            )))
-                                            .toList(),
-                                        onChanged: (item) {
-                                          setState(
+                                Row(
+                                  children: [
+                                    Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.25,
+                                        child: Text(
+                                          "Activity Type:",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        )),
+                                    SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.38,
+                                        child: Center(
+                                          child: DropdownButton<String>(
+                                            isExpanded: true,
+                                            value: selectedItem,
+                                            items: items
+                                                .map((item) => DropdownMenuItem(
+                                                    value: item,
+                                                    child: Text(
+                                                      item,
+                                                      style: TextStyle(
+                                                          fontSize: 15),
+                                                    )))
+                                                .toList(),
+                                            onChanged: (item) {
+                                              setState(
                                                   () => selectedItem = item);
-                                        }
-
-                                        ,
+                                            },
+                                          ),
+                                        )),
+                                  ],
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 8.0, bottom: 8.0),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.25,
+                                          child: Text(
+                                            "Time:",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          )),
+                                      Expanded(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              '${hours}:${minutes}',
+                                              style: TextStyle(fontSize: 15),
+                                            ),
+                                            IconButton(
+                                              onPressed: () async {
+                                                TimeOfDay? newTime =
+                                                    await showTimePicker(
+                                                  context: context,
+                                                  initialTime: time,
+                                                );
+                                                if (newTime == null) {
+                                                  return;
+                                                }
+                                                setState(() {
+                                                  time = newTime;
+                                                  hours = time.hour
+                                                      .toString()
+                                                      .padLeft(2, '0');
+                                                  minutes = time.minute
+                                                      .toString()
+                                                      .padLeft(2, '0');
+                                                });
+                                              },
+                                              icon: Icon(Icons.expand_more),
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                    )),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 8.0, bottom: 8.0),
-                              child: Row(
-                                children: [
-                                  Container(
-                                      width: MediaQuery.of(context)
-                                          .size
-                                          .width *
-                                          0.25,
-                                      child: Text(
-                                        "Time:",
+                                    ],
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.25,
+                                        child: Text(
+                                          "Location:",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        )),
+                                    SizedBox(
+                                        height: 20,
+                                        width: 150,
+                                        child: TextFormField(
+                                          controller: locationKey,
+                                          //initialValue: activityModel.location,
+                                        )),
+                                  ],
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 15.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "Participants",
                                         style: TextStyle(
+                                            fontSize: 20,
                                             fontWeight: FontWeight.bold),
-                                      )),
-                                  Expanded(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          '${hours}:${minutes}',
-                                          style: TextStyle(fontSize: 15),
-                                        ),
-                                        IconButton(
-                                          onPressed: () async {
-                                            TimeOfDay? newTime =
-                                            await showTimePicker(
-                                              context: context,
-                                              initialTime: time,
-                                            );
-                                            if (newTime == null) {
-                                              return;
-                                            }
-                                            ;
-                                            setState(() {time = newTime;
-                                            hours = time.hour.toString().padLeft(2, '0');
-                                            minutes = time.minute.toString().padLeft(2, '0');} );
+                                      ),
+                                      IconButton(
+                                          padding: EdgeInsets.only(left: 8),
+                                          constraints: BoxConstraints(),
+                                          onPressed: () {
+                                            EditParticipantSearchPage
+                                                editSearch =
+                                                EditParticipantSearchPage(
+                                                    participantsObj:
+                                                        activityParticipants,
+                                                    participantsString:
+                                                        activityModel
+                                                            .participants);
+                                            showSearch(
+                                                    context: context,
+                                                    delegate: editSearch)
+                                                .then((value) {
+                                              setState(() {});
+                                            });
+
+                                            activityModel.participants =
+                                                editSearch
+                                                    .getParticipantsString();
+                                            setState(() {
+                                              activityParticipants = editSearch
+                                                  .getParticipantsObj();
+                                            });
+                                            print(
+                                                "editlenen participantlar: ${activityModel.participants}");
                                           },
-                                          icon: Icon(Icons.expand_more),
-                                        ),
-                                      ],
-                                    ),
+                                          icon: Icon(
+                                              Icons.person_add_alt_1_outlined)),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ),
-                            Row(
-                              children: [
+                                ),
                                 Container(
-                                    width:
-                                    MediaQuery.of(context).size.width *
-                                        0.25,
-                                    child: Text(
-                                      "Location:",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    )),
-                                SizedBox(
-                                    height: 20,
-                                    width: 150,
-                                    child: TextFormField(
-                                      controller: locationKey..text = activityModel.location,
-                                      //initialValue: activityModel.location,
-                                    )),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 15.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Participants",
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold),
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.6,
+                                  constraints: BoxConstraints(
+                                    minHeight:
+                                        MediaQuery.of(context).size.height *
+                                            0.1,
+                                    // maxHeight:
+                                    // MediaQuery.of(context).size.height *
+                                    //     0.4,
                                   ),
-                                  IconButton(
-                                      padding: EdgeInsets.only(left: 8),
-                                      constraints: BoxConstraints(),
-                                      onPressed: () {
-                                        showSearch(
-                                            context: context,
-                                            delegate:
-                                            ParticipantSearchPage());
-                                      },
-                                      icon: Icon(
-                                          Icons.person_add_alt_1_outlined)),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              width:
-                              MediaQuery.of(context).size.width * 0.75,
-                              constraints: BoxConstraints(
-                                minHeight:
-                                MediaQuery.of(context).size.height *
-                                    0.1,
-                                maxHeight:
-                                MediaQuery.of(context).size.height *
-                                    0.4,
-                              ),
-                              decoration: BoxDecoration(
-                                  color: Color(0XFFD6E6F1),
-                                  borderRadius: BorderRadius.circular(15)),
-                              child: Padding(
-                                padding: const EdgeInsets.only(bottom: 8.0),
-                                child: ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount:
-                                    activityParticipants.length,
-                                    itemBuilder: (context, index) => Column(
-                                      children: [
-                                        Padding(
-                                          padding:
-                                          const EdgeInsets.fromLTRB(
-                                              15, 10, 15, 0),
-                                          child: Container(
-                                            height:
-                                            MediaQuery.of(context)
-                                                .size
-                                                .height *
-                                                0.07,
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                BorderRadius
-                                                    .circular(15),
-                                                color: Colors.white),
-                                            child: Row(
+                                  decoration: BoxDecoration(
+                                      color: Color(0XFFD6E6F1),
+                                      borderRadius: BorderRadius.circular(15)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(bottom: 8.0),
+                                    child: ListView.builder(
+                                        shrinkWrap: true,
+                                        itemCount: activityParticipants.length,
+                                        itemBuilder: (context, index) => Column(
                                               children: [
                                                 Padding(
                                                   padding:
-                                                  const EdgeInsets
-                                                      .all(8.0),
+                                                      const EdgeInsets.fromLTRB(
+                                                          0, 10, 0, 0),
                                                   child: Container(
-                                                    height: MediaQuery.of(
-                                                        context)
-                                                        .size
-                                                        .height *
-                                                        0.05,
-                                                    width: MediaQuery.of(
-                                                        context)
-                                                        .size
-                                                        .height *
-                                                        0.05,
-                                                    decoration: activityParticipants[
-                                                    index]
-                                                        .ppURL ==
-                                                        'ppURL'
-                                                        ? BoxDecoration(
-                                                        shape: BoxShape
-                                                            .circle,
-                                                        color: Colors
-                                                            .grey)
-                                                        : BoxDecoration(
-                                                      shape: BoxShape
-                                                          .circle,
-                                                      image:
-                                                      DecorationImage(
-                                                        fit: BoxFit
-                                                            .cover,
-                                                        image: NetworkImage(
-                                                            activityParticipants[index].ppURL),
-                                                      ),
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.5,
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.07,
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(15),
+                                                        color: Colors.white),
+                                                    child: Row(
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(8.0),
+                                                          child: Container(
+                                                            height: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .height *
+                                                                0.05,
+                                                            width: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .height *
+                                                                0.05,
+                                                            decoration: activityParticipants[
+                                                                            index]
+                                                                        .ppURL ==
+                                                                    'ppURL'
+                                                                ? BoxDecoration(
+                                                                    shape: BoxShape
+                                                                        .circle,
+                                                                    color: Colors
+                                                                        .grey)
+                                                                : BoxDecoration(
+                                                                    shape: BoxShape
+                                                                        .circle,
+                                                                    image:
+                                                                        DecorationImage(
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                      image: NetworkImage(
+                                                                          activityParticipants[index]
+                                                                              .ppURL),
+                                                                    ),
+                                                                  ),
+                                                          ),
+                                                        ),
+                                                        Expanded(
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              Container(
+                                                                  alignment:
+                                                                      AlignmentDirectional
+                                                                          .centerStart,
+                                                                  child: Text(
+                                                                    activityParticipants[
+                                                                            index]
+                                                                        .name,
+                                                                    style: TextStyle(
+                                                                        fontSize:
+                                                                            17,
+                                                                        color: Colors
+                                                                            .black),
+                                                                  )),
+                                                              Padding(
+                                                                  padding: const EdgeInsets
+                                                                          .only(
+                                                                      right:
+                                                                          8.0),
+                                                                  child:
+                                                                      InkWell(
+                                                                    onTap: () {
+                                                                      activityModel
+                                                                          .participants
+                                                                          .removeAt(
+                                                                              index);
+                                                                      setState(
+                                                                          () {
+                                                                        activityParticipants
+                                                                            .removeAt(index);
+                                                                      });
+                                                                      print(
+                                                                          " kalan participantlar ${activityModel.participants} ve ${activityParticipants}");
+                                                                    },
+                                                                    child: Text(
+                                                                      "Cancel",
+                                                                      style: TextStyle(
+                                                                          color: Colors
+                                                                              .red,
+                                                                          fontWeight:
+                                                                              FontWeight.w700),
+                                                                    ),
+                                                                  )),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
                                                 ),
-                                                Expanded(
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                    children: [
-                                                      Container(
-                                                          alignment:
-                                                          AlignmentDirectional
-                                                              .centerStart,
-                                                          child: Text(
-                                                            activityParticipants[
-                                                            index]
-                                                                .name,
-                                                            style: TextStyle(
-                                                                fontSize:
-                                                                17,
-                                                                color: Colors
-                                                                    .black),
-                                                          )),
-                                                      Padding(
-                                                          padding: const EdgeInsets
-                                                              .only(
-                                                              right:
-                                                              8.0),
-                                                          child:
-                                                          InkWell(
-                                                            onTap: () {
-                                                              activityModel.participants.removeAt(index);
-                                                              setState(
-                                                                      () {
-                                                                        activityParticipants.removeAt(index);
-                                                                  });
-                                                              print(" kalan participantlar ${activityModel.participants} ve ${activityParticipants}");
-                                                            },
-                                                            child: Text(
-                                                              "Cancel",
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .red,
-                                                                  fontWeight:
-                                                                  FontWeight.w700),
-                                                            ),
-                                                          )),
-                                                    ],
-                                                  ),
-                                                ),
                                               ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    )),
-                              ),
+                                            )),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-              actions: [
-                InkWell(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text("Cancel ",style: TextStyle(fontSize: 20,
-                        color: Colors
-                            .red,
-                        fontWeight:
-                        FontWeight.w700),)),
-                InkWell(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text(" Save",style: TextStyle(
-                      fontSize: 20,
-                        color: Colors
-                            .green,
-                        fontWeight:
-                        FontWeight.w700),)),
-              ],
-            );
-          },
-        ));
+                  actions: [
+                    InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "Cancel ",
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.red,
+                              fontWeight: FontWeight.w700),
+                        )),
+                    InkWell(
+                        onTap: () async {
+                          hours = time.hour.toString().padLeft(2, '0');
+                          minutes = time.minute.toString().padLeft(2, '0');
+                          DateTime times =
+                              DateTime.parse('${date}T$hours:$minutes');
+                          Timestamp myTimeStamp = Timestamp.fromDate(times);
+                          print(
+                              "modelin kalan participantları: ${activityModel.participants}");
+                          activityModel.activityType = selectedItem!;
+                          activityModel.location = locationKey.text;
+                          activityModel.time = myTimeStamp;
+                          await PostServices().updateActivity(activityModel);
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          " Save",
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.green,
+                              fontWeight: FontWeight.w700),
+                        )),
+                  ],
+                );
+              },
+            ));
   }
 }
