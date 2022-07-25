@@ -12,8 +12,7 @@ class PostServices {
 
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   CollectionReference posts = FirebaseFirestore.instance.collection('posts');
-  CollectionReference activities =
-  FirebaseFirestore.instance.collection('activities');
+  CollectionReference activities = FirebaseFirestore.instance.collection('activities');
 
   Future<String> createActivity(String selectedItem, Timestamp time,
       String location, List<String> participants) async {
@@ -203,6 +202,43 @@ class PostServices {
 
     return postsList;
   }
+<<<<<<< Updated upstream
+=======
+  
+Future<DocumentSnapshot> getMyDoc()async{
+  DocumentSnapshot myDoc = await users.doc(myId).get();
+  return myDoc;
+}
+
+// Future<List<PostModel>> getMyFriendsPosts() async{
+//     List<PostModel> postList=[];
+//     DocumentSnapshot myDoc= await users.doc(myId).get();
+//     List<String> myFriendsList= myDoc["Friends"].cast<String>();
+//     for(String myFriendID in myFriendsList){
+//       DocumentSnapshot myFriendDoc= await users.doc(myFriendID).get();
+//      List<String> myFriendPostsList= myFriendDoc["posts"].cast<String>();
+//      for(String myFriendPostID in myFriendPostsList){
+//        DocumentSnapshot MyFriendPost= await posts.doc("myFriendPostID").get();
+//        postList.add(PostModel.fromSnapshot(MyFriendPost));
+//      }
+//
+//     }
+//     postList.sort((a, b) => a.date.compareTo(b.date));
+//     return postList;
+// }
+  Future<List<ActivityModel>> getActivities(List<String> activityIDs) async {
+    List<ActivityModel> activityModels = [];
+
+    for ( String id in activityIDs) {
+      DocumentSnapshot dc = await activities.doc(id).get();
+      activityModels.add(ActivityModel.fromSnapshot(dc));
+    }
+    return activityModels;
+  }
+
+
+  
+>>>>>>> Stashed changes
 
   Future<List<UserModel>> getAllParticipants(List<String> actIDs) async {
 
