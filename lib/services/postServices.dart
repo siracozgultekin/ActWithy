@@ -115,9 +115,10 @@ class PostServices {
 
     List<PostModel> post = [];
     DocumentSnapshot dc = await users.doc(profileID).get();
+
     List<String> postList = dc["posts"].cast<String>();
 
-    for (String postID in postList){
+    for (String postID in postList.reversed){
       DocumentSnapshot postDoc = await posts.doc(postID).get();
       post.add(PostModel.fromSnapshot(postDoc));
     }
@@ -258,15 +259,16 @@ Future<DocumentSnapshot> getMyDoc()async{
 
       for (String part in actPartList) {
         DocumentSnapshot partDoc = await users.doc(part).get();
-        participants.add(UserModel.fromSnapshot(partDoc));
+        UserModel user = UserModel.fromSnapshot(partDoc);
+        if(!participants.contains(user.userUID)) {
+          participants.add(user);
+
+        }
       }
     }
-
     return participants;
 
   }
-
-
 }
 
 class DenemeModel {
