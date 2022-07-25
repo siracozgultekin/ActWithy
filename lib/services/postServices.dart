@@ -44,6 +44,9 @@ class PostServices {
   Future<void> updatePost(PostModel postModel) async {
     await posts.doc(postModel.postUID).set(postModel.createMap());
   }
+  Future<void> updateActivity(ActivityModel activityModel) async {
+    await activities.doc(activityModel.activityUID).set(activityModel.createMap());
+  }
 
   Future<PostModel> createPost() async {
     String id = "";
