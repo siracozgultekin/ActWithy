@@ -148,7 +148,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 if(isMyPage) {
                   ///TODO editle profili
                   //UserModel userModel = UserModel.fromSnapshot(await FirebaseFirestore.instance.collection('users').doc(user.userUID).get()) as UserModel;
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfilePage(userModel: user,)));
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=> EditProfilePage(userModel: user))).then((value) {setState((){});});
+                  //Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfilePage(userModel: user,)));
                 }else if (!isMyPage && isMyFriend) {
                   await SearchService().removeFriend(user.userUID);
                 }else if (!isMyPage && !isMyFriend) {

@@ -274,6 +274,19 @@ Future<DocumentSnapshot> getMyDoc()async{
     return participants;
 
   }
+
+  Future<void> editProfile(String name, String surname, String bio) async {
+
+    await users.doc(myId).update({
+      'name': name, 'surname':surname, 'bio':bio
+    });
+
+  }
+
+  Future<UserModel> returnUser(String uid) async {
+    return UserModel.fromSnapshot(await users.doc(uid).get());
+  }
+
 }
 
 class DenemeModel {
