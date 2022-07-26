@@ -83,8 +83,9 @@ class _DrawerPageState extends State<DrawerPage> {
                                   child: Text(
                                     "@${widget.userProf.username}",
                                     style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold
+
                                     ),
                                   ),
                                 ),
@@ -197,4 +198,4 @@ class _DrawerPageState extends State<DrawerPage> {
       ),
     );
   }
-}
+

@@ -199,7 +199,7 @@ class PostServices {
         }
        // deneme.setActivities(md);
         DenemeModel deneme = DenemeModel(userObj:UserModel.fromSnapshot(friendDoc) ,activitiesList: md,postObj: PostModel.fromSnapshot(postDoc));
-        md.clear();
+        md=[];
         postsList.add(deneme);
       }
     }
