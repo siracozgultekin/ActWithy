@@ -12,8 +12,7 @@ class PostServices {
 
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   CollectionReference posts = FirebaseFirestore.instance.collection('posts');
-  CollectionReference activities =
-  FirebaseFirestore.instance.collection('activities');
+  CollectionReference activities = FirebaseFirestore.instance.collection('activities');
 
   Future<String> createActivity(String selectedItem, Timestamp time,
       String location, List<String> participants) async {
@@ -107,7 +106,26 @@ class PostServices {
   Future<List<UserModel>> getFriends (List<String> friends) async {
     List<UserModel> models = [];
 
+    for (String friendID in friends) {
+      models.add(UserModel.fromSnapshot(await users.doc(friendID).get()));
+    }
+
     return models;
+
+  }
+
+  Future<List<PostModel>> getPosts(String profileID) async {
+
+    List<PostModel> post = [];
+    DocumentSnapshot dc = await users.doc(profileID).get();
+
+    List<String> postList = dc["posts"].cast<String>();
+
+    for (String postID in postList.reversed){
+      DocumentSnapshot postDoc = await posts.doc(postID).get();
+      post.add(PostModel.fromSnapshot(postDoc));
+    }
+    return post;
 
   }
 
@@ -123,6 +141,7 @@ class PostServices {
 
   Future<PostModel> getDailyPost() async {
     bool check = await checkDailyPost();
+
    if(!check){
      return PostModel(postUID: "postUID", date: Timestamp.now(), activityUID: [], heartCounter: 0, brokenHeartCounter: 0, joyCounter: 0, sobCounter: 0, angryCounter: 0);
    }
@@ -158,25 +177,36 @@ class PostServices {
     return activitiesList;
   }
 
-  Future<List<PostModel>> getFriendsPosts() async {
-    List<PostModel> postsList = [];
+  Future<List<DenemeModel>> getFriendsPosts() async {
+    List<DenemeModel> postsList = [];
     DocumentSnapshot myDoc = await users.doc(myId).get();
     List<String> friendsList = myDoc["friends"].cast<String>(); //friend ids
 
     for (String friendID in friendsList) {
       DocumentSnapshot friendDoc = await users.doc(friendID).get();
-      List<String> friendsPosts =
-      friendDoc["posts"].cast<String>(); //friend's post ids
+
+      List<String> friendsPosts = friendDoc["posts"].cast<String>(); //friend's post ids
       for (String postID in friendsPosts) {
         DocumentSnapshot postDoc = await posts.doc(postID).get();
-        postsList.add(PostModel.fromSnapshot(postDoc));
+      //  DenemeModel deneme = DenemeModel(postObj: PostModel.fromSnapshot(postDoc));
+      //  deneme.setUser(UserModel.fromSnapshot(friendDoc));
+        List<String> activityIDs = postDoc['activityUID'].cast<String>();
+        List<ActivityModel> md = [];
+        for ( String id in activityIDs) {
+          DocumentSnapshot dc = await activities.doc(id).get();
+          md.add(ActivityModel.fromSnapshot(dc));
+          print("activitymodelMM: ${md.first.activityUID}");
+        }
+       // deneme.setActivities(md);
+        DenemeModel deneme = DenemeModel(userObj:UserModel.fromSnapshot(friendDoc) ,activitiesList: md,postObj: PostModel.fromSnapshot(postDoc));
+        md=[];
+        postsList.add(deneme);
       }
     }
-    postsList.sort((a, b) => a.date.compareTo(b.date));
+    postsList.sort((a, b) => a.postObj.date.compareTo(b.postObj.date));
     return postsList;
   }
-
-  Future<List<PostModel>> getMyPosts()async{
+Future<List<PostModel>> getMyPosts()async{
     List<PostModel> postsList = [];
     DocumentSnapshot myDoc = await users.doc(myId).get();
     List<String> myPostIDs = myDoc["posts"].cast<String>();
@@ -188,5 +218,78 @@ class PostServices {
 
     return postsList;
   }
+
+  
+Future<DocumentSnapshot> getMyDoc()async{
+  DocumentSnapshot myDoc = await users.doc(myId).get();
+  return myDoc;
+}
+
+// Future<List<PostModel>> getMyFriendsPosts() async{
+//     List<PostModel> postList=[];
+//     DocumentSnapshot myDoc= await users.doc(myId).get();
+//     List<String> myFriendsList= myDoc["Friends"].cast<String>();
+//     for(String myFriendID in myFriendsList){
+//       DocumentSnapshot myFriendDoc= await users.doc(myFriendID).get();
+//      List<String> myFriendPostsList= myFriendDoc["posts"].cast<String>();
+//      for(String myFriendPostID in myFriendPostsList){
+//        DocumentSnapshot MyFriendPost= await posts.doc("myFriendPostID").get();
+//        postList.add(PostModel.fromSnapshot(MyFriendPost));
+//      }
+//
+//     }
+//     postList.sort((a, b) => a.date.compareTo(b.date));
+//     return postList;
+// }
+  Future<List<ActivityModel>> getActivities(List<String> activityIDs) async {
+    List<ActivityModel> activityModels = [];
+
+    for ( String id in activityIDs) {
+      DocumentSnapshot dc = await activities.doc(id).get();
+      activityModels.add(ActivityModel.fromSnapshot(dc));
+    }
+    return activityModels;
+  }
+
+
+
+
+  Future<List<UserModel>> getAllParticipants(List<String> actIDs) async {
+
+    List<UserModel> participants = [] ;
+
+    for (String id in actIDs) {
+      DocumentSnapshot actDoc = await activities.doc(id).get();
+      var actPartList = ActivityModel.fromSnapshot(actDoc).participants;
+
+      for (String part in actPartList) {
+        DocumentSnapshot partDoc = await users.doc(part).get();
+        UserModel user = UserModel.fromSnapshot(partDoc);
+        if(!participants.contains(user.userUID)) {
+          participants.add(user);
+
+        }
+      }
+    }
+    return participants;
+
+  }
+}
+
+class DenemeModel {
+  PostModel postObj;
+  List<ActivityModel> activitiesList;
+  UserModel userObj;
+
+  DenemeModel({required this.userObj, required this.activitiesList,required this.postObj});
+
+  void setUser(UserModel muser){
+    this.userObj = muser;
+  }
+
+  void setActivities(List<ActivityModel> m){
+    this.activitiesList = m;
+  }
+
 
 }
