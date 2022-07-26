@@ -12,8 +12,7 @@ class PostServices {
 
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   CollectionReference posts = FirebaseFirestore.instance.collection('posts');
-  CollectionReference activities =
-  FirebaseFirestore.instance.collection('activities');
+  CollectionReference activities = FirebaseFirestore.instance.collection('activities');
 
   Future<String> createActivity(String selectedItem, Timestamp time,
       String location, List<String> participants) async {
@@ -44,6 +43,9 @@ class PostServices {
 
   Future<void> updatePost(PostModel postModel) async {
     await posts.doc(postModel.postUID).set(postModel.createMap());
+  }
+  Future<void> updateActivity(ActivityModel activityModel) async {
+    await activities.doc(activityModel.activityUID).set(activityModel.createMap());
   }
 
   Future<PostModel> createPost() async {
@@ -116,9 +118,10 @@ class PostServices {
 
     List<PostModel> post = [];
     DocumentSnapshot dc = await users.doc(profileID).get();
+
     List<String> postList = dc["posts"].cast<String>();
 
-    for (String postID in postList){
+    for (String postID in postList.reversed){
       DocumentSnapshot postDoc = await posts.doc(postID).get();
       post.add(PostModel.fromSnapshot(postDoc));
     }
@@ -196,7 +199,7 @@ class PostServices {
         }
        // deneme.setActivities(md);
         DenemeModel deneme = DenemeModel(userObj:UserModel.fromSnapshot(friendDoc) ,activitiesList: md,postObj: PostModel.fromSnapshot(postDoc));
-        md.clear();
+        md=[];
         postsList.add(deneme);
       }
     }
@@ -215,12 +218,13 @@ Future<List<PostModel>> getMyPosts()async{
 
     return postsList;
   }
+
   
 Future<DocumentSnapshot> getMyDoc()async{
   DocumentSnapshot myDoc = await users.doc(myId).get();
   return myDoc;
 }
-}
+
 // Future<List<PostModel>> getMyFriendsPosts() async{
 //     List<PostModel> postList=[];
 //     DocumentSnapshot myDoc= await users.doc(myId).get();
@@ -248,7 +252,7 @@ Future<DocumentSnapshot> getMyDoc()async{
   }
 
 
-  
+
 
   Future<List<UserModel>> getAllParticipants(List<String> actIDs) async {
 
@@ -260,14 +264,28 @@ Future<DocumentSnapshot> getMyDoc()async{
 
       for (String part in actPartList) {
         DocumentSnapshot partDoc = await users.doc(part).get();
-        participants.add(UserModel.fromSnapshot(partDoc));
+        UserModel user = UserModel.fromSnapshot(partDoc);
+        if(!participants.contains(user.userUID)) {
+          participants.add(user);
+
+        }
       }
     }
-
     return participants;
 
   }
 
+  Future<void> editProfile(String name, String surname, String bio) async {
+
+    await users.doc(myId).update({
+      'name': name, 'surname':surname, 'bio':bio
+    });
+
+  }
+
+  Future<UserModel> returnUser(String uid) async {
+    return UserModel.fromSnapshot(await users.doc(uid).get());
+  }
 
 }
 

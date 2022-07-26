@@ -1,8 +1,9 @@
-import 'package:actwithy/Models/ActivityModel.dart';
 import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
+import 'package:actwithy/pages/editProfilePage.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:actwithy/services/searchService.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -23,6 +24,8 @@ class _ProfilePageState extends State<ProfilePage> {
   bool isToDo = true;
   bool isMyFriend = false;
   String buttonText = "";
+
+  bool additional = true;
 
   getIsMyFriend() async {
     bool result = await SearchService().isMyFriend(user.userUID);
@@ -67,7 +70,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
                     ],
         ): Container(),
-        leading: isMyPage ?Column(
+        leading: isMyPage ? Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text('@${user.username}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
@@ -76,7 +79,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ): BackButton(
           color: negativeColor,
         ),
-        leadingWidth: MediaQuery.of(context).size.width * 0.2,
+        leadingWidth: MediaQuery.of(context).size.width * 0.4,
         actions: [
           Container(
             width: MediaQuery.of(context).size.width * 0.2,
@@ -144,6 +147,9 @@ class _ProfilePageState extends State<ProfilePage> {
               onPressed: ()  async {
                 if(isMyPage) {
                   ///TODO editle profili
+                  //UserModel userModel = UserModel.fromSnapshot(await FirebaseFirestore.instance.collection('users').doc(user.userUID).get()) as UserModel;
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=> EditProfilePage(userModel: user))).then((value) {setState((){});});
+                  //Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfilePage(userModel: user,)));
                 }else if (!isMyPage && isMyFriend) {
                   await SearchService().removeFriend(user.userUID);
                 }else if (!isMyPage && !isMyFriend) {
@@ -240,7 +246,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
     String selectedPostID = user.lastPostID;
     return
-
       SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: FutureBuilder(
@@ -296,7 +301,6 @@ class _ProfilePageState extends State<ProfilePage> {
   
   Widget FriendWidget() {
     return
-
       SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: FutureBuilder(
@@ -314,16 +318,47 @@ class _ProfilePageState extends State<ProfilePage> {
                     itemCount: snap.data.length,
                     itemBuilder: (context, index) {
                       UserModel friend = snap.data[index] as UserModel;
-                      return Column(
-                        children: [
-                          Container(
-                            height: 65,
-                            width: 200,
-                            color: Colors.white38,
-                            child: Text(friend.userUID),
-                          )
-                        ],
-                      );
+                      return Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child : Container(
+                        decoration: BoxDecoration(
+                            color: negativeColor,
+                            borderRadius: BorderRadius.all(Radius.circular(25))
+                        ),
+                        width: MediaQuery.of(context).size.width*0.95,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              InkWell(
+                                onTap: () {
+              //TODO eğer kendi sayfama yönlendirmeye çalışıyosam !isMyPage gibi olmalı
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ProfilePage(user: friend,)));
+                                },
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage: NetworkImage(friend.ppURL),
+                                      radius: MediaQuery.of(context).size.width*0.05,
+                                    ),
+                                    SizedBox(
+                                      width: 8, //TODO dynamiccc
+                                    ),
+                                    Column(
+                                      children: [
+                                        Container(width: MediaQuery.of(context).size.width*0.8,child: Text("${friend.name} ${friend.surname}")),
+                                        Container(width: MediaQuery.of(context).size.width*0.8,child: Text("@${friend.username}"))
+                                      ],
+                                    ),
+
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),);
                     },
 
                   ),
@@ -401,11 +436,16 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+
+
   Widget ClosedPost(PostModel post) {
     var postDate = post.date.toDate();
     int day = postDate.day;
     var month = postDate.month;
     var year = postDate.year;
+    List<UserModel> participants = [];
+
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
@@ -417,12 +457,17 @@ class _ProfilePageState extends State<ProfilePage> {
               fontWeight: FontWeight.bold,
               fontSize: MediaQuery.of(context).size.width*0.045,
             ), ),
+          Text(participants.length.toString()),
+
           //TODO iki kişiden fazlasını artı olarak göster
         ],
       ),
     );
   }
 
+
+
 }
+
 
 
