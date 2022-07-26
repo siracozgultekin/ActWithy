@@ -75,8 +75,16 @@ class ParticipantSearchPage extends SearchDelegate {
                 var result = snap.data[index] as UserModel;
                 return InkWell(
                   onTap: (){
-                    CreatingPage.participants.add(result);
-                    participants.add(result.userUID);
+                    if (!participants.contains(result.userUID)){
+                      CreatingPage.participants.add(result);
+                      participants.add(result.userUID);
+                    }else{
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('This person already added...')),
+                      );
+                      ScaffoldMessenger.of(context).deactivate();
+                    }
+
                     print(participants);
                     query = '';
                   },
