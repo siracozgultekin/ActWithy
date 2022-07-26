@@ -38,20 +38,24 @@ class _DrawerPageState extends State<DrawerPage> {
                   Row(
                     children: [
                       InkWell(
-                        onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>ProfilePage(
-                            user: widget.userProf,
-                          )),
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (context) =>
+                                  ProfilePage(
+                                    user: widget.userProf,
+                                  )),
 
                           );
                         },
                         child: Container(
                           height: 60,
                           width: 60,
-                          decoration: widget.userProf.ppURL == 'ppURL' ? BoxDecoration(
+                          decoration: widget.userProf.ppURL == 'ppURL'
+                              ? BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.grey
-                          ) :BoxDecoration(
+                          )
+                              : BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(
                               fit: BoxFit.fill,
@@ -69,7 +73,8 @@ class _DrawerPageState extends State<DrawerPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 8, bottom: 8),
+                                  padding: const EdgeInsets.only(
+                                      top: 8, bottom: 8),
                                   child: InkWell(
                                     onTap: () {},
                                     child: Text(
@@ -94,7 +99,8 @@ class _DrawerPageState extends State<DrawerPage> {
                                   child: Row(
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.only(right: 2.0),
+                                        padding: const EdgeInsets.only(
+                                            right: 2.0),
                                         child: Text(
                                           "${widget.userProf.friends.length}",
                                           style: TextStyle(color: Colors.white),
@@ -107,7 +113,8 @@ class _DrawerPageState extends State<DrawerPage> {
                                         ),
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.only(right: 2.0, left: 10),
+                                        padding: const EdgeInsets.only(
+                                            right: 2.0, left: 10),
                                         child: Text(
                                           "${widget.userProf.postCount}",
                                           style: TextStyle(color: Colors.white),
@@ -121,7 +128,8 @@ class _DrawerPageState extends State<DrawerPage> {
                                       ),
                                     ],
                                   ),
-                                ),],
+                                ),
+                              ],
                             ),
 
                           ],
@@ -155,7 +163,7 @@ class _DrawerPageState extends State<DrawerPage> {
                         thickness: 0.2,
                       ),
                       InkWell(
-                        onTap: () async{
+                        onTap: () async {
                           await AuthService().signOut(context);
                         },
                         child: ListTile(
@@ -184,13 +192,14 @@ class _DrawerPageState extends State<DrawerPage> {
     );
   }
 
-  Widget listTile(Icon icon, String text, var page){
+  Widget listTile(Icon icon, String text, var page) {
     return InkWell(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => page));
+        Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => page));
       },
       child: ListTile(
-        leading:icon,
+        leading: icon,
         title: Text(
           text,
           style: TextStyle(color: Colors.white),

@@ -9,7 +9,8 @@ import 'package:actwithy/services/authService.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
+import 'package:emojis/emojis.dart';
+import 'package:emojis/emoji.dart';
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -23,6 +24,14 @@ class _HomePageState extends State<HomePage> {
   final controller = ScrollController();
   late UserModel user;
   bool isLoading = true;
+  var mediaqueryHeight;
+ List<bool> emojiCheck =[
+   false,//Hearth
+   false,//Broken Hearth
+   false,//Laughing
+   false,//Sob
+   false,//Angry
+ ];
   @override
   void initState() {
     getMe();
@@ -32,6 +41,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0XFFD6E6F1),
       drawer: isLoading
           ? CircularProgressIndicator(
               backgroundColor: Color(0xFF15202B),
@@ -125,6 +135,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: FutureBuilder(
+
           future: PostServices().getFriendsPosts(),
           builder: (context, AsyncSnapshot snap) {
             if (!snap.hasData) {
@@ -137,11 +148,12 @@ class _HomePageState extends State<HomePage> {
                     shrinkWrap: true,
                     separatorBuilder: (context, index) => Divider(
                           color: Colors.grey,
-                          height: 0.25,
+                          height: 0.15,
                         ),
                     scrollDirection: Axis.vertical,
                     itemCount: snap.data.length, //TODO snap.data.length,
                     itemBuilder: (context, index) {
+                      mediaqueryHeight=MediaQuery.of(context).size.height*0.06;
                       DenemeModel postModelObj =
                           snap.data[index] as DenemeModel;
                       return mainListTile(postModelObj);
@@ -246,24 +258,25 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(left: 8.0,right: 8.0,top: 8.0,bottom: 8.0),
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.4,
+              height: mod.activitiesList.length<=2 ? MediaQuery.of(context).size.height * 0.33 :MediaQuery.of(context).size.height * 0.45,
+              width: MediaQuery.of(context).size.width * 0.9,
               decoration: BoxDecoration(
-                  color: Colors.brown, borderRadius: BorderRadius.circular(20)),
+                  color: Colors.white, borderRadius: BorderRadius.circular(20)),
               child: Center(
                   child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
                             Container(
-                              height: 45,
-                              width: 45,
+                              height: mediaqueryHeight,
+                              width: mediaqueryHeight,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 image: DecorationImage(
@@ -293,152 +306,139 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   //TODO HATA Text(mod.activitiesList![0].activityUID),
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.3,
-                    child: SingleChildScrollView(
-                      physics: ClampingScrollPhysics(),
-                      child: Column(
-                        children: [
-                          ListView.builder(
-                              itemCount: mod.activitiesList.length,
-                              scrollDirection: Axis.vertical,
-                              physics: ClampingScrollPhysics(),
-                              shrinkWrap: true,
-                              itemBuilder: (context, index) {
-                                return FutureBuilder(
-                                  future: PostServices()
-                                      .getParticipants(mod.activitiesList[index]),
-                                  builder: (context, AsyncSnapshot snap) {
-                                    if (!snap.hasData) {
-                                      return CircularProgressIndicator();
-                                    }else{
-                                      ActivityModel activity = mod.activitiesList[index];
-                                      List<UserModel> participantList = snap.data;
-                                      return Column(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                    MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Text(activity
-                                                          .activityType),
-                                                      Row(
-                                                        children: [
-                                                          Container(
-                                                            padding: EdgeInsets.all(0.0),
-                                                            child: InkWell(
-                                                                child: Icon(Icons
-                                                                    .watch_later_outlined)),
-                                                          ),
-                                                          Text(
-                                                              "${activity.time.toDate().hour}:${mod.activitiesList[index].time.toDate().minute}"),
-                                                        ],
-                                                      )
-                                                    ],
-                                                  ),
-                                                ), // activity and clock
-                                                Row(
-                                                  children: [
-                                                    Container(
-                                                      padding: EdgeInsets.only(left: 10),
-                                                      child:
-                                                      InkWell(child: Icon(Icons.close)),
-                                                    ),
-                                                  ],
-                                                ), // delete and edit icons
-                                              ],
-                                            ),
-                                          ),
-                                          Row(
-                                            children: [
-                                              Row(
+                  Expanded(
+                    child: Container(
+                      child: SingleChildScrollView(
+                        physics: ClampingScrollPhysics(),
+                        child: Column(
+                          children: [
+                            ListView.builder(
+                                itemCount: mod.activitiesList.length,
+                                scrollDirection: Axis.vertical,
+                                physics: ClampingScrollPhysics(),
+                                shrinkWrap: true,
+                                itemBuilder: (context, index) {
+                                  return FutureBuilder(
+                                    future: PostServices()
+                                        .getParticipants(mod.activitiesList[index]),
+                                    builder: (context, AsyncSnapshot snap) {
+                                      if (!snap.hasData) {
+                                        return CircularProgressIndicator();
+                                      }else{
+                                        ActivityModel activity = mod.activitiesList[index];
+                                        List<UserModel> participantList = snap.data;
+                                        return Column(
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Row(
                                                 children: [
-                                                  Icon(Icons.location_on),
-                                                  Text(
-                                                      "${activity.location}"),
-                                                ],
-                                              ),
-                                              InkWell(
-                                                onTap: () {
-                                                  ParticipantPopUp(participantList);
-                                                },
-                                                child: Row(
-                                                  children: [
-                                                    if (activity.participants
-                                                        .length >=
-                                                        1)
-                                                      Padding(
-                                                        padding:
-                                                        const EdgeInsets.only(left: 8.0),
-                                                        child: Container(
-                                                          height: 20,
-                                                          width: 20,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.green,
-                                                            shape: BoxShape.circle,
-                                                            image: DecorationImage(
-                                                              image: NetworkImage(
-                                                                  participantList[0].ppURL),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    if (activity.participants
-                                                        .length >=
-                                                        2)
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(
-                                                          left: 4.0,
-                                                        ),
-                                                        child: Row(
+                                                  Expanded(
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                      MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        Text(activity
+                                                            .activityType),
+                                                        Row(
                                                           children: [
                                                             Container(
-                                                              height: 20,
-                                                              width: 20,
-                                                              decoration: BoxDecoration(
-                                                                  color: Colors.green,
-                                                                  shape: BoxShape.circle,
-                                                                  image: DecorationImage(
-                                                                    image: NetworkImage(
-                                                                        participantList[1].ppURL),
-                                                                  )),
+                                                              padding: EdgeInsets.all(0.0),
+                                                              child: InkWell(
+                                                                  child: Icon(Icons
+                                                                      .watch_later_outlined)),
                                                             ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    if (activity.participants
-                                                        .length >
-                                                        2)
-                                                      Padding(
-                                                        padding:
-                                                        const EdgeInsets.only(left: 8.0),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                          CrossAxisAlignment.start,
-                                                          children: [
                                                             Text(
-                                                                "+${activity.participants.length - 2}"),
-                                                            Row(
-                                                              children: [
-                                                                Container(
-                                                                  height: 5,
-                                                                  width: 5,
-                                                                  decoration: BoxDecoration(
-                                                                    color: Colors.black,
+                                                                "${activity.time.toDate().hour}:${mod.activitiesList[index].time.toDate().minute}"),
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ), // activity and clock
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        padding: EdgeInsets.only(left: 10),
+                                                        child:
+                                                        InkWell(child: Icon(Icons.close)),
+                                                      ),
+                                                    ],
+                                                  ), // delete and edit icons
+                                                ],
+                                              ),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Icon(Icons.location_on),
+                                                    Text(
+                                                        "${activity.location}"),
+                                                  ],
+                                                ),
+                                                InkWell(
+                                                  onTap: () {
+                                                    ParticipantPopUp(participantList);
+                                                  },
+                                                  child: Row(
+                                                    children: [
+                                                      if (activity.participants
+                                                          .length >=
+                                                          1)
+                                                        Padding(
+                                                          padding:
+                                                          const EdgeInsets.only(left: 8.0),
+                                                          child: Container(
+                                                            height: 20,
+                                                            width: 20,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.green,
+                                                              shape: BoxShape.circle,
+                                                              image: DecorationImage(
+                                                                image: NetworkImage(
+                                                                    participantList[0].ppURL),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      if (activity.participants
+                                                          .length >=
+                                                          2)
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(
+                                                            left: 4.0,
+                                                          ),
+                                                          child: Row(
+                                                            children: [
+                                                              Container(
+                                                                height: 20,
+                                                                width: 20,
+                                                                decoration: BoxDecoration(
+                                                                    color: Colors.green,
                                                                     shape: BoxShape.circle,
-                                                                  ),
-                                                                ),
-                                                                Padding(
-                                                                  padding:
-                                                                  const EdgeInsets.only(
-                                                                      left: 2.0,
-                                                                      right: 2),
-                                                                  child: Container(
+                                                                    image: DecorationImage(
+                                                                      image: NetworkImage(
+                                                                          participantList[1].ppURL),
+                                                                    )),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      if (activity.participants
+                                                          .length >
+                                                          2)
+                                                        Padding(
+                                                          padding:
+                                                          const EdgeInsets.only(left: 8.0),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                            CrossAxisAlignment.start,
+                                                            children: [
+                                                              Text(
+                                                                  "+${activity.participants.length - 2}"),
+                                                              Row(
+                                                                children: [
+                                                                  Container(
                                                                     height: 5,
                                                                     width: 5,
                                                                     decoration: BoxDecoration(
@@ -446,32 +446,199 @@ class _HomePageState extends State<HomePage> {
                                                                       shape: BoxShape.circle,
                                                                     ),
                                                                   ),
-                                                                ),
-                                                                Container(
-                                                                  height: 5,
-                                                                  width: 5,
-                                                                  decoration: BoxDecoration(
-                                                                    color: Colors.black,
-                                                                    shape: BoxShape.circle,
+                                                                  Padding(
+                                                                    padding:
+                                                                    const EdgeInsets.only(
+                                                                        left: 2.0,
+                                                                        right: 2),
+                                                                    child: Container(
+                                                                      height: 5,
+                                                                      width: 5,
+                                                                      decoration: BoxDecoration(
+                                                                        color: Colors.black,
+                                                                        shape: BoxShape.circle,
+                                                                      ),
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
+                                                                  Container(
+                                                                    height: 5,
+                                                                    width: 5,
+                                                                    decoration: BoxDecoration(
+                                                                      color: Colors.black,
+                                                                      shape: BoxShape.circle,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
                                                         ),
-                                                      ),
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      );
-                                    }
+                                              ],
+                                            ),
+                                          ],
+                                        );
+                                      }
+                                    },
+                                  );
+                                }),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Divider(height: 1,color: Colors.blue,),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      height:MediaQuery.of(context).size.height * 0.05,
+                      width:  MediaQuery.of(context).size.width*0.9,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                IconButton(padding: EdgeInsets.zero,
+                                  icon: Text("${Emojis.redHeart}",style: TextStyle(fontSize: 15),),
+                                  onPressed: (){
+                                  if(emojiCheck[0]==false){
+                                    setState((){
+                                      mod.postObj.heartCounter++;
+
+                                      emojiCheck[0]=true;
+                                      emojiCheck[1]=false;
+                                      emojiCheck[2]=false;
+                                      emojiCheck[3]=false;
+                                      emojiCheck[4]=false;
+                                    });
+                                  }
+                                  else{
+                                   setState((){
+                                     mod.postObj.heartCounter--;
+                                     emojiCheck[0]=false;
+                                     emojiCheck[1]=false;
+                                     emojiCheck[2]=false;
+                                     emojiCheck[3]=false;
+                                     emojiCheck[4]=false;
+                                   });
+                                  }
                                   },
-                                );
-                              }),
-                        ],
+                                ),
+                                Text("${mod.postObj.heartCounter}"),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                IconButton(padding: EdgeInsets.zero,
+                                  icon: Text("${Emojis.brokenHeart}",style: TextStyle(fontSize: 15),),
+                                  onPressed: (){ if(emojiCheck[1]==false){
+                                    setState((){
+                                      mod.postObj.brokenHeartCounter++;
+                                      emojiCheck[0]=false;
+                                      emojiCheck[1]=true;
+                                      emojiCheck[2]=false;
+                                      emojiCheck[3]=false;
+                                      emojiCheck[4]=false;
+                                    });
+                                  }
+                                  else{
+                                  emojiCheck[0]=false;
+                                  emojiCheck[1]=false;
+                                  emojiCheck[2]=false;
+                                  emojiCheck[3]=false;
+                                  emojiCheck[4]=false;
+                                  setState((){
+                                    mod.postObj.brokenHeartCounter--;
+                                  });
+                                  }},
+                                ), Text("${mod.postObj.brokenHeartCounter}"),
+                              ],
+                            ), Row(
+                              children: [
+                                IconButton(padding: EdgeInsets.zero,
+                                  icon: Text("${Emojis.rollingOnTheFloorLaughing}",style: TextStyle(fontSize: 15),),
+                                  onPressed: (){
+                                  if(emojiCheck[2]==false){
+                                   setState((){ mod.postObj.joyCounter++;
+                                   emojiCheck[0]=false;
+                                   emojiCheck[1]=false;
+                                   emojiCheck[2]=true;
+                                   emojiCheck[3]=false;
+                                   emojiCheck[4]=false;
+                                   });
+
+                                  }
+                                  else{
+                                   setState((){
+                                     mod.postObj.joyCounter--;
+                                     emojiCheck[0]=false;
+                                     emojiCheck[1]=false;
+                                     emojiCheck[2]=false;
+                                     emojiCheck[3]=false;
+                                     emojiCheck[4]=false;
+                                   });
+                                  }},
+                                ),  Text("${mod.postObj.joyCounter}"),
+                              ],
+                            ),Row(
+                              children: [
+                                IconButton(padding: EdgeInsets.zero,
+                                  icon: Text("${Emojis.sadButRelievedFace}",style: TextStyle(fontSize: 15),),
+                                  onPressed: (){ if(emojiCheck[3]==false){
+                                   setState((){
+                                     mod.postObj.sobCounter++;
+                                     emojiCheck[0]=false;
+                                     emojiCheck[1]=false;
+                                     emojiCheck[2]=false;
+                                     emojiCheck[3]=true;
+                                     emojiCheck[4]=false;
+                                   });
+                                  }
+                                  else{
+                                    setState((){
+                                      mod.postObj.sobCounter--;
+                                      emojiCheck[0]=false;
+                                      emojiCheck[1]=false;
+                                      emojiCheck[2]=false;
+                                      emojiCheck[3]=false;
+                                      emojiCheck[4]=false;
+                                    });
+                                  }},
+                                ), Text("${mod.postObj.sobCounter}"),
+                              ],
+                            ),Row(
+                              children: [
+                                IconButton(padding: EdgeInsets.zero,
+                                  icon: Text("${Emojis.angryFace}",style: TextStyle(fontSize: 15),),
+                                  onPressed: (){ if(emojiCheck[4]==false){
+                                    setState((){
+                                      mod.postObj.sobCounter++;
+                                      emojiCheck[0]=false;
+                                      emojiCheck[1]=false;
+                                      emojiCheck[2]=false;
+                                      emojiCheck[3]=false;
+                                      emojiCheck[4]=true;
+                                    });
+                                  }
+                                  else{
+                                   setState((){
+                                     mod.postObj.sobCounter--;
+                                     emojiCheck[0]=false;
+                                     emojiCheck[1]=false;
+                                     emojiCheck[2]=false;
+                                     emojiCheck[3]=false;
+                                     emojiCheck[4]=false;
+                                   });
+                                  }},
+                                ), Text("${mod.postObj.angryCounter}"),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -506,11 +673,12 @@ class _HomePageState extends State<HomePage> {
                       SizedBox(
                         height: 10,
                       ),
-                      ListView.builder(
+                      ListView.separated(
                         shrinkWrap: true,
                         scrollDirection: Axis.vertical,
                         physics: ClampingScrollPhysics(),
                         itemCount: participantList.length,
+                        separatorBuilder:  (context, index) =>Divider(thickness: 10,),
                         itemBuilder: (context, index) {
                           UserModel user = participantList[index];
                           return Padding(
