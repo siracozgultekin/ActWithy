@@ -1,10 +1,9 @@
-import 'dart:ui';
-
-import 'package:actwithy/Models/ActivityModel.dart';
 import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
+import 'package:actwithy/pages/editProfilePage.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:actwithy/services/searchService.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -71,7 +70,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
                     ],
         ): Container(),
-        leading: isMyPage ?Column(
+        leading: isMyPage ? Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text('@${user.username}', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),),
@@ -80,7 +79,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ): BackButton(
           color: negativeColor,
         ),
-        leadingWidth: MediaQuery.of(context).size.width * 0.2,
+        leadingWidth: MediaQuery.of(context).size.width * 0.4,
         actions: [
           Container(
             width: MediaQuery.of(context).size.width * 0.2,
@@ -148,6 +147,8 @@ class _ProfilePageState extends State<ProfilePage> {
               onPressed: ()  async {
                 if(isMyPage) {
                   ///TODO editle profili
+                  //UserModel userModel = UserModel.fromSnapshot(await FirebaseFirestore.instance.collection('users').doc(user.userUID).get()) as UserModel;
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfilePage(userModel: user,)));
                 }else if (!isMyPage && isMyFriend) {
                   await SearchService().removeFriend(user.userUID);
                 }else if (!isMyPage && !isMyFriend) {
