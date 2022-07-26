@@ -85,6 +85,7 @@ class _DrawerPageState extends State<DrawerPage> {
                                     style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold
+
                                     ),
                                   ),
                                 ),
@@ -197,4 +198,4 @@ class _DrawerPageState extends State<DrawerPage> {
       ),
     );
   }
-}
+
