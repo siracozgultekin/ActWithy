@@ -21,18 +21,20 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late List<UserModel> userMList;
   int chosenEmoji=0;
-  List<int> emojiCheck =[
-    0,//Hearth
-    0,//Broken Hearth
-    0,//Laughing
-    0,//Sob
-    0,//Angry
-  ];
+
   int selectedIndex = 0;
   final controller = ScrollController();
   late UserModel user;
   bool isLoading = true;
   var mediaqueryHeight;
+
+ List<int> emojiCheck =[ //TODO HER POST OBJESİ İÇİN AYRI BİR LİSTE ATAYABİLMEN LAZIM (MUHTEMELEN FİREBASE TARAFINDA OLUŞTURULACAK.)
+   0,//Hearth
+   0,//Broken Hearth
+   0,//Laughing
+   0,//Sob
+   0,//Angry
+ ];
 
   @override
   void initState() {
@@ -510,30 +512,35 @@ class _HomePageState extends State<HomePage> {
                                 IconButton(padding: EdgeInsets.zero,
                                   icon: Text("${Emojis.redHeart}",style: TextStyle(fontSize: 15),),
                                   onPressed: ()async{
-                                    if(emojiCheck[0]==0){
 
-                                      PostServices().setHeartCounter(mod.postObj.postUID, true);
-                                      emojiCheck[0]=1;
-                                      emojiCheck[1]=-1;
-                                      emojiCheck[2]=-1;
-                                      emojiCheck[3]=-1;
-                                      emojiCheck[4]=-1;
-                                      chosenEmoji=1;
+                                  if(emojiCheck[0]==0){
+                                    PostServices().setHeartCounter(mod.postObj.postUID, true);
+                                    emojiCheck[0]=1;
+                                    emojiCheck[1]=-1;
+                                    emojiCheck[2]=-1;
+                                    emojiCheck[3]=-1;
+                                    emojiCheck[4]=-1;
+                                    chosenEmoji=1;
+                                  }
+                                  else if(emojiCheck[0]==1){
+                                    PostServices().setHeartCounter(mod.postObj.postUID, false);
+                                    emojiCheck[0]=0;
+                                    emojiCheck[1]=0;
+                                    emojiCheck[2]=0;
+                                    emojiCheck[3]=0;
+                                    emojiCheck[4]=0;
+                                  }
+                                  else if(emojiCheck[0]==-1){
+                                    PostServices().checkEmoji(chosenEmoji, mod.postObj.postUID);
+                                    PostServices().setHeartCounter(mod.postObj.postUID, true);
+                                    emojiCheck[0]=1;
+                                    emojiCheck[1]=-1;
+                                    emojiCheck[2]=-1;
+                                    emojiCheck[3]=-1;
+                                    emojiCheck[4]=-1;
+                                    chosenEmoji=1;
+                                  }
 
-                                    }
-                                    else if(emojiCheck[0]==1){
-
-                                     PostServices().setHeartCounter(mod.postObj.postUID, false);
-                                     emojiCheck[0]=0;
-                                     emojiCheck[1]=0;
-                                     emojiCheck[2]=0;
-                                     emojiCheck[3]=0;
-                                     emojiCheck[4]=0;
-
-                                    }
-                                    else if(emojiCheck[0]==-1){
-
-                                    }
 
                                   },
                                 ),
