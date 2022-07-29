@@ -21,11 +21,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late List<UserModel> userMList;
   int chosenEmoji=0;
+
   int selectedIndex = 0;
   final controller = ScrollController();
   late UserModel user;
   bool isLoading = true;
   var mediaqueryHeight;
+
  List<int> emojiCheck =[ //TODO HER POST OBJESİ İÇİN AYRI BİR LİSTE ATAYABİLMEN LAZIM (MUHTEMELEN FİREBASE TARAFINDA OLUŞTURULACAK.)
    0,//Hearth
    0,//Broken Hearth
@@ -33,6 +35,7 @@ class _HomePageState extends State<HomePage> {
    0,//Sob
    0,//Angry
  ];
+
   @override
   void initState() {
     getMe();
@@ -254,6 +257,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget mainListTile(DenemeModel mod) {
+
+
     return SingleChildScrollView(
       physics: NeverScrollableScrollPhysics(),
       child: Column(
@@ -507,6 +512,7 @@ class _HomePageState extends State<HomePage> {
                                 IconButton(padding: EdgeInsets.zero,
                                   icon: Text("${Emojis.redHeart}",style: TextStyle(fontSize: 15),),
                                   onPressed: ()async{
+
                                   if(emojiCheck[0]==0){
                                     PostServices().setHeartCounter(mod.postObj.postUID, true);
                                     emojiCheck[0]=1;
@@ -534,6 +540,7 @@ class _HomePageState extends State<HomePage> {
                                     emojiCheck[4]=-1;
                                     chosenEmoji=1;
                                   }
+
 
                                   },
                                 ),
@@ -825,4 +832,5 @@ class _HomePageState extends State<HomePage> {
               ],
             ));
   }
+
 }

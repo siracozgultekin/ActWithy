@@ -195,7 +195,7 @@ class PostServices {
         for ( String id in activityIDs) {
           DocumentSnapshot dc = await activities.doc(id).get();
           md.add(ActivityModel.fromSnapshot(dc));
-          print("activitymodelMM: ${md.first.activityUID}");
+
         }
        // deneme.setActivities(md);
         DenemeModel deneme = DenemeModel(userObj:UserModel.fromSnapshot(friendDoc) ,activitiesList: md,postObj: PostModel.fromSnapshot(postDoc));
