@@ -20,18 +20,20 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late List<UserModel> userMList;
+  int chosenEmoji=0;
+  List<int> emojiCheck =[
+    0,//Hearth
+    0,//Broken Hearth
+    0,//Laughing
+    0,//Sob
+    0,//Angry
+  ];
   int selectedIndex = 0;
   final controller = ScrollController();
   late UserModel user;
   bool isLoading = true;
   var mediaqueryHeight;
- List<bool> emojiCheck =[
-   false,//Hearth
-   false,//Broken Hearth
-   false,//Laughing
-   false,//Sob
-   false,//Angry
- ];
+
   @override
   void initState() {
     getMe();
@@ -253,6 +255,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget mainListTile(DenemeModel mod) {
+
+
     return SingleChildScrollView(
       physics: NeverScrollableScrollPhysics(),
       child: Column(
@@ -478,6 +482,7 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                               ],
                                             ),
+                                            Divider(height: 3,thickness: 1.50,),
                                           ],
                                         );
                                       }
@@ -504,28 +509,32 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 IconButton(padding: EdgeInsets.zero,
                                   icon: Text("${Emojis.redHeart}",style: TextStyle(fontSize: 15),),
-                                  onPressed: (){
-                                  if(emojiCheck[0]==false){
-                                    setState((){
-                                      mod.postObj.heartCounter++;
+                                  onPressed: ()async{
+                                    if(emojiCheck[0]==0){
 
-                                      emojiCheck[0]=true;
-                                      emojiCheck[1]=false;
-                                      emojiCheck[2]=false;
-                                      emojiCheck[3]=false;
-                                      emojiCheck[4]=false;
-                                    });
-                                  }
-                                  else{
-                                   setState((){
-                                     mod.postObj.heartCounter--;
-                                     emojiCheck[0]=false;
-                                     emojiCheck[1]=false;
-                                     emojiCheck[2]=false;
-                                     emojiCheck[3]=false;
-                                     emojiCheck[4]=false;
-                                   });
-                                  }
+                                      PostServices().setHeartCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=1;
+                                      emojiCheck[1]=-1;
+                                      emojiCheck[2]=-1;
+                                      emojiCheck[3]=-1;
+                                      emojiCheck[4]=-1;
+                                      chosenEmoji=1;
+
+                                    }
+                                    else if(emojiCheck[0]==1){
+
+                                     PostServices().setHeartCounter(mod.postObj.postUID, false);
+                                     emojiCheck[0]=0;
+                                     emojiCheck[1]=0;
+                                     emojiCheck[2]=0;
+                                     emojiCheck[3]=0;
+                                     emojiCheck[4]=0;
+
+                                    }
+                                    else if(emojiCheck[0]==-1){
+
+                                    }
+
                                   },
                                 ),
                                 Text("${mod.postObj.heartCounter}"),
@@ -535,26 +544,37 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 IconButton(padding: EdgeInsets.zero,
                                   icon: Text("${Emojis.brokenHeart}",style: TextStyle(fontSize: 15),),
-                                  onPressed: (){ if(emojiCheck[1]==false){
-                                    setState((){
-                                      mod.postObj.brokenHeartCounter++;
-                                      emojiCheck[0]=false;
-                                      emojiCheck[1]=true;
-                                      emojiCheck[2]=false;
-                                      emojiCheck[3]=false;
-                                      emojiCheck[4]=false;
-                                    });
+                                  onPressed: (){ {
+                                    if(emojiCheck[1]==0){
+                                      PostServices().setBrokenHeartCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=-1;
+                                      emojiCheck[1]=1;
+                                      emojiCheck[2]=-1;
+                                      emojiCheck[3]=-1;
+                                      emojiCheck[4]=-1;
+                                      chosenEmoji=2;
+                                    }
+                                    else if(emojiCheck[1]==1){
+                                      PostServices().setBrokenHeartCounter(mod.postObj.postUID, false);
+                                      emojiCheck[0]=0;
+                                      emojiCheck[1]=0;
+                                      emojiCheck[2]=0;
+                                      emojiCheck[3]=0;
+                                      emojiCheck[4]=0;
+                                    }
+                                    else if(emojiCheck[1]==-1){
+                                      PostServices().checkEmoji(chosenEmoji, mod.postObj.postUID);
+                                      PostServices().setBrokenHeartCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=-1;
+                                      emojiCheck[1]=1;
+                                      emojiCheck[2]=-1;
+                                      emojiCheck[3]=-1;
+                                      emojiCheck[4]=-1;
+                                      chosenEmoji=2;
+                                    }
+
                                   }
-                                  else{
-                                  emojiCheck[0]=false;
-                                  emojiCheck[1]=false;
-                                  emojiCheck[2]=false;
-                                  emojiCheck[3]=false;
-                                  emojiCheck[4]=false;
-                                  setState((){
-                                    mod.postObj.brokenHeartCounter--;
-                                  });
-                                  }},
+                                  },
                                 ), Text("${mod.postObj.brokenHeartCounter}"),
                               ],
                             ), Row(
@@ -562,78 +582,110 @@ class _HomePageState extends State<HomePage> {
                                 IconButton(padding: EdgeInsets.zero,
                                   icon: Text("${Emojis.rollingOnTheFloorLaughing}",style: TextStyle(fontSize: 15),),
                                   onPressed: (){
-                                  if(emojiCheck[2]==false){
-                                   setState((){ mod.postObj.joyCounter++;
-                                   emojiCheck[0]=false;
-                                   emojiCheck[1]=false;
-                                   emojiCheck[2]=true;
-                                   emojiCheck[3]=false;
-                                   emojiCheck[4]=false;
-                                   });
-
-                                  }
-                                  else{
-                                   setState((){
-                                     mod.postObj.joyCounter--;
-                                     emojiCheck[0]=false;
-                                     emojiCheck[1]=false;
-                                     emojiCheck[2]=false;
-                                     emojiCheck[3]=false;
-                                     emojiCheck[4]=false;
-                                   });
-                                  }},
+                                    if(emojiCheck[2]==0){
+                                      PostServices().setJoyCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=-1;
+                                      emojiCheck[1]=-1;
+                                      emojiCheck[2]=1;
+                                      emojiCheck[3]=-1;
+                                      emojiCheck[4]=-1;
+                                      chosenEmoji=3;
+                                    }
+                                    else if(emojiCheck[2]==1){
+                                      PostServices().setJoyCounter(mod.postObj.postUID, false);
+                                      emojiCheck[0]=0;
+                                      emojiCheck[1]=0;
+                                      emojiCheck[2]=0;
+                                      emojiCheck[3]=0;
+                                      emojiCheck[4]=0;
+                                    }
+                                    else if(emojiCheck[2]==-1){
+                                      PostServices().checkEmoji(chosenEmoji, mod.postObj.postUID);
+                                      PostServices().setJoyCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=-1;
+                                      emojiCheck[1]=-1;
+                                      emojiCheck[2]=1;
+                                      emojiCheck[3]=-1;
+                                      emojiCheck[4]=-1;
+                                      chosenEmoji=3;
+                                    }
+                                 },
                                 ),  Text("${mod.postObj.joyCounter}"),
                               ],
                             ),Row(
                               children: [
                                 IconButton(padding: EdgeInsets.zero,
                                   icon: Text("${Emojis.sadButRelievedFace}",style: TextStyle(fontSize: 15),),
-                                  onPressed: (){ if(emojiCheck[3]==false){
-                                   setState((){
-                                     mod.postObj.sobCounter++;
-                                     emojiCheck[0]=false;
-                                     emojiCheck[1]=false;
-                                     emojiCheck[2]=false;
-                                     emojiCheck[3]=true;
-                                     emojiCheck[4]=false;
-                                   });
+                                  onPressed: (){ {
+                                    if(emojiCheck[3]==0){
+                                      PostServices().setSobCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=-1;
+                                      emojiCheck[1]=-1;
+                                      emojiCheck[2]=-1;
+                                      emojiCheck[3]=1;
+                                      emojiCheck[4]=-1;
+                                      chosenEmoji=4;
+                                    }
+                                    else if(emojiCheck[3]==1){
+                                      PostServices().setSobCounter(mod.postObj.postUID, false);
+                                      emojiCheck[0]=0;
+                                      emojiCheck[1]=0;
+                                      emojiCheck[2]=0;
+                                      emojiCheck[3]=0;
+                                      emojiCheck[4]=0;
+                                    }
+                                    else if(emojiCheck[3]==-1){
+                                      PostServices().checkEmoji(chosenEmoji, mod.postObj.postUID);
+                                      PostServices().setSobCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=-1;
+                                      emojiCheck[1]=-1;
+                                      emojiCheck[2]=-1;
+                                      emojiCheck[3]=1;
+                                      emojiCheck[4]=-1;
+                                      chosenEmoji=4;
+                                    }
+
                                   }
-                                  else{
-                                    setState((){
-                                      mod.postObj.sobCounter--;
-                                      emojiCheck[0]=false;
-                                      emojiCheck[1]=false;
-                                      emojiCheck[2]=false;
-                                      emojiCheck[3]=false;
-                                      emojiCheck[4]=false;
-                                    });
-                                  }},
+                                 },
                                 ), Text("${mod.postObj.sobCounter}"),
                               ],
                             ),Row(
                               children: [
                                 IconButton(padding: EdgeInsets.zero,
                                   icon: Text("${Emojis.angryFace}",style: TextStyle(fontSize: 15),),
-                                  onPressed: (){ if(emojiCheck[4]==false){
-                                    setState((){
-                                      mod.postObj.sobCounter++;
-                                      emojiCheck[0]=false;
-                                      emojiCheck[1]=false;
-                                      emojiCheck[2]=false;
-                                      emojiCheck[3]=false;
-                                      emojiCheck[4]=true;
-                                    });
+                                  onPressed: (){{
+
+                                    if(emojiCheck[4]==0){
+                                      PostServices().setAngryCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=-1;
+                                      emojiCheck[1]=-1;
+                                      emojiCheck[2]=-1;
+                                      emojiCheck[3]=-1;
+                                      emojiCheck[4]=1;
+                                      chosenEmoji=5;
+                                    }
+                                    else if(emojiCheck[4]==1){
+                                      PostServices().setAngryCounter(mod.postObj.postUID, false);
+                                      emojiCheck[0]=0;
+                                      emojiCheck[1]=0;
+                                      emojiCheck[2]=0;
+                                      emojiCheck[3]=0;
+                                      emojiCheck[4]=0;
+                                    }
+                                    else if(emojiCheck[4]==-1){
+                                      PostServices().checkEmoji(chosenEmoji, mod.postObj.postUID);
+                                      PostServices().setAngryCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=-1;
+                                      emojiCheck[1]=-1;
+                                      emojiCheck[2]=-1;
+                                      emojiCheck[3]=-1;
+                                      emojiCheck[4]=1;
+                                      chosenEmoji=5;
+                                    }
+
+
                                   }
-                                  else{
-                                   setState((){
-                                     mod.postObj.sobCounter--;
-                                     emojiCheck[0]=false;
-                                     emojiCheck[1]=false;
-                                     emojiCheck[2]=false;
-                                     emojiCheck[3]=false;
-                                     emojiCheck[4]=false;
-                                   });
-                                  }},
+                                  },
                                 ), Text("${mod.postObj.angryCounter}"),
                               ],
                             ),
@@ -649,6 +701,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+
   }
 
   ParticipantPopUp(List<UserModel> participantList) {
@@ -772,4 +825,5 @@ class _HomePageState extends State<HomePage> {
               ],
             ));
   }
+
 }
