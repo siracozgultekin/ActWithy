@@ -164,9 +164,15 @@ class _HomePageState extends State<HomePage> {
 
                  Navigator.of(context).push(MaterialPageRoute(builder: (context)=>CreatingPage(postModel: postModel)));
               } else if (selectedIndex == 3) {
+<<<<<<< Updated upstream
 
               }else if (selectedIndex == 4) {
 
+=======
+              } else if (selectedIndex == 4) {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => ProfilePage(user: user)));
+>>>>>>> Stashed changes
               }
             });
           },

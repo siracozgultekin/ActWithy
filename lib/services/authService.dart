@@ -1,3 +1,4 @@
+import 'package:actwithy/Models/UserModel.dart';
 import 'package:actwithy/pages/homePage.dart';
 import 'package:actwithy/pages/welcomePage.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthService{
   String uid='';
+  CollectionReference users = FirebaseFirestore.instance.collection('users');
+
+
   Future<bool> register(String email, String pass, String username, String name,String surname) async {
     bool result = false;
     await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: pass)
@@ -64,6 +68,14 @@ class AuthService{
       ScaffoldMessenger.of(context)
           .showSnackBar(snacks("Hata oluştu. Daha sonra tekrar deneyiniz"));
     });
+  }
+
+  getUserURL(bool isPP) async {
+    String userID = FirebaseAuth.instance.currentUser!.uid;
+    DocumentSnapshot doc = await users.doc(userID).get();
+    UserModel user = UserModel.fromSnapshot(doc) as UserModel;
+
+    return isPP ? user.ppURL : user.backgroundURL;
   }
 
   SnackBar snacks(String text) {

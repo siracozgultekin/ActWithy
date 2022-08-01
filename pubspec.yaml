@@ -39,6 +39,11 @@ dependencies:
   cloud_firestore: ^3.2.1
   firebase_storage: ^10.3.1
   firebase_core: ^1.19.1
+<<<<<<< Updated upstream
+=======
+  emojis: ^0.9.9
+  image_picker: ^0.8.5+3
+>>>>>>> Stashed changes
 
 flutter_icons:
   android: "launcher_icon"
