@@ -9,7 +9,8 @@ import 'package:actwithy/services/authService.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
+import 'package:emojis/emojis.dart';
+import 'package:emojis/emoji.dart';
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -19,10 +20,23 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late List<UserModel> userMList;
+  String reactid="";
+  int chosenEmoji=0;
+
   int selectedIndex = 0;
   final controller = ScrollController();
   late UserModel user;
   bool isLoading = true;
+  var mediaqueryHeight;
+
+ List<int> emojiCheck =[ //TODO HER POST OBJESİ İÇİN AYRI BİR LİSTE ATAYABİLMEN LAZIM (MUHTEMELEN FİREBASE TARAFINDA OLUŞTURULACAK.)
+   0,//Hearth
+   0,//Broken Hearth
+   0,//Laughing
+   0,//Sob
+   0,//Angry
+ ];
+
   @override
   void initState() {
     getMe();
@@ -32,6 +46,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0XFFD6E6F1),
       drawer: isLoading
           ? CircularProgressIndicator(
               backgroundColor: Color(0xFF15202B),
@@ -125,6 +140,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: FutureBuilder(
+
           future: PostServices().getFriendsPosts(),
           builder: (context, AsyncSnapshot snap) {
             if (!snap.hasData) {
@@ -137,11 +153,12 @@ class _HomePageState extends State<HomePage> {
                     shrinkWrap: true,
                     separatorBuilder: (context, index) => Divider(
                           color: Colors.grey,
-                          height: 0.25,
+                          height: 0.15,
                         ),
                     scrollDirection: Axis.vertical,
                     itemCount: snap.data.length, //TODO snap.data.length,
                     itemBuilder: (context, index) {
+                      mediaqueryHeight=MediaQuery.of(context).size.height*0.06;
                       DenemeModel postModelObj =
                           snap.data[index] as DenemeModel;
                       return mainListTile(postModelObj);
@@ -191,7 +208,15 @@ class _HomePageState extends State<HomePage> {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => CreatingPage(postModel: postModel)));
               } else if (selectedIndex == 3) {
-              } else if (selectedIndex == 4) {}
+
+           
+              } else if (selectedIndex == 4) {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => ProfilePage(user: user)));
+              }
+
+             
+
             });
           },
           /*  if (selected == 0) {
@@ -241,29 +266,32 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget mainListTile(DenemeModel mod) {
+
+
     return SingleChildScrollView(
       physics: NeverScrollableScrollPhysics(),
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(left: 8.0,right: 8.0,top: 8.0,bottom: 8.0),
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.4,
+              height: mod.activitiesList.length<=2 ? MediaQuery.of(context).size.height * 0.33 :MediaQuery.of(context).size.height * 0.45,
+              width: MediaQuery.of(context).size.width * 0.9,
               decoration: BoxDecoration(
-                  color: Colors.brown, borderRadius: BorderRadius.circular(20)),
+                  color: Colors.white, borderRadius: BorderRadius.circular(20)),
               child: Center(
                   child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(10),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
                             Container(
-                              height: 45,
-                              width: 45,
+                              height: mediaqueryHeight,
+                              width: mediaqueryHeight,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 image: DecorationImage(
@@ -293,152 +321,139 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   //TODO HATA Text(mod.activitiesList![0].activityUID),
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.3,
-                    child: SingleChildScrollView(
-                      physics: ClampingScrollPhysics(),
-                      child: Column(
-                        children: [
-                          ListView.builder(
-                              itemCount: mod.activitiesList.length,
-                              scrollDirection: Axis.vertical,
-                              physics: ClampingScrollPhysics(),
-                              shrinkWrap: true,
-                              itemBuilder: (context, index) {
-                                return FutureBuilder(
-                                  future: PostServices()
-                                      .getParticipants(mod.activitiesList[index]),
-                                  builder: (context, AsyncSnapshot snap) {
-                                    if (!snap.hasData) {
-                                      return CircularProgressIndicator();
-                                    }else{
-                                      ActivityModel activity = mod.activitiesList[index];
-                                      List<UserModel> participantList = snap.data;
-                                      return Column(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                    MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Text(activity
-                                                          .activityType),
-                                                      Row(
-                                                        children: [
-                                                          Container(
-                                                            padding: EdgeInsets.all(0.0),
-                                                            child: InkWell(
-                                                                child: Icon(Icons
-                                                                    .watch_later_outlined)),
-                                                          ),
-                                                          Text(
-                                                              "${activity.time.toDate().hour}:${mod.activitiesList[index].time.toDate().minute}"),
-                                                        ],
-                                                      )
-                                                    ],
-                                                  ),
-                                                ), // activity and clock
-                                                Row(
-                                                  children: [
-                                                    Container(
-                                                      padding: EdgeInsets.only(left: 10),
-                                                      child:
-                                                      InkWell(child: Icon(Icons.close)),
-                                                    ),
-                                                  ],
-                                                ), // delete and edit icons
-                                              ],
-                                            ),
-                                          ),
-                                          Row(
-                                            children: [
-                                              Row(
+                  Expanded(
+                    child: Container(
+                      child: SingleChildScrollView(
+                        physics: ClampingScrollPhysics(),
+                        child: Column(
+                          children: [
+                            ListView.builder(
+                                itemCount: mod.activitiesList.length,
+                                scrollDirection: Axis.vertical,
+                                physics: ClampingScrollPhysics(),
+                                shrinkWrap: true,
+                                itemBuilder: (context, index) {
+                                  return FutureBuilder(
+                                    future: PostServices()
+                                        .getParticipants(mod.activitiesList[index]),
+                                    builder: (context, AsyncSnapshot snap) {
+                                      if (!snap.hasData) {
+                                        return CircularProgressIndicator();
+                                      }else{
+                                        ActivityModel activity = mod.activitiesList[index];
+                                        List<UserModel> participantList = snap.data;
+                                        return Column(
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Row(
                                                 children: [
-                                                  Icon(Icons.location_on),
-                                                  Text(
-                                                      "${activity.location}"),
-                                                ],
-                                              ),
-                                              InkWell(
-                                                onTap: () {
-                                                  ParticipantPopUp(participantList);
-                                                },
-                                                child: Row(
-                                                  children: [
-                                                    if (activity.participants
-                                                        .length >=
-                                                        1)
-                                                      Padding(
-                                                        padding:
-                                                        const EdgeInsets.only(left: 8.0),
-                                                        child: Container(
-                                                          height: 20,
-                                                          width: 20,
-                                                          decoration: BoxDecoration(
-                                                            color: Colors.green,
-                                                            shape: BoxShape.circle,
-                                                            image: DecorationImage(
-                                                              image: NetworkImage(
-                                                                  participantList[0].ppURL),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    if (activity.participants
-                                                        .length >=
-                                                        2)
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(
-                                                          left: 4.0,
-                                                        ),
-                                                        child: Row(
+                                                  Expanded(
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                      MainAxisAlignment.spaceBetween,
+                                                      children: [
+                                                        Text(activity
+                                                            .activityType),
+                                                        Row(
                                                           children: [
                                                             Container(
-                                                              height: 20,
-                                                              width: 20,
-                                                              decoration: BoxDecoration(
-                                                                  color: Colors.green,
-                                                                  shape: BoxShape.circle,
-                                                                  image: DecorationImage(
-                                                                    image: NetworkImage(
-                                                                        participantList[1].ppURL),
-                                                                  )),
+                                                              padding: EdgeInsets.all(0.0),
+                                                              child: InkWell(
+                                                                  child: Icon(Icons
+                                                                      .watch_later_outlined)),
                                                             ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    if (activity.participants
-                                                        .length >
-                                                        2)
-                                                      Padding(
-                                                        padding:
-                                                        const EdgeInsets.only(left: 8.0),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                          CrossAxisAlignment.start,
-                                                          children: [
                                                             Text(
-                                                                "+${activity.participants.length - 2}"),
-                                                            Row(
-                                                              children: [
-                                                                Container(
-                                                                  height: 5,
-                                                                  width: 5,
-                                                                  decoration: BoxDecoration(
-                                                                    color: Colors.black,
+                                                                "${activity.time.toDate().hour}:${mod.activitiesList[index].time.toDate().minute}"),
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ), // activity and clock
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        padding: EdgeInsets.only(left: 10),
+                                                        child:
+                                                        InkWell(child: Icon(Icons.close)),
+                                                      ),
+                                                    ],
+                                                  ), // delete and edit icons
+                                                ],
+                                              ),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Icon(Icons.location_on),
+                                                    Text(
+                                                        "${activity.location}"),
+                                                  ],
+                                                ),
+                                                InkWell(
+                                                  onTap: () {
+                                                    ParticipantPopUp(participantList);
+                                                  },
+                                                  child: Row(
+                                                    children: [
+                                                      if (activity.participants
+                                                          .length >=
+                                                          1)
+                                                        Padding(
+                                                          padding:
+                                                          const EdgeInsets.only(left: 8.0),
+                                                          child: Container(
+                                                            height: 20,
+                                                            width: 20,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.green,
+                                                              shape: BoxShape.circle,
+                                                              image: DecorationImage(
+                                                                image: NetworkImage(
+                                                                    participantList[0].ppURL),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      if (activity.participants
+                                                          .length >=
+                                                          2)
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(
+                                                            left: 4.0,
+                                                          ),
+                                                          child: Row(
+                                                            children: [
+                                                              Container(
+                                                                height: 20,
+                                                                width: 20,
+                                                                decoration: BoxDecoration(
+                                                                    color: Colors.green,
                                                                     shape: BoxShape.circle,
-                                                                  ),
-                                                                ),
-                                                                Padding(
-                                                                  padding:
-                                                                  const EdgeInsets.only(
-                                                                      left: 2.0,
-                                                                      right: 2),
-                                                                  child: Container(
+                                                                    image: DecorationImage(
+                                                                      image: NetworkImage(
+                                                                          participantList[1].ppURL),
+                                                                    )),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      if (activity.participants
+                                                          .length >
+                                                          2)
+                                                        Padding(
+                                                          padding:
+                                                          const EdgeInsets.only(left: 8.0),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                            CrossAxisAlignment.start,
+                                                            children: [
+                                                              Text(
+                                                                  "+${activity.participants.length - 2}"),
+                                                              Row(
+                                                                children: [
+                                                                  Container(
                                                                     height: 5,
                                                                     width: 5,
                                                                     decoration: BoxDecoration(
@@ -446,32 +461,267 @@ class _HomePageState extends State<HomePage> {
                                                                       shape: BoxShape.circle,
                                                                     ),
                                                                   ),
-                                                                ),
-                                                                Container(
-                                                                  height: 5,
-                                                                  width: 5,
-                                                                  decoration: BoxDecoration(
-                                                                    color: Colors.black,
-                                                                    shape: BoxShape.circle,
+                                                                  Padding(
+                                                                    padding:
+                                                                    const EdgeInsets.only(
+                                                                        left: 2.0,
+                                                                        right: 2),
+                                                                    child: Container(
+                                                                      height: 5,
+                                                                      width: 5,
+                                                                      decoration: BoxDecoration(
+                                                                        color: Colors.black,
+                                                                        shape: BoxShape.circle,
+                                                                      ),
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ],
+                                                                  Container(
+                                                                    height: 5,
+                                                                    width: 5,
+                                                                    decoration: BoxDecoration(
+                                                                      color: Colors.black,
+                                                                      shape: BoxShape.circle,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
                                                         ),
-                                                      ),
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      );
+                                              ],
+                                            ),
+                                            Divider(height: 3,thickness: 1.50,),
+                                          ],
+                                        );
+                                      }
+                                    },
+                                  );
+                                }),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Divider(height: 1,color: Colors.blue,),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      height:MediaQuery.of(context).size.height * 0.05,
+                      width:  MediaQuery.of(context).size.width*0.9,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                IconButton(padding: EdgeInsets.zero,
+                                  icon: Text("${Emojis.redHeart}",style: TextStyle(fontSize: 15),),
+                                  onPressed: ()async{
+
+
+                                    if(emojiCheck[0]==0){
+                                      reactid= await PostServices().createReact(user.userUID, mod.userObj.userUID, mod.postObj.postUID, "redHeart");
+                                      PostServices().setHeartCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=1;
+                                      emojiCheck[1]=-1;
+                                      emojiCheck[2]=-1;
+                                      emojiCheck[3]=-1;
+                                      emojiCheck[4]=-1;
+                                      chosenEmoji=1;
+
                                     }
+                                    else if(emojiCheck[0]==1){
+                                     PostServices().deleteReaction(reactid);
+                                     PostServices().setHeartCounter(mod.postObj.postUID, false);
+                                     emojiCheck[0]=0;
+                                     emojiCheck[1]=0;
+                                     emojiCheck[2]=0;
+                                     emojiCheck[3]=0;
+                                     emojiCheck[4]=0;
+
+                                    }
+                                    else if(emojiCheck[0]==-1){
+                                      PostServices().updateReactionType(reactid, "redHeart");
+                                      PostServices().checkEmoji(chosenEmoji, mod.postObj.postUID);
+                                      PostServices().setHeartCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=1;
+                                      emojiCheck[1]=-1;
+                                      emojiCheck[2]=-1;
+                                      emojiCheck[3]=-1;
+                                      emojiCheck[4]=-1;
+                                      chosenEmoji=1;
+                                    }
+
                                   },
-                                );
-                              }),
-                        ],
+                                ),
+                                Text("${mod.postObj.heartCounter}"),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                IconButton(padding: EdgeInsets.zero,
+                                  icon: Text("${Emojis.brokenHeart}",style: TextStyle(fontSize: 15),),
+                                  onPressed: ()async{ {
+                                    String reactid="";
+                                    if(emojiCheck[1]==0){
+                                      reactid= await PostServices().createReact(user.userUID, mod.userObj.userUID, mod.postObj.postUID, "brokenHeart");
+                                      PostServices().setHeartCounter(mod.postObj.postUID, true);
+                                      PostServices().setBrokenHeartCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=-1;
+                                      emojiCheck[1]=1;
+                                      emojiCheck[2]=-1;
+                                      emojiCheck[3]=-1;
+                                      emojiCheck[4]=-1;
+                                      chosenEmoji=2;
+                                    }
+                                    else if(emojiCheck[1]==1){
+                                      PostServices().deleteReaction(reactid);
+                                      PostServices().setBrokenHeartCounter(mod.postObj.postUID, false);
+                                      emojiCheck[0]=0;
+                                      emojiCheck[1]=0;
+                                      emojiCheck[2]=0;
+                                      emojiCheck[3]=0;
+                                      emojiCheck[4]=0;
+                                    }
+                                    else if(emojiCheck[1]==-1){
+                                      print("Reactid: $reactid");
+                                     PostServices().updateReactionType(reactid, "brokenHeart");
+                                     PostServices().checkEmoji(chosenEmoji, mod.postObj.postUID);
+                                     PostServices().setBrokenHeartCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=-1;
+                                      emojiCheck[1]=1;
+                                      emojiCheck[2]=-1;
+                                      emojiCheck[3]=-1;
+                                      emojiCheck[4]=-1;
+                                      chosenEmoji=2;
+                                    }
+
+                                  }
+                                  },
+                                ), Text("${mod.postObj.brokenHeartCounter}"),
+                              ],
+                            ), Row(
+                              children: [
+                                IconButton(padding: EdgeInsets.zero,
+                                  icon: Text("${Emojis.rollingOnTheFloorLaughing}",style: TextStyle(fontSize: 15),),
+                                  onPressed: ()async{
+                                    String reactid="";
+                                    if(emojiCheck[2]==0){
+                                      reactid= await PostServices().createReact(user.userUID, mod.userObj.userUID, mod.postObj.postUID, "rollingOnTheFloorLaughing");
+                                      PostServices().setJoyCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=-1;
+                                      emojiCheck[1]=-1;
+                                      emojiCheck[2]=1;
+                                      emojiCheck[3]=-1;
+                                      emojiCheck[4]=-1;
+                                      chosenEmoji=3;
+                                    }
+                                    else if(emojiCheck[2]==1){
+                                      PostServices().deleteReaction(reactid);
+                                      PostServices().setJoyCounter(mod.postObj.postUID, false);
+                                      emojiCheck[0]=0;
+                                      emojiCheck[1]=0;
+                                      emojiCheck[2]=0;
+                                      emojiCheck[3]=0;
+                                      emojiCheck[4]=0;
+                                    }
+                                    else if(emojiCheck[2]==-1){
+                                      PostServices().updateReactionType(reactid, "rollingOnTheFloorLaughing");
+                                      PostServices().checkEmoji(chosenEmoji, mod.postObj.postUID);
+                                      PostServices().setJoyCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=-1;
+                                      emojiCheck[1]=-1;
+                                      emojiCheck[2]=1;
+                                      emojiCheck[3]=-1;
+                                      emojiCheck[4]=-1;
+                                      chosenEmoji=3;
+                                    }
+                                 },
+                                ),  Text("${mod.postObj.joyCounter}"),
+                              ],
+                            ),Row(
+                              children: [
+                                IconButton(padding: EdgeInsets.zero,
+                                  icon: Text("${Emojis.sadButRelievedFace}",style: TextStyle(fontSize: 15),),
+                                  onPressed: (){ {
+                                    if(emojiCheck[3]==0){
+                                      PostServices().setSobCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=-1;
+                                      emojiCheck[1]=-1;
+                                      emojiCheck[2]=-1;
+                                      emojiCheck[3]=1;
+                                      emojiCheck[4]=-1;
+                                      chosenEmoji=4;
+                                    }
+                                    else if(emojiCheck[3]==1){
+                                      PostServices().setSobCounter(mod.postObj.postUID, false);
+                                      emojiCheck[0]=0;
+                                      emojiCheck[1]=0;
+                                      emojiCheck[2]=0;
+                                      emojiCheck[3]=0;
+                                      emojiCheck[4]=0;
+                                    }
+                                    else if(emojiCheck[3]==-1){
+                                      PostServices().checkEmoji(chosenEmoji, mod.postObj.postUID);
+                                      PostServices().setSobCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=-1;
+                                      emojiCheck[1]=-1;
+                                      emojiCheck[2]=-1;
+                                      emojiCheck[3]=1;
+                                      emojiCheck[4]=-1;
+                                      chosenEmoji=4;
+                                    }
+
+                                  }
+                                 },
+                                ), Text("${mod.postObj.sobCounter}"),
+                              ],
+                            ),Row(
+                              children: [
+                                IconButton(padding: EdgeInsets.zero,
+                                  icon: Text("${Emojis.angryFace}",style: TextStyle(fontSize: 15),),
+                                  onPressed: (){{
+
+                                    if(emojiCheck[4]==0){
+                                      PostServices().setAngryCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=-1;
+                                      emojiCheck[1]=-1;
+                                      emojiCheck[2]=-1;
+                                      emojiCheck[3]=-1;
+                                      emojiCheck[4]=1;
+                                      chosenEmoji=5;
+                                    }
+                                    else if(emojiCheck[4]==1){
+                                      PostServices().setAngryCounter(mod.postObj.postUID, false);
+                                      emojiCheck[0]=0;
+                                      emojiCheck[1]=0;
+                                      emojiCheck[2]=0;
+                                      emojiCheck[3]=0;
+                                      emojiCheck[4]=0;
+                                    }
+                                    else if(emojiCheck[4]==-1){
+                                      PostServices().checkEmoji(chosenEmoji, mod.postObj.postUID);
+                                      PostServices().setAngryCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=-1;
+                                      emojiCheck[1]=-1;
+                                      emojiCheck[2]=-1;
+                                      emojiCheck[3]=-1;
+                                      emojiCheck[4]=1;
+                                      chosenEmoji=5;
+                                    }
+
+
+                                  }
+                                  },
+                                ), Text("${mod.postObj.angryCounter}"),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -482,6 +732,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+
   }
 
   ParticipantPopUp(List<UserModel> participantList) {
@@ -506,11 +757,12 @@ class _HomePageState extends State<HomePage> {
                       SizedBox(
                         height: 10,
                       ),
-                      ListView.builder(
+                      ListView.separated(
                         shrinkWrap: true,
                         scrollDirection: Axis.vertical,
                         physics: ClampingScrollPhysics(),
                         itemCount: participantList.length,
+                        separatorBuilder:  (context, index) =>Divider(thickness: 10,),
                         itemBuilder: (context, index) {
                           UserModel user = participantList[index];
                           return Padding(
@@ -604,4 +856,5 @@ class _HomePageState extends State<HomePage> {
               ],
             ));
   }
+
 }

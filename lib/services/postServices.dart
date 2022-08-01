@@ -1,6 +1,7 @@
 
 import 'package:actwithy/Models/ActivityModel.dart';
 import 'package:actwithy/Models/PostModel.dart';
+import 'package:actwithy/Models/ReactionModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -13,9 +14,10 @@ class PostServices {
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   CollectionReference posts = FirebaseFirestore.instance.collection('posts');
   CollectionReference activities = FirebaseFirestore.instance.collection('activities');
+  CollectionReference reactions = FirebaseFirestore.instance.collection('reactions');
 
-  Future<String> createActivity(String selectedItem, Timestamp time,
-      String location, List<String> participants) async {
+  Future<String> createActivity(
+      String selectedItem, Timestamp time, String location, List<String> participants) async {
     /* await activities.add(model.createMap()).then((value) async {
 
      String postId = value.id;
@@ -165,7 +167,7 @@ class PostServices {
     PostModel postModel = await getDailyPost();
     List<String> actIDs = postModel.activityUID;
     List<ActivityModel> activitiesList = [];
-    print("activitiesListYUKARI: ${activitiesList}");
+
 
     for (String id in actIDs) {
       DocumentSnapshot dc = await activities.doc(id).get();
@@ -174,7 +176,6 @@ class PostServices {
     }
     print("activitiesList: ${activitiesList}");
     activitiesList.sort((a, b) => a.time.compareTo(b.time));
-
     return activitiesList;
   }
 
@@ -196,7 +197,7 @@ class PostServices {
         for ( String id in activityIDs) {
           DocumentSnapshot dc = await activities.doc(id).get();
           md.add(ActivityModel.fromSnapshot(dc));
-          print("activitymodelMM: ${md.first.activityUID}");
+
         }
         md.sort((a, b) => a.time.compareTo(b.time));
        // deneme.setActivities(md);
@@ -277,6 +278,153 @@ Future<DocumentSnapshot> getMyDoc()async{
     }
     return participants;
 
+  }
+
+  Future<void> editProfile(String name, String surname, String bio) async {
+
+    await users.doc(myId).update({
+      'name': name, 'surname':surname, 'bio':bio
+    });
+
+  }
+
+  Future<UserModel> returnUser(String uid) async {
+    return UserModel.fromSnapshot(await users.doc(uid).get());
+  }
+
+
+  Future<void> setAngryCounter(String postUID,bool check)async{
+DocumentSnapshot postDoc = await posts.doc(postUID).get();
+   int count;
+    if(check){
+      count= postDoc["angryCounter"]+1;
+      print("CountForTrueCondition:: $count");
+      await posts.doc(postUID).update({
+        "angryCounter": count,
+      });
+    }
+    else{
+      count= postDoc["angryCounter"]-1;
+      print("CountForFalseCondition:: $count");
+      await posts.doc(postUID).update({
+        "angryCounter": count,
+      });
+    }
+  }
+  Future<void> setJoyCounter(String postUID,bool check)async{
+    DocumentSnapshot postDoc = await posts.doc(postUID).get();
+    int count;
+    if(check){
+      count= postDoc["joyCounter"]+1;
+      print("CountForTrueCondition:: $count");
+      await posts.doc(postUID).update({
+        "joyCounter": count,
+      });
+    }
+    else{
+      count= postDoc["joyCounter"]-1;
+      print("CountForFalseCondition:: $count");
+      await posts.doc(postUID).update({
+        "joyCounter": count,
+      });
+    }
+  }
+  Future<void> setBrokenHeartCounter(String postUID,bool check)async{
+    DocumentSnapshot postDoc = await posts.doc(postUID).get();
+    int count;
+    if(check){
+      count= postDoc["brokenHeartCounter"]+1;
+      print("CountForTrueCondition:: $count");
+      await posts.doc(postUID).update({
+        "brokenHeartCounter": count,
+      });
+    }
+    else{
+      count= postDoc["brokenHeartCounter"]-1;
+      print("CountForFalseCondition:: $count");
+      await posts.doc(postUID).update({
+        "brokenHeartCounter": count,
+      });
+    }
+  }
+  Future<void> setSobCounter(String postUID,bool check)async{
+    DocumentSnapshot postDoc = await posts.doc(postUID).get();
+    int count;
+    if(check){
+      count= postDoc["sobCounter"]+1;
+      print("CountForTrueCondition:: $count");
+      await posts.doc(postUID).update({
+        "sobCounter": count,
+      });
+    }
+    else{
+      count= postDoc["sobCounter"]-1;
+      print("CountForFalseCondition:: $count");
+      await posts.doc(postUID).update({
+        "sobCounter": count,
+      });
+    }
+  }
+  Future<void> setHeartCounter(String postUID,bool check)async{
+    DocumentSnapshot postDoc = await posts.doc(postUID).get();
+    int count;
+    if(check){
+      count= postDoc["heartCounter"]+1;
+      print("CountForTrueCondition:: $count");
+      await posts.doc(postUID).update({
+        "heartCounter": count,
+      });
+    }
+    else{
+      count= postDoc["heartCounter"]-1;
+      print("CountForFalseCondition:: $count");
+      await posts.doc(postUID).update({
+        "heartCounter": count,
+      });
+    }
+  }
+ Future<void> checkEmoji(int val,String postUID)async{
+    if(val==1){
+    setHeartCounter(postUID, false);
+    }
+    else if(val==2){
+      setBrokenHeartCounter(postUID, false);
+    }
+    else if(val==3){
+      setJoyCounter(postUID, false);
+    }
+    else if(val==4){
+      setSobCounter(postUID, false);
+    }
+    else if(val==5){
+      setAngryCounter(postUID, false);
+    }
+    else{
+      val=0;
+    }
+  }
+
+  Future<String> createReact(String userID, String reacteeID, String postID, String reactType  )async{
+    String reactionid="xxxx";
+    await reactions.add({
+    "reacterID":userID,
+    "reacteeID":reacteeID,
+    "postID":postID,
+    "type":reactType,
+    }).then((value)async {
+    reactionid=value.id;
+    print("reactionid in func. ::::$reactionid");
+    await reactions.doc(value.id).update({"reactionUID":value.id});
+    });
+    return reactionid;
+  }
+  Future<void> updateReactionType(String reactionUID,String reactionType)async{
+    await reactions.doc(reactionUID).update({"type":reactionType});
+  }
+  Future<void> deleteReaction(String reactionUID)async{
+  if(reactionUID!=""){
+    await reactions.doc(reactionUID).delete();
+  }
   }
 }
 
