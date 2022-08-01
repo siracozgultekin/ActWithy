@@ -20,6 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late List<UserModel> userMList;
+  String reactid="";
   int chosenEmoji=0;
   List<int> emojiCheck =[
     0,//Hearth
@@ -510,8 +511,9 @@ class _HomePageState extends State<HomePage> {
                                 IconButton(padding: EdgeInsets.zero,
                                   icon: Text("${Emojis.redHeart}",style: TextStyle(fontSize: 15),),
                                   onPressed: ()async{
-                                    if(emojiCheck[0]==0){
 
+                                    if(emojiCheck[0]==0){
+                                      reactid= await PostServices().createReact(user.userUID, mod.userObj.userUID, mod.postObj.postUID, "redHeart");
                                       PostServices().setHeartCounter(mod.postObj.postUID, true);
                                       emojiCheck[0]=1;
                                       emojiCheck[1]=-1;
@@ -522,7 +524,7 @@ class _HomePageState extends State<HomePage> {
 
                                     }
                                     else if(emojiCheck[0]==1){
-
+                                     PostServices().deleteReaction(reactid);
                                      PostServices().setHeartCounter(mod.postObj.postUID, false);
                                      emojiCheck[0]=0;
                                      emojiCheck[1]=0;
@@ -532,7 +534,15 @@ class _HomePageState extends State<HomePage> {
 
                                     }
                                     else if(emojiCheck[0]==-1){
-
+                                      PostServices().updateReactionType(reactid, "redHeart");
+                                      PostServices().checkEmoji(chosenEmoji, mod.postObj.postUID);
+                                      PostServices().setHeartCounter(mod.postObj.postUID, true);
+                                      emojiCheck[0]=1;
+                                      emojiCheck[1]=-1;
+                                      emojiCheck[2]=-1;
+                                      emojiCheck[3]=-1;
+                                      emojiCheck[4]=-1;
+                                      chosenEmoji=1;
                                     }
 
                                   },
@@ -544,8 +554,11 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 IconButton(padding: EdgeInsets.zero,
                                   icon: Text("${Emojis.brokenHeart}",style: TextStyle(fontSize: 15),),
-                                  onPressed: (){ {
+                                  onPressed: ()async{ {
+                                    String reactid="";
                                     if(emojiCheck[1]==0){
+                                      reactid= await PostServices().createReact(user.userUID, mod.userObj.userUID, mod.postObj.postUID, "brokenHeart");
+                                      PostServices().setHeartCounter(mod.postObj.postUID, true);
                                       PostServices().setBrokenHeartCounter(mod.postObj.postUID, true);
                                       emojiCheck[0]=-1;
                                       emojiCheck[1]=1;
@@ -555,6 +568,7 @@ class _HomePageState extends State<HomePage> {
                                       chosenEmoji=2;
                                     }
                                     else if(emojiCheck[1]==1){
+                                      PostServices().deleteReaction(reactid);
                                       PostServices().setBrokenHeartCounter(mod.postObj.postUID, false);
                                       emojiCheck[0]=0;
                                       emojiCheck[1]=0;
@@ -563,8 +577,10 @@ class _HomePageState extends State<HomePage> {
                                       emojiCheck[4]=0;
                                     }
                                     else if(emojiCheck[1]==-1){
-                                      PostServices().checkEmoji(chosenEmoji, mod.postObj.postUID);
-                                      PostServices().setBrokenHeartCounter(mod.postObj.postUID, true);
+                                      print("Reactid: $reactid");
+                                     PostServices().updateReactionType(reactid, "brokenHeart");
+                                     PostServices().checkEmoji(chosenEmoji, mod.postObj.postUID);
+                                     PostServices().setBrokenHeartCounter(mod.postObj.postUID, true);
                                       emojiCheck[0]=-1;
                                       emojiCheck[1]=1;
                                       emojiCheck[2]=-1;
@@ -581,8 +597,10 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 IconButton(padding: EdgeInsets.zero,
                                   icon: Text("${Emojis.rollingOnTheFloorLaughing}",style: TextStyle(fontSize: 15),),
-                                  onPressed: (){
+                                  onPressed: ()async{
+                                    String reactid="";
                                     if(emojiCheck[2]==0){
+                                      reactid= await PostServices().createReact(user.userUID, mod.userObj.userUID, mod.postObj.postUID, "rollingOnTheFloorLaughing");
                                       PostServices().setJoyCounter(mod.postObj.postUID, true);
                                       emojiCheck[0]=-1;
                                       emojiCheck[1]=-1;
@@ -592,6 +610,7 @@ class _HomePageState extends State<HomePage> {
                                       chosenEmoji=3;
                                     }
                                     else if(emojiCheck[2]==1){
+                                      PostServices().deleteReaction(reactid);
                                       PostServices().setJoyCounter(mod.postObj.postUID, false);
                                       emojiCheck[0]=0;
                                       emojiCheck[1]=0;
@@ -600,6 +619,7 @@ class _HomePageState extends State<HomePage> {
                                       emojiCheck[4]=0;
                                     }
                                     else if(emojiCheck[2]==-1){
+                                      PostServices().updateReactionType(reactid, "rollingOnTheFloorLaughing");
                                       PostServices().checkEmoji(chosenEmoji, mod.postObj.postUID);
                                       PostServices().setJoyCounter(mod.postObj.postUID, true);
                                       emojiCheck[0]=-1;

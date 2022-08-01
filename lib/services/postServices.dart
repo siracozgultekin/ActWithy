@@ -1,6 +1,7 @@
 
 import 'package:actwithy/Models/ActivityModel.dart';
 import 'package:actwithy/Models/PostModel.dart';
+import 'package:actwithy/Models/ReactionModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -13,9 +14,10 @@ class PostServices {
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   CollectionReference posts = FirebaseFirestore.instance.collection('posts');
   CollectionReference activities = FirebaseFirestore.instance.collection('activities');
+  CollectionReference reactions = FirebaseFirestore.instance.collection('reactions');
 
-  Future<String> createActivity(String selectedItem, Timestamp time,
-      String location, List<String> participants) async {
+  Future<String> createActivity(
+      String selectedItem, Timestamp time, String location, List<String> participants) async {
     /* await activities.add(model.createMap()).then((value) async {
 
      String postId = value.id;
@@ -165,14 +167,14 @@ class PostServices {
     PostModel postModel = await getDailyPost();
     List<String> actIDs = postModel.activityUID;
     List<ActivityModel> activitiesList = [];
-    print("activitiesListYUKARI: ${activitiesList}");
+
 
     for (String id in actIDs) {
       DocumentSnapshot dc = await activities.doc(id).get();
       print("id: ${dc["activityUID"]}");
       activitiesList.add(ActivityModel.fromSnapshot(dc));
     }
-    print("activitiesList: ${activitiesList}");
+
 
     return activitiesList;
   }
@@ -397,6 +399,29 @@ DocumentSnapshot postDoc = await posts.doc(postUID).get();
     else{
       val=0;
     }
+  }
+
+  Future<String> createReact(String userID, String reacteeID, String postID, String reactType  )async{
+    String reactionid="xxxx";
+    await reactions.add({
+    "reacterID":userID,
+    "reacteeID":reacteeID,
+    "postID":postID,
+    "type":reactType,
+    }).then((value)async {
+    reactionid=value.id;
+    print("reactionid in func. ::::$reactionid");
+    await reactions.doc(value.id).update({"reactionUID":value.id});
+    });
+    return reactionid;
+  }
+  Future<void> updateReactionType(String reactionUID,String reactionType)async{
+    await reactions.doc(reactionUID).update({"type":reactionType});
+  }
+  Future<void> deleteReaction(String reactionUID)async{
+  if(reactionUID!=""){
+    await reactions.doc(reactionUID).delete();
+  }
   }
 }
 
