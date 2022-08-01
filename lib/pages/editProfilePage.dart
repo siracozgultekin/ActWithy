@@ -1,4 +1,5 @@
 import 'package:actwithy/Models/UserModel.dart';
+import 'package:actwithy/pages/imagePickerPage.dart';
 import 'package:actwithy/pages/profilePage.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -37,24 +38,36 @@ class _EditProfilePageState extends State<EditProfilePage> {
         backgroundColor: appbarColor,
         centerTitle: true,
         title: Text("Edit Profile"),
-        // leading: IconButton(
-        //   icon: Icon(Icons.close),
-        //   iconSize: 35,
-        //   onPressed: () {
-        //     Navigator.of(context).pop();
-        //   },
-        // ),
-        // leadingWidth: MediaQuery.of(context).size.width * 0.2,
-        // actions: [
-        //   Container(
-        //     width: MediaQuery.of(context).size.width * 0.2,
-        //     alignment: Alignment.centerRight,
-        //     child: IconButton(onPressed: () {
-        //       PostServices().editProfile(nameKey.text.trim(), surnameKey.text.trim(), bioKey.text.trim());
-        //       Navigator.of(context).pop();
-        //     }, icon: Icon(Icons.check), iconSize: 35,),
-        //   ),
-        // ],
+        leading: IconButton(
+          icon: Icon(Icons.close),
+          iconSize: 35,
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        leadingWidth: MediaQuery.of(context).size.width * 0.2,
+        actions: [
+          Container(
+            width: MediaQuery.of(context).size.width * 0.2,
+            alignment: Alignment.centerRight,
+            child: IconButton(onPressed: () async {
+                  String nameText = nameKey.text.trim();
+                  String surnameText = surnameKey.text.trim();
+                  String bioText = bioKey.text.trim();
+
+                  if(nameText.isEmpty) nameText = user.name;
+                  if(surnameText.isEmpty) surnameText = user.surname;
+                  if(bioText.isEmpty) bioText = user.bio;
+
+
+                  PostServices().editProfile(nameText, surnameText, bioText);
+
+                  UserModel userModel = await PostServices().returnUser(user.userUID);
+                  //TODO pop push olayını düzelt ve her yerdeki güncellensin
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ProfilePage(user: userModel)));
+                }, icon: Icon(Icons.check), iconSize: 35,),
+          ),
+        ],
 
       ),
 
@@ -90,7 +103,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           child: IconButton(
                             color: selectedColor,
                             icon: Icon(Icons.camera_enhance_rounded, size: MediaQuery.of(context).size.width*0.1,),
-                            onPressed: () {  },
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => ImagePickerPage(isPP: false,)));
+                            },
                           ))
                     ],
                   ),
@@ -111,7 +126,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         child: IconButton(
                           color: selectedColor,
                           icon: Icon(Icons.camera_enhance_rounded, size: MediaQuery.of(context).size.width*0.1,),
-                          onPressed: () {  },
+                          onPressed: () {
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => ImagePickerPage(isPP: true)));
+                          },
                         ))
                   ],
                 ),
@@ -182,41 +199,41 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ),
             ),
           ),
-          Container(
-            child: Row(
-              children: [
-                IconButton(
-                  icon: Icon(Icons.close),
-                  iconSize: 35,
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.2,
-                    alignment: Alignment.centerRight,
-                    child: IconButton(onPressed: () async {
-                      String nameText = nameKey.text.trim();
-                      String surnameText = surnameKey.text.trim();
-                      String bioText = bioKey.text.trim();
-
-                      if(nameText.isEmpty) nameText = user.name;
-                      if(surnameText.isEmpty) surnameText = user.surname;
-                      if(bioText.isEmpty) bioText = user.bio;
-
-
-                      PostServices().editProfile(nameText, surnameText, bioText);
-
-                      UserModel userModel = await PostServices().returnUser(user.userUID);
-                      //TODO pop push olayını düzelt ve her yerdeki güncellensin
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ProfilePage(user: userModel)));
-                    }, icon: Icon(Icons.check), iconSize: 35,),
-                  ),
-
-              ],
-            ),
-          )
+          // Container(
+          //   child: Row(
+          //     children: [
+          //       IconButton(
+          //         icon: Icon(Icons.close),
+          //         iconSize: 35,
+          //         onPressed: () {
+          //           Navigator.of(context).pop();
+          //         },
+          //       ),
+          //
+          //         Container(
+          //           width: MediaQuery.of(context).size.width * 0.2,
+          //           alignment: Alignment.centerRight,
+          //           child: IconButton(onPressed: () async {
+          //             String nameText = nameKey.text.trim();
+          //             String surnameText = surnameKey.text.trim();
+          //             String bioText = bioKey.text.trim();
+          //
+          //             if(nameText.isEmpty) nameText = user.name;
+          //             if(surnameText.isEmpty) surnameText = user.surname;
+          //             if(bioText.isEmpty) bioText = user.bio;
+          //
+          //
+          //             PostServices().editProfile(nameText, surnameText, bioText);
+          //
+          //             UserModel userModel = await PostServices().returnUser(user.userUID);
+          //             //TODO pop push olayını düzelt ve her yerdeki güncellensin
+          //             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ProfilePage(user: userModel)));
+          //           }, icon: Icon(Icons.check), iconSize: 35,),
+          //         ),
+          //
+          //     ],
+          //   ),
+          // )
         ],
           ),
       ),
