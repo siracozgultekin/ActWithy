@@ -174,8 +174,8 @@ class PostServices {
       print("id: ${dc["activityUID"]}");
       activitiesList.add(ActivityModel.fromSnapshot(dc));
     }
-
-
+    print("activitiesList: ${activitiesList}");
+    activitiesList.sort((a, b) => a.time.compareTo(b.time));
     return activitiesList;
   }
 
@@ -199,15 +199,17 @@ class PostServices {
           md.add(ActivityModel.fromSnapshot(dc));
 
         }
+        md.sort((a, b) => a.time.compareTo(b.time));
        // deneme.setActivities(md);
         DenemeModel deneme = DenemeModel(userObj:UserModel.fromSnapshot(friendDoc) ,activitiesList: md,postObj: PostModel.fromSnapshot(postDoc));
         md=[];
         postsList.add(deneme);
       }
     }
-    postsList.sort((a, b) => a.postObj.date.compareTo(b.postObj.date));
+    postsList.sort((a, b) => b.postObj.date.compareTo(a.postObj.date));
     return postsList;
   }
+
 Future<List<PostModel>> getMyPosts()async{
     List<PostModel> postsList = [];
     DocumentSnapshot myDoc = await users.doc(myId).get();
@@ -250,6 +252,7 @@ Future<DocumentSnapshot> getMyDoc()async{
       DocumentSnapshot dc = await activities.doc(id).get();
       activityModels.add(ActivityModel.fromSnapshot(dc));
     }
+    activityModels.sort((a, b) => a.time.compareTo(b.time));
     return activityModels;
   }
 
