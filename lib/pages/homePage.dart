@@ -288,7 +288,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ],
                         ),
-
+                        Text("${mod.postObj.date.toDate().day}/${mod.postObj.date.toDate().month}/${mod.postObj.date.toDate().year}",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 17),),
                       ],
                     ),
                   ),
