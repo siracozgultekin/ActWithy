@@ -22,18 +22,20 @@ class _HomePageState extends State<HomePage> {
   late List<UserModel> userMList;
   String reactid="";
   int chosenEmoji=0;
-  List<int> emojiCheck =[
-    0,//Hearth
-    0,//Broken Hearth
-    0,//Laughing
-    0,//Sob
-    0,//Angry
-  ];
+
   int selectedIndex = 0;
   final controller = ScrollController();
   late UserModel user;
   bool isLoading = true;
   var mediaqueryHeight;
+
+ List<int> emojiCheck =[ //TODO HER POST OBJESİ İÇİN AYRI BİR LİSTE ATAYABİLMEN LAZIM (MUHTEMELEN FİREBASE TARAFINDA OLUŞTURULACAK.)
+   0,//Hearth
+   0,//Broken Hearth
+   0,//Laughing
+   0,//Sob
+   0,//Angry
+ ];
 
   @override
   void initState() {
@@ -511,6 +513,7 @@ class _HomePageState extends State<HomePage> {
                                 IconButton(padding: EdgeInsets.zero,
                                   icon: Text("${Emojis.redHeart}",style: TextStyle(fontSize: 15),),
                                   onPressed: ()async{
+
 
                                     if(emojiCheck[0]==0){
                                       reactid= await PostServices().createReact(user.userUID, mod.userObj.userUID, mod.postObj.postUID, "redHeart");
