@@ -3,12 +3,12 @@ import 'package:actwithy/pages/creatingPage.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:flutter/material.dart';
 
-class ParticipantSearchPage extends SearchDelegate {
+class EditParticipantSearchPage extends SearchDelegate {
 
-  static List<String> participants = [];
+  List<String> participantsString;
   final String? hintText;
   final TextStyle? hintTextColor;
-  ParticipantSearchPage({this.hintText,this.hintTextColor});
+
   List<String> searchTerms= [
     'apple',
     'banana',
@@ -17,10 +17,19 @@ class ParticipantSearchPage extends SearchDelegate {
     'strawberry'
   ];
 
-  List<String> getParticipants(){
-    List<String> returnList = participants;
-    participants =  [];
-    return returnList;
+  List<UserModel> participantsObj;
+
+  EditParticipantSearchPage({this.hintText,this.hintTextColor,required this.participantsObj, required this.participantsString});
+
+  List<String> getParticipantsString(){
+    // List<String> returnList = participantsString;
+    // participantsString =  [];
+    return participantsString;
+  }
+
+  List<UserModel> getParticipantsObj(){
+    //List<UserModel> returnList = participantsObj;
+    return participantsObj;
   }
   @override
   ThemeData appBarTheme(BuildContext context) {
@@ -75,17 +84,17 @@ class ParticipantSearchPage extends SearchDelegate {
                 var result = snap.data[index] as UserModel;
                 return InkWell(
                   onTap: (){
-                    if (!participants.contains(result.userUID)){
-                      CreatingPage.participants.add(result);
-                      participants.add(result.userUID);
-                    }else{
+                    if (participantsString.contains(result.userUID)){
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('This person already added...')),
                       );
                       ScaffoldMessenger.of(context).deactivate();
+                    }else{
+                      participantsObj.add(result);
+                      participantsString.add(result.userUID);
                     }
 
-                    print(participants);
+                    print(participantsString);
                     query = '';
                   },
                   child: Row(
