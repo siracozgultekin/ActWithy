@@ -92,7 +92,7 @@ class _ProfilePageState extends State<ProfilePage> {
             setState(() {
               selectedIndex = value;
               if (selectedIndex == 0) {
-                Navigator.of(context).push(MaterialPageRoute(
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => HomePage()));
               } else if (selectedIndex == 1) {
                 showSearch(
@@ -101,7 +101,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         hintText: "Search",
                         hintTextColor: TextStyle(color: Colors.white)));
               } else if (selectedIndex == 2) {
-                Navigator.of(context).push(MaterialPageRoute(
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => CreatingPage(postModel: postModel)));
               } else if (selectedIndex == 3) {
               } else if (selectedIndex == 4) {
@@ -198,7 +198,7 @@ class _ProfilePageState extends State<ProfilePage> {
             left: 0,
             child: Container(
               child:
-              Image.network(user.backgroundURL, height: MediaQuery.of(context).size.height*0.21, width: MediaQuery.of(context).size.width,fit: BoxFit.fill,),
+              Image.network(user.backgroundURL, height: MediaQuery.of(context).size.height*0.21, width: MediaQuery.of(context).size.width,fit: BoxFit.cover,),
               //NetworkImage(user.backgroundURL); //height width
               //Image.asset("assets/images/img.png",height: MediaQuery.of(context).size.height*0.21, width: MediaQuery.of(context).size.width,fit: BoxFit.fill,),
             ),
@@ -231,7 +231,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 if(isMyPage) {
                   ///TODO editle profili
                   //UserModel userModel = UserModel.fromSnapshot(await FirebaseFirestore.instance.collection('users').doc(user.userUID).get()) as UserModel;
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=> EditProfilePage(userModel: user))).then((value) {setState((){});});
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> EditProfilePage(userModel: user))).then((value) {setState((){});});
                   //Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfilePage(userModel: user,)));
                 }else if (!isMyPage && isMyFriend) {
                   await SearchService().removeFriend(user.userUID).then((value) {
