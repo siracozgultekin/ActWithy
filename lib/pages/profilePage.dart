@@ -162,7 +162,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ): BackButton(
           color: negativeColor,
         ),
-        leadingWidth: MediaQuery.of(context).size.width * 0.4,
+        leadingWidth: isMyPage? MediaQuery.of(context).size.width * 0.5 :MediaQuery.of(context).size.width * 0.2,
         actions: [
           Container(
             width: MediaQuery.of(context).size.width * 0.2,
@@ -177,7 +177,7 @@ class _ProfilePageState extends State<ProfilePage> {
         children: [
           ProfileWidget(isMyPage),
           DividerWidget(),
-          isToDo ? ToDoWidget() : FriendWidget(),
+          Expanded(child: isToDo ? ToDoWidget() : FriendWidget()),
         ],
       ),
 
@@ -234,22 +234,13 @@ class _ProfilePageState extends State<ProfilePage> {
                   Navigator.push(context, MaterialPageRoute(builder: (context)=> EditProfilePage(userModel: user))).then((value) {setState((){});});
                   //Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfilePage(userModel: user,)));
                 }else if (!isMyPage && isMyFriend) {
-                  await SearchService().removeFriend(user.userUID);
+                  await SearchService().removeFriend(user.userUID).then((value) {
+                    setState((){isMyFriend = !isMyFriend;buttonText = "Add Friend";});
+                  });
                 }else if (!isMyPage && !isMyFriend) {
-                  await SearchService().addFriend(user.userUID);
+                  await SearchService().addFriend(user.userUID).then((value) {setState((){isMyFriend = !isMyFriend; buttonText = "Remove Friend";});});
                 }
 
-                setState((){
-                  isMyFriend = !isMyFriend;
-                });
-
-                setState(() {
-                  if(!isMyFriend) {
-                    buttonText = "Add Friend";
-                  }else if (isMyFriend){
-                    buttonText = "Remove Friend";
-                  }
-                });
               },
               child: Text(isMyPage? "Edit Profile":buttonText,style: TextStyle(color: negativeColor,fontSize: MediaQuery.of(context).size.width*0.028),),
               style: ElevatedButton.styleFrom(
@@ -342,11 +333,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   ListView.builder(
                     shrinkWrap: true,
                     scrollDirection: Axis.vertical,
-                    physics: ClampingScrollPhysics(),
+                    physics: BouncingScrollPhysics(),
                     itemCount: snap.data.length,
                     itemBuilder: (context, index) {
                       PostModel post = snap.data[index] as PostModel;
-
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Column(
