@@ -163,6 +163,17 @@ class PostServices {
     return usersList;
   }
 
+  Future<Map<ActivityModel,List<UserModel>>> getParticipantsByID(String activityID) async{
+    List<UserModel> usersList = [];
+    DocumentSnapshot doc = await activities.doc(activityID).get();
+    ActivityModel activityModel = ActivityModel.fromSnapshot(doc);
+    for (String userID in activityModel.participants){
+      DocumentSnapshot myDoc = await users.doc(userID).get();
+      usersList.add(UserModel.fromSnapshot(myDoc));
+    }
+    return {activityModel:usersList};
+  }
+
   Future<List<ActivityModel>> getDailyActivities() async {
     PostModel postModel = await getDailyPost();
     List<String> actIDs = postModel.activityUID;
@@ -425,6 +436,15 @@ DocumentSnapshot postDoc = await posts.doc(postUID).get();
   if(reactionUID!=""){
     await reactions.doc(reactionUID).delete();
   }
+  }
+  Future<bool> checkReacterID(String reacterID)async{
+    bool res=false;
+ QuerySnapshot x=await reactions.where("reacterID",isEqualTo: reacterID).get();
+  if(x.size==0){
+    res=true;
+  }
+
+ return res;
   }
 }
 
