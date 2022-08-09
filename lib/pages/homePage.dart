@@ -144,7 +144,12 @@ class _HomePageState extends State<HomePage> {
           future: PostServices().getFriendsPosts(),
           builder: (context, AsyncSnapshot snap) {
             if (!snap.hasData) {
-              return CircularProgressIndicator();
+              return Container(
+                decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage("assets/images/mev.png"),
+                    )),
+              );
             } else {
               return Container(
                 height: MediaQuery.of(context).size.height * 0.8,
