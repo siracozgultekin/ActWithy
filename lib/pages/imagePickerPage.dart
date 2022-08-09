@@ -19,6 +19,7 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
   bool isPP;
   _ImagePickerPageState(this.isPP);
   String url = "";
+  String newUrl = "";
 
 
   Color selectedColor = Color(0xFF4C6170); //dark blue
@@ -31,7 +32,6 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
     String u = await AuthService().getUserURL(isPP) as String;
     setState(() {
       url = u;
-      //TODO AuthService().updateNewUrl(true, url, isPP);
     });
   }
 
@@ -61,14 +61,21 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
             width: MediaQuery.of(context).size.width * 0.2,
             alignment: Alignment.centerRight,
             child: IconButton(onPressed: () async {
+
+
+              setState((){
+                if (!newUrl.isEmpty || url==newUrl) {
+                  url = newUrl;
+                  newUrl ="";
+                }
+              });
+
+              AuthService().approveImage(url, isPP);
+
               String uid = FirebaseAuth.instance.currentUser!.uid;
               DocumentSnapshot dc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
               UserModel user = UserModel.fromSnapshot(dc) as UserModel;
 
-              setState((){
-
-              }); //TODO is necessary?
-              AuthService().approveImage(url, isPP);
               Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => ProfilePage(user: user)));
 
             }, icon: Icon(Icons.check), iconSize: 35,),
@@ -91,7 +98,8 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
                   image:
                   new NetworkImage(
                       //TODO AuthService().newUrl
-                    url
+                      (newUrl.isEmpty) ?
+                    url : newUrl
                   )))
               ):
               Container(
@@ -102,7 +110,8 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
                           fit: BoxFit.cover,
                           image: new NetworkImage(
                               //TODO AuthService().newUrl
-                            url
+                              (newUrl.isEmpty) ?
+                              url : newUrl
                           )))
               )
               ,
@@ -120,7 +129,9 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
               width: MediaQuery.of(context).size.width/2,
               child: TextButton(onPressed: () async {
 
-                String Url = await AuthService().takeNewImage(ImageSource.gallery, isPP);
+                newUrl = await AuthService().takeNewImage(ImageSource.gallery, isPP);
+                setState((){});
+
                 //TODO new url update
 
               } , child: Row(
@@ -144,7 +155,8 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
               width: MediaQuery.of(context).size.width/2,
               child: TextButton(onPressed: () async {
 
-                String Url = await AuthService().takeNewImage(ImageSource.camera, isPP);
+                newUrl= await AuthService().takeNewImage(ImageSource.camera, isPP);
+                setState((){});
                 //TODO AuthService().updateNewUrl(false, Url, isPP);
 
               } , child: Row(

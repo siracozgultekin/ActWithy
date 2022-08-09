@@ -81,12 +81,20 @@ class AuthService{
   }
 
   Future takeNewImage(ImageSource source, bool isPP) async {
+
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+
+
     final image = await ImagePicker().pickImage(source: source);
-    if (image == null) return;
+    if (image == null) {
+      UserModel user = UserModel.fromSnapshot(await users.doc(userId).get());
+      String userUrl = isPP ? user.ppURL : user.backgroundURL;
+      return userUrl;
+    }
+
     final file = File(image.path);
 
     FirebaseStorage storage = FirebaseStorage.instance;
-    String userId = FirebaseAuth.instance.currentUser!.uid;
     Reference reference = storage.ref().child('userProfiles/${userId}/${Timestamp.now()}');
     UploadTask task = reference.putFile(file);
     await task.whenComplete(() {
