@@ -104,7 +104,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             color: selectedColor,
                             icon: Icon(Icons.camera_enhance_rounded, size: MediaQuery.of(context).size.width*0.1,),
                             onPressed: () {
-                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => ImagePickerPage(isPP: false,)));
+                              //TODO push||pushRep
+                              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => ImagePickerPage(isPP: false,)));
                             },
                           ))
                     ],
@@ -127,7 +128,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           color: selectedColor,
                           icon: Icon(Icons.camera_enhance_rounded, size: MediaQuery.of(context).size.width*0.1,),
                           onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => ImagePickerPage(isPP: true)));
+                            //TODO push||pushRep
+                            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => ImagePickerPage(isPP: true)));
                           },
                         ))
                   ],
