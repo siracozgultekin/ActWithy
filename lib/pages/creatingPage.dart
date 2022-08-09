@@ -485,7 +485,11 @@ class _CreatingPageState extends State<CreatingPage> {
                           .getDailyActivities(), //Last post of current user
                       builder: (context, AsyncSnapshot snap) {
                         if (!snap.hasData) {
-                          return CircularProgressIndicator();
+                          return Center(
+                            child: Container(
+                                height: 50,width: 50,
+                                child: CircularProgressIndicator()),
+                          );
                         } else {
                           return Container(
                             height: MediaQuery.of(context).size.height * 0.8,
@@ -657,7 +661,11 @@ class _CreatingPageState extends State<CreatingPage> {
             .getParticipants(activityObj), //Last post of current user
         builder: (context, AsyncSnapshot snap) {
           if (!snap.hasData) {
-            return CircularProgressIndicator();
+            return Center(
+              child: Container(
+                  height: 50,width: 50,
+                  child: CircularProgressIndicator()),
+            );
           } else {
             List<UserModel> participantList = snap.data;
             print("participant sayısı: ${activityObj.participants.length}");

@@ -161,7 +161,11 @@ class _DrawerPageState extends State<DrawerPage> {
               child: FutureBuilder(
                   future:PostServices().getDailyPost(),builder: (context, AsyncSnapshot snap) {
                 if (!snap.hasData) {
-                  return CircularProgressIndicator();
+                  return Center(
+                    child: Container(
+                        height: 50,width: 50,
+                        child: CircularProgressIndicator()),
+                  );
                 } else {
                   PostModel post = snap.data;
                   return Center(
@@ -207,7 +211,11 @@ class _DrawerPageState extends State<DrawerPage> {
                                                     .getParticipantsByID(post.activityUID[index]),
                                                 builder: (context, AsyncSnapshot snap) {
                                                   if (!snap.hasData) {
-                                                    return CircularProgressIndicator();
+                                                    return Center(
+                                                      child: Container(
+                                                          height: 50,width: 50,
+                                                          child: CircularProgressIndicator()),
+                                                    );
                                                   }else{
                                                     Map<ActivityModel,List<UserModel>> map = snap.data;
                                                     late ActivityModel activity;
