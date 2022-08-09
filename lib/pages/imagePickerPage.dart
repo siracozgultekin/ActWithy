@@ -19,7 +19,7 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
   bool isPP;
   _ImagePickerPageState(this.isPP);
   String url = "";
-  String newUrl = "";
+
 
   Color selectedColor = Color(0xFF4C6170); //dark blue
   Color negativeColor = Color(0xFFFFFFFF);//white
@@ -31,13 +31,12 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
     String u = await AuthService().getUserURL(isPP) as String;
     setState(() {
       url = u;
-      newUrl = u;
+      //TODO AuthService().updateNewUrl(true, url, isPP);
     });
   }
 
   void initState() {
     getURL();
-    print(newUrl);
     super.initState();
   }
 
@@ -66,8 +65,9 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
               DocumentSnapshot dc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
               UserModel user = UserModel.fromSnapshot(dc) as UserModel;
 
-              setState((){url = newUrl;
-              newUrl="";});
+              setState((){
+
+              }); //TODO is necessary?
               AuthService().approveImage(url, isPP);
               Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => ProfilePage(user: user)));
 
@@ -81,19 +81,29 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              child: isPP ? CircleAvatar(
-                radius: MediaQuery.of(context).size.width/4,
-                child: Image.network(newUrl,
-                  errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                    return Text('Your error widget...');
-                  },),
+              child: isPP ? Container(
+                height: MediaQuery.of(context).size.width/2,
+                width: MediaQuery.of(context).size.width/2,
+          decoration: new BoxDecoration(
+              shape: BoxShape.circle,
+              image: new DecorationImage(
+                  fit: BoxFit.cover,
+                  image:
+                  new NetworkImage(
+                      //TODO AuthService().newUrl
+                    url
+                  )))
               ):
               Container(
-                  child:
-                  Image.network(newUrl,
-                    errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-                    return Text('Your error widget...');
-                  },)
+                  height: MediaQuery.of(context).size.height*0.21,
+                  width: MediaQuery.of(context).size.width,
+                  decoration: new BoxDecoration(
+                      image: new DecorationImage(
+                          fit: BoxFit.cover,
+                          image: new NetworkImage(
+                              //TODO AuthService().newUrl
+                            url
+                          )))
               )
               ,
             ),
@@ -110,7 +120,8 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
               width: MediaQuery.of(context).size.width/2,
               child: TextButton(onPressed: () async {
 
-                newUrl = await AuthService().takeNewImage(ImageSource.gallery, isPP);
+                String Url = await AuthService().takeNewImage(ImageSource.gallery, isPP);
+                //TODO new url update
 
               } , child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -133,7 +144,8 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
               width: MediaQuery.of(context).size.width/2,
               child: TextButton(onPressed: () async {
 
-                newUrl = await AuthService().takeNewImage(ImageSource.camera, isPP);
+                String Url = await AuthService().takeNewImage(ImageSource.camera, isPP);
+                //TODO AuthService().updateNewUrl(false, Url, isPP);
 
               } , child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,

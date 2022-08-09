@@ -100,7 +100,7 @@ class AuthService{
   Future approveImage(String url, bool isPP) async{
     String userId = FirebaseAuth.instance.currentUser!.uid;
     if (isPP) {
-      await FirebaseFirestore.instance.collection("users").doc(userId).update({'ppURL': url}).then((value) {
+      await users.doc(userId).update({'ppURL': url}).then((value) {
 
       });
     }else{
@@ -108,8 +108,9 @@ class AuthService{
 
       });
     }
-
   }
+
+
 
   SnackBar snacks(String text) {
     return SnackBar(
@@ -120,6 +121,7 @@ class AuthService{
       ),
     );
   }
+
 
 
 }
