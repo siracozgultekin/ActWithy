@@ -83,7 +83,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   brokenHeartCounter: 0,
                   joyCounter: 0,
                   sobCounter: 0,
-                  angryCounter: 0);
+                  angryCounter: 0,
+              reactionIDs: []);
             } else {
               //oluşturulmuş demek
               postModel = await PostServices().getDailyPost();

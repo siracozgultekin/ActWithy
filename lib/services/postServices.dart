@@ -18,16 +18,6 @@ class PostServices {
 
   Future<String> createActivity(
       String selectedItem, Timestamp time, String location, List<String> participants) async {
-    /* await activities.add(model.createMap()).then((value) async {
-
-     String postId = value.id;
-     await activities.doc(postId).update({'activityUID': postId,});
-     PostModel obj=PostModel(date:Timestamp.now(), activityUID:postId, heartCounter, brokenHeartCounter, joyCounter, sobCounter, angryCounter)
-     await posts.add(model.createMap());
-     print('myID:$myId');
-   });
-   */
-
     String returnID = "";
     await activities.add({
       "activityType": selectedItem,
@@ -60,6 +50,7 @@ class PostServices {
       'joyCounter': 0,
       'sobCounter': 0,
       'angryCounter': 0,
+      'reactionIDs':[],
     }).then((value) async {
       await posts.doc(value.id).update({"postUID": value.id});
       id = value.id;
@@ -79,7 +70,6 @@ class PostServices {
       ActivityModel activityModel, UserModel participant) async {
     activityModel.participants.add(participant.userUID);
 
-    //DocumentSnapshot doc = await activities.doc(activityModel.activityUID).get();
     activities
         .doc(activityModel.activityUID)
         .update({"participants": activityModel.participants});
@@ -145,7 +135,7 @@ class PostServices {
     bool check = await checkDailyPost();
 
    if(!check){
-     return PostModel(postUID: "postUID", date: Timestamp.now(), activityUID: [], heartCounter: 0, brokenHeartCounter: 0, joyCounter: 0, sobCounter: 0, angryCounter: 0);
+     return PostModel(postUID: "postUID", date: Timestamp.now(), activityUID: [], heartCounter: 0, brokenHeartCounter: 0, joyCounter: 0, sobCounter: 0, angryCounter: 0, reactionIDs: []);
    }
 
     DocumentSnapshot ds = await users.doc(myId).get();
