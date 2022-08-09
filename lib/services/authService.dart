@@ -32,7 +32,7 @@ class AuthService{
         "lastSeen": Timestamp.now(),
         "postCount": 0,
         "lastPostID":"lastPostID",
-        "lastPostStamp":null,
+        "lastPostStamp":Timestamp.fromDate(DateTime(2000)),
         "notifications":[],
       };
       print("Result: $result");
@@ -85,6 +85,15 @@ class AuthService{
         onPressed: () {},
       ),
     );
+  }
+
+  Future<UserModel> getCurrentUser() async {
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    DocumentSnapshot doc = await users.doc(uid).get();
+    UserModel user = UserModel.fromSnapshot(doc);
+
+    return user;
+
   }
 }
 

@@ -115,6 +115,7 @@ class _HomePageState extends State<HomePage> {
                       postModel = await PostServices().getDailyPost();
                     }
 
+
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => CreatingPage(
                               postModel: postModel,
@@ -187,6 +188,7 @@ class _HomePageState extends State<HomePage> {
               //oluşturulmuş demek
               postModel = await PostServices().getDailyPost();
             }
+            UserModel currentUser = await AuthService().getCurrentUser();
 
             setState(() {
               selectedIndex = value;
@@ -205,7 +207,7 @@ class _HomePageState extends State<HomePage> {
 
               } else if (selectedIndex == 4) {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => ProfilePage(user: user)));
+                    builder: (context) => ProfilePage(user: currentUser)));
               }
 
              

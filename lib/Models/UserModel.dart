@@ -83,7 +83,7 @@ class UserModel {
         postCount: doc['postCount'],
         lastPostID : doc["lastPostID"],
         lastPostStamp : doc["lastPostStamp"],
-      notifications: doc["notifications"],
+      notifications: doc["notifications"].cast<String>(),
       );
 
   }
