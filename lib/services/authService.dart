@@ -1,9 +1,12 @@
+import 'dart:io';
 import 'package:actwithy/Models/UserModel.dart';
 import 'package:actwithy/pages/homePage.dart';
 import 'package:actwithy/pages/welcomePage.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AuthService{
   String uid='';
@@ -69,13 +72,44 @@ class AuthService{
     });
   }
 
-  getUserURL(bool isPP) async {
+  Future<String> getUserURL(bool isPP) async {
     String userID = FirebaseAuth.instance.currentUser!.uid;
     DocumentSnapshot doc = await users.doc(userID).get();
     UserModel user = UserModel.fromSnapshot(doc) as UserModel;
 
     return isPP ? user.ppURL : user.backgroundURL;
   }
+
+  Future takeNewImage(ImageSource source, bool isPP) async {
+    final image = await ImagePicker().pickImage(source: source);
+    if (image == null) return;
+    final file = File(image.path);
+
+    FirebaseStorage storage = FirebaseStorage.instance;
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+    Reference reference = storage.ref().child('userProfiles/${userId}/${Timestamp.now()}');
+    UploadTask task = reference.putFile(file);
+    await task.whenComplete(() {
+      print("uploaded");
+    });
+    String url = await reference.getDownloadURL();
+    return url;
+  }
+
+  Future approveImage(String url, bool isPP) async{
+    String userId = FirebaseAuth.instance.currentUser!.uid;
+    if (isPP) {
+      await users.doc(userId).update({'ppURL': url}).then((value) {
+
+      });
+    }else{
+      await FirebaseFirestore.instance.collection("users").doc(userId).update({'backgroundURL': url}).then((value) {
+
+      });
+    }
+  }
+
+
 
   SnackBar snacks(String text) {
     return SnackBar(
@@ -87,6 +121,7 @@ class AuthService{
     );
   }
 
+
   Future<UserModel> getCurrentUser() async {
     String uid = FirebaseAuth.instance.currentUser!.uid;
     DocumentSnapshot doc = await users.doc(uid).get();
@@ -95,5 +130,6 @@ class AuthService{
     return user;
 
   }
+
 }
 

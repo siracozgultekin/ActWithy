@@ -92,7 +92,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         left: 0,
                         child: Container(
                           child:
-                          Image.network(user.backgroundURL, height: MediaQuery.of(context).size.height*0.21, width: MediaQuery.of(context).size.width,fit: BoxFit.fill,),
+                          Image.network(user.backgroundURL, height: MediaQuery.of(context).size.height*0.21, width: MediaQuery.of(context).size.width,fit: BoxFit.cover,),
                           //NetworkImage(user.backgroundURL); //height width
                           //Image.asset("assets/images/img.png",height: MediaQuery.of(context).size.height*0.21, width: MediaQuery.of(context).size.width,fit: BoxFit.fill,),
                         ),

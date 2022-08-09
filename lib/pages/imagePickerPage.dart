@@ -1,7 +1,10 @@
 import 'package:actwithy/Models/UserModel.dart';
+import 'package:actwithy/pages/profilePage.dart';
 import 'package:actwithy/services/authService.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 
 class ImagePickerPage extends StatefulWidget {
@@ -17,6 +20,7 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
   _ImagePickerPageState(this.isPP);
   String url = "";
 
+
   Color selectedColor = Color(0xFF4C6170); //dark blue
   Color negativeColor = Color(0xFFFFFFFF);//white
   Color bgColor = Color(0xFFD6E6F1); //light blue
@@ -24,15 +28,15 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
   Color textColor = Color(0xFF2D3A43);
 
   getURL() async {
-    String u = await AuthService().getUserURL(isPP);
+    String u = await AuthService().getUserURL(isPP) as String;
     setState(() {
       url = u;
+      //TODO AuthService().updateNewUrl(true, url, isPP);
     });
   }
 
-  initState() {
+  void initState() {
     getURL();
-
     super.initState();
   }
 
@@ -57,6 +61,15 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
             width: MediaQuery.of(context).size.width * 0.2,
             alignment: Alignment.centerRight,
             child: IconButton(onPressed: () async {
+              String uid = FirebaseAuth.instance.currentUser!.uid;
+              DocumentSnapshot dc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+              UserModel user = UserModel.fromSnapshot(dc) as UserModel;
+
+              setState((){
+
+              }); //TODO is necessary?
+              AuthService().approveImage(url, isPP);
+              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => ProfilePage(user: user)));
 
             }, icon: Icon(Icons.check), iconSize: 35,),
           ),
@@ -68,13 +81,29 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              child: isPP ? CircleAvatar(
-                backgroundImage: NetworkImage(url),
-                radius: MediaQuery.of(context).size.width/4,
+              child: isPP ? Container(
+                height: MediaQuery.of(context).size.width/2,
+                width: MediaQuery.of(context).size.width/2,
+          decoration: new BoxDecoration(
+              shape: BoxShape.circle,
+              image: new DecorationImage(
+                  fit: BoxFit.cover,
+                  image:
+                  new NetworkImage(
+                      //TODO AuthService().newUrl
+                    url
+                  )))
               ):
               Container(
-                  child:
-                  Image.network(url, height: MediaQuery.of(context).size.height*0.21, width: MediaQuery.of(context).size.width,fit: BoxFit.fill,)
+                  height: MediaQuery.of(context).size.height*0.21,
+                  width: MediaQuery.of(context).size.width,
+                  decoration: new BoxDecoration(
+                      image: new DecorationImage(
+                          fit: BoxFit.cover,
+                          image: new NetworkImage(
+                              //TODO AuthService().newUrl
+                            url
+                          )))
               )
               ,
             ),
@@ -89,7 +118,12 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
                 ),
               ),
               width: MediaQuery.of(context).size.width/2,
-              child: TextButton(onPressed: () {} , child: Row(
+              child: TextButton(onPressed: () async {
+
+                String Url = await AuthService().takeNewImage(ImageSource.gallery, isPP);
+                //TODO new url update
+
+              } , child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.image_outlined,color: textColor,),
@@ -108,7 +142,12 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
                 ),
               ),
               width: MediaQuery.of(context).size.width/2,
-              child: TextButton(onPressed: () {} , child: Row(
+              child: TextButton(onPressed: () async {
+
+                String Url = await AuthService().takeNewImage(ImageSource.camera, isPP);
+                //TODO AuthService().updateNewUrl(false, Url, isPP);
+
+              } , child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.camera_alt_outlined,color: textColor,),

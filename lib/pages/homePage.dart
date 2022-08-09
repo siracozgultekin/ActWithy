@@ -138,7 +138,12 @@ class _HomePageState extends State<HomePage> {
           future: PostServices().getFriendsPosts(),
           builder: (context, AsyncSnapshot snap) {
             if (!snap.hasData) {
-              return CircularProgressIndicator();
+              return Container(
+                decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage("assets/images/mev.png"),
+                    )),
+              );
             } else {
               return Container(
                 height: MediaQuery.of(context).size.height * 0.8,
@@ -349,38 +354,23 @@ class _HomePageState extends State<HomePage> {
                                             Padding(
                                               padding: const EdgeInsets.all(8.0),
                                               child: Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                                 children: [
-                                                  Expanded(
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                      MainAxisAlignment.spaceBetween,
-                                                      children: [
-                                                        Text(activity
-                                                            .activityType),
-                                                        Row(
-                                                          children: [
-                                                            Container(
-                                                              padding: EdgeInsets.all(0.0),
-                                                              child: InkWell(
-                                                                  child: Icon(Icons
-                                                                      .watch_later_outlined)),
-                                                            ),
-                                                            Text(
-                                                                "${activity.time.toDate().hour}:${mod.activitiesList[index].time.toDate().minute}"),
-                                                          ],
-                                                        )
-                                                      ],
-                                                    ),
-                                                  ), // activity and clock
+                                                  Text(activity
+                                                      .activityType),
                                                   Row(
                                                     children: [
                                                       Container(
-                                                        padding: EdgeInsets.only(left: 10),
-                                                        child:
-                                                        InkWell(child: Icon(Icons.close)),
+                                                        padding: EdgeInsets.all(0.0),
+                                                        child: InkWell(
+                                                            child: Icon(Icons
+                                                                .watch_later_outlined)),
                                                       ),
+                                                      Text(
+                                                          "${activity.time.toDate().hour}:${mod.activitiesList[index].time.toDate().minute}"),
                                                     ],
-                                                  ), // delete and edit icons
+                                                  )
                                                 ],
                                               ),
                                             ),

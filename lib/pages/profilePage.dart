@@ -93,7 +93,7 @@ class _ProfilePageState extends State<ProfilePage> {
             setState(() {
               selectedIndex = value;
               if (selectedIndex == 0) {
-                Navigator.of(context).push(MaterialPageRoute(
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => HomePage()));
               } else if (selectedIndex == 1) {
                 showSearch(
@@ -102,7 +102,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         hintText: "Search",
                         hintTextColor: TextStyle(color: Colors.white)));
               } else if (selectedIndex == 2) {
-                Navigator.of(context).push(MaterialPageRoute(
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => CreatingPage(postModel: postModel)));
               } else if (selectedIndex == 3) {
               } else if (selectedIndex == 4) {
@@ -163,7 +163,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ): BackButton(
           color: negativeColor,
         ),
-        leadingWidth: MediaQuery.of(context).size.width * 0.4,
+        leadingWidth: isMyPage? MediaQuery.of(context).size.width * 0.5 :MediaQuery.of(context).size.width * 0.2,
         actions: [
           Container(
             width: MediaQuery.of(context).size.width * 0.2,
@@ -178,7 +178,7 @@ class _ProfilePageState extends State<ProfilePage> {
         children: [
           ProfileWidget(isMyPage),
           DividerWidget(),
-          isToDo ? ToDoWidget() : FriendWidget(),
+          Expanded(child: isToDo ? ToDoWidget() : FriendWidget()),
         ],
       ),
 
@@ -199,7 +199,7 @@ class _ProfilePageState extends State<ProfilePage> {
             left: 0,
             child: Container(
               child:
-              Image.network(user.backgroundURL, height: MediaQuery.of(context).size.height*0.21, width: MediaQuery.of(context).size.width,fit: BoxFit.fill,),
+              Image.network(user.backgroundURL, height: MediaQuery.of(context).size.height*0.21, width: MediaQuery.of(context).size.width,fit: BoxFit.cover,),
               //NetworkImage(user.backgroundURL); //height width
               //Image.asset("assets/images/img.png",height: MediaQuery.of(context).size.height*0.21, width: MediaQuery.of(context).size.width,fit: BoxFit.fill,),
             ),
@@ -232,25 +232,16 @@ class _ProfilePageState extends State<ProfilePage> {
                 if(isMyPage) {
                   ///TODO editle profili
                   //UserModel userModel = UserModel.fromSnapshot(await FirebaseFirestore.instance.collection('users').doc(user.userUID).get()) as UserModel;
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=> EditProfilePage(userModel: user))).then((value) {setState((){});});
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> EditProfilePage(userModel: user))).then((value) {setState((){});});
                   //Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfilePage(userModel: user,)));
                 }else if (!isMyPage && isMyFriend) {
-                  await SearchService().removeFriend(user.userUID);
+                  await SearchService().removeFriend(user.userUID).then((value) {
+                    setState((){isMyFriend = !isMyFriend;buttonText = "Add Friend";});
+                  });
                 }else if (!isMyPage && !isMyFriend) {
-                  await SearchService().addFriend(user.userUID);
+                  await SearchService().addFriend(user.userUID).then((value) {setState((){isMyFriend = !isMyFriend; buttonText = "Remove Friend";});});
                 }
 
-                setState((){
-                  isMyFriend = !isMyFriend;
-                });
-
-                setState(() {
-                  if(!isMyFriend) {
-                    buttonText = "Add Friend";
-                  }else if (isMyFriend){
-                    buttonText = "Remove Friend";
-                  }
-                });
               },
               child: Text(isMyPage? "Edit Profile":buttonText,style: TextStyle(color: negativeColor,fontSize: MediaQuery.of(context).size.width*0.028),),
               style: ElevatedButton.styleFrom(
@@ -343,11 +334,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   ListView.builder(
                     shrinkWrap: true,
                     scrollDirection: Axis.vertical,
-                    physics: ClampingScrollPhysics(),
+                    physics: BouncingScrollPhysics(),
                     itemCount: snap.data.length,
                     itemBuilder: (context, index) {
                       PostModel post = snap.data[index] as PostModel;
-
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Column(
