@@ -17,6 +17,7 @@ class UserModel {
   Timestamp lastSeen;
   String lastPostID;
   Timestamp lastPostStamp;
+  List<String> notifications;
 
   UserModel(
       {
@@ -36,6 +37,7 @@ class UserModel {
         required this.lastSeen,
         required this.lastPostID,
         required this.lastPostStamp,
+        required this.notifications,
       });
 
 
@@ -57,23 +59,13 @@ class UserModel {
      "lastSeen":this.lastSeen,
      "lastPostID":this.lastPostID,
      "lastPostStamp":this.lastPostStamp,
+      "notifications":this.notifications,
     };
     return map;
   }
 
   factory UserModel.fromSnapshot(DocumentSnapshot doc) {
-/*
-    List<String> fr = [];
-    List<String> ps = [];
 
-    for (var f in doc["friends"]) {
-      fr.add(f as String);
-    }
-
-    for (var f in doc["posts"]) {
-      ps.add(f as String);
-    }
-*/
     return UserModel(
         backgroundURL: doc['backgroundURL'],
         bio: doc['bio'],
@@ -91,6 +83,7 @@ class UserModel {
         postCount: doc['postCount'],
         lastPostID : doc["lastPostID"],
         lastPostStamp : doc["lastPostStamp"],
+      notifications: doc["notifications"],
       );
 
   }

@@ -29,14 +29,6 @@ class _HomePageState extends State<HomePage> {
   bool isLoading = true;
   var mediaqueryHeight;
 
- List<int> emojiCheck =[ //TODO HER POST OBJESİ İÇİN AYRI BİR LİSTE ATAYABİLMEN LAZIM (MUHTEMELEN FİREBASE TARAFINDA OLUŞTURULACAK.)
-   0,//Hearth
-   0,//Broken Hearth
-   0,//Laughing
-   0,//Sob
-   0,//Angry
- ];
-
   @override
   void initState() {
     getMe();
@@ -116,7 +108,8 @@ class _HomePageState extends State<HomePage> {
                           brokenHeartCounter: 0,
                           joyCounter: 0,
                           sobCounter: 0,
-                          angryCounter: 0);
+                          angryCounter: 0,
+                      reactionIDs: []);
                     } else {
                       //oluşturulmuş demek
                       postModel = await PostServices().getDailyPost();
@@ -188,7 +181,8 @@ class _HomePageState extends State<HomePage> {
                   brokenHeartCounter: 0,
                   joyCounter: 0,
                   sobCounter: 0,
-                  angryCounter: 0);
+                  angryCounter: 0,
+              reactionIDs: []);
             } else {
               //oluşturulmuş demek
               postModel = await PostServices().getDailyPost();
@@ -209,7 +203,6 @@ class _HomePageState extends State<HomePage> {
                     builder: (context) => CreatingPage(postModel: postModel)));
               } else if (selectedIndex == 3) {
 
-           
               } else if (selectedIndex == 4) {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => ProfilePage(user: user)));
@@ -266,7 +259,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget mainListTile(DenemeModel mod) {
-
+    List<bool> emojiList =[false,false,false,false,false];
+    List<int> emojiCheck =[ //TODO HER POST OBJESİ İÇİN AYRI BİR LİSTE ATAYABİLMEN LAZIM (MUHTEMELEN FİREBASE TARAFINDA OLUŞTURULACAK.)
+      0,//Hearth
+      0,//Broken Hearth
+      0,//Laughing
+      0,//Sob
+      0,//Angry
+    ];
 
     return SingleChildScrollView(
       physics: NeverScrollableScrollPhysics(),
