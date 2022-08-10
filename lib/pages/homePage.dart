@@ -198,8 +198,6 @@ class _HomePageState extends State<HomePage> {
 
             setState(() {
               selectedIndex = value;
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
               if (selectedIndex == 0) {
                 scrollUp();
               } else if (selectedIndex == 1) {
@@ -217,9 +215,7 @@ class _HomePageState extends State<HomePage> {
               } else if (selectedIndex == 4) {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => ProfilePage(user: currentUser)));
-=======
-=======
->>>>>>> Stashed changes
+              }
               switch(selectedIndex){
                 case 0: scrollUp();
                   break;
@@ -233,6 +229,10 @@ class _HomePageState extends State<HomePage> {
                   break;
 
               }
+
+
+             
+
             });
           },
           destinations: [
