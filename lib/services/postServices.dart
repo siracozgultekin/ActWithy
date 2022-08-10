@@ -16,6 +16,7 @@ class PostServices {
       FirebaseFirestore.instance.collection('activities');
   CollectionReference reactions =
       FirebaseFirestore.instance.collection('reactions');
+  CollectionReference notifications = FirebaseFirestore.instance.collection('notifications');
 
   Future<String> createActivity(String selectedItem, Timestamp time,
       String location, List<String> participants) async {
@@ -35,6 +36,10 @@ class PostServices {
 
   Future<void> updatePost(PostModel postModel) async {
     await posts.doc(postModel.postUID).set(postModel.createMap());
+  }
+
+  Future<void> updateUser(UserModel userModel)async{
+    await users.doc(userModel.userUID).set(userModel.createMap());
   }
 
   Future<void> updateActivity(ActivityModel activityModel) async {
@@ -352,6 +357,57 @@ class PostServices {
     await reactions.doc(reactionModel.reactionUID).set(reactionModel.createMap());
   }
 
+  Future<String> createNotification(int type, String userID, String reactionID ,String requestID,)async{
+    String notificationId = "";
+    await notifications.add({
+      'time' : Timestamp.now(),
+      "type": type,
+      "userID": userID,
+      "reactionID": reactionID,
+      "requestID": requestID,
+    }).then((value) async {
+      notificationId = value.id;
+      await reactions.doc(value.id).update({"notificationUID": value.id});
+    });
+    DocumentSnapshot doc =await users.doc(userID).get();
+    UserModel userModel = UserModel.fromSnapshot(doc);
+    userModel.notifications.add(notificationId);
+    await updateUser(userModel);
+    return notificationId;
+  }
+
+  Future<void> deleteReactionNotification(String rectionId, UserModel userModel) async {
+    if (rectionId != "") {
+      for (String id in userModel.notifications){
+        DocumentSnapshot doc = await notifications.doc(id).get();
+        if(doc["reactionID"]==rectionId){
+          userModel.notifications.remove(doc["notificationUID"]);
+          await updateUser(userModel);
+          await notifications.doc(doc["notificationUID"]).delete();
+          return;
+        }
+      }
+    }
+  }
+
+  Future<List<NotificationActivityModel>> getNotificationReactions()async{
+    List<NotificationActivityModel> reactionsList = [];
+    String myID = await FirebaseAuth.instance.currentUser!.uid;
+    DocumentSnapshot myDoc = await users.doc(myID).get();
+    List<String> notIDs = myDoc["notifications"].cast<String>();
+    for (String id in notIDs){
+      DocumentSnapshot notDoc = await notifications.doc(id).get();
+      if(notDoc["type"]==0){
+        DocumentSnapshot reactionDoc = await reactions.doc(notDoc["reactionID"]).get();
+        ReactionModel reactionModel = ReactionModel.fromSnapshot(reactionDoc);
+        DocumentSnapshot postDoc =await posts.doc(reactionModel.postID).get();
+        DocumentSnapshot userDoc = await users.doc(reactionModel.reacterID).get();
+        reactionsList.add(NotificationActivityModel(user: UserModel.fromSnapshot(userDoc), reaction: reactionModel, post: PostModel.fromSnapshot(postDoc)));
+      }
+    }
+    return reactionsList;
+  }
+
 
 }
 
@@ -372,4 +428,12 @@ class DenemeModel {
   void setActivities(List<ActivityModel> m) {
     this.activitiesList = m;
   }
+}
+
+class NotificationActivityModel{
+  UserModel user;
+  ReactionModel reaction;
+  PostModel post;
+
+  NotificationActivityModel({required this.user,required this.reaction,required this.post});
 }
