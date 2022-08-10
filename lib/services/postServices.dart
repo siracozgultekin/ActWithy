@@ -296,111 +296,7 @@ class PostServices {
     return UserModel.fromSnapshot(await users.doc(uid).get());
   }
 
-  Future<void> setAngryCounter(String postUID, bool check) async {
-    DocumentSnapshot postDoc = await posts.doc(postUID).get();
-    int count;
-    if (check) {
-      count = postDoc["angryCounter"] + 1;
-      print("CountForTrueCondition:: $count");
-      await posts.doc(postUID).update({
-        "angryCounter": count,
-      });
-    } else {
-      count = postDoc["angryCounter"] - 1;
-      print("CountForFalseCondition:: $count");
-      await posts.doc(postUID).update({
-        "angryCounter": count,
-      });
-    }
-  }
 
-  Future<void> setJoyCounter(String postUID, bool check) async {
-    DocumentSnapshot postDoc = await posts.doc(postUID).get();
-    int count;
-    if (check) {
-      count = postDoc["joyCounter"] + 1;
-      print("CountForTrueCondition:: $count");
-      await posts.doc(postUID).update({
-        "joyCounter": count,
-      });
-    } else {
-      count = postDoc["joyCounter"] - 1;
-      print("CountForFalseCondition:: $count");
-      await posts.doc(postUID).update({
-        "joyCounter": count,
-      });
-    }
-  }
-
-  Future<void> setBrokenHeartCounter(String postUID, bool check) async {
-    DocumentSnapshot postDoc = await posts.doc(postUID).get();
-    int count;
-    if (check) {
-      count = postDoc["brokenHeartCounter"] + 1;
-      print("CountForTrueCondition:: $count");
-      await posts.doc(postUID).update({
-        "brokenHeartCounter": count,
-      });
-    } else {
-      count = postDoc["brokenHeartCounter"] - 1;
-      print("CountForFalseCondition:: $count");
-      await posts.doc(postUID).update({
-        "brokenHeartCounter": count,
-      });
-    }
-  }
-
-  Future<void> setSobCounter(String postUID, bool check) async {
-    DocumentSnapshot postDoc = await posts.doc(postUID).get();
-    int count;
-    if (check) {
-      count = postDoc["sobCounter"] + 1;
-      print("CountForTrueCondition:: $count");
-      await posts.doc(postUID).update({
-        "sobCounter": count,
-      });
-    } else {
-      count = postDoc["sobCounter"] - 1;
-      print("CountForFalseCondition:: $count");
-      await posts.doc(postUID).update({
-        "sobCounter": count,
-      });
-    }
-  }
-
-  Future<void> setHeartCounter(String postUID, bool check) async {
-    DocumentSnapshot postDoc = await posts.doc(postUID).get();
-    int count;
-    if (check) {
-      count = postDoc["heartCounter"] + 1;
-      print("CountForTrueCondition:: $count");
-      await posts.doc(postUID).update({
-        "heartCounter": count,
-      });
-    } else {
-      count = postDoc["heartCounter"] - 1;
-      print("CountForFalseCondition:: $count");
-      await posts.doc(postUID).update({
-        "heartCounter": count,
-      });
-    }
-  }
-
-  Future<void> checkEmoji(int val, String postUID) async {
-    if (val == 1) {
-      setHeartCounter(postUID, false);
-    } else if (val == 2) {
-      setBrokenHeartCounter(postUID, false);
-    } else if (val == 3) {
-      setJoyCounter(postUID, false);
-    } else if (val == 4) {
-      setSobCounter(postUID, false);
-    } else if (val == 5) {
-      setAngryCounter(postUID, false);
-    } else {
-      val = 0;
-    }
-  }
 
   Future<String> createReaction(
       String reacteeID, String postID, String reactType) async {
@@ -420,26 +316,10 @@ class PostServices {
     return reactionid;
   }
 
-  Future<void> updateReactionType(
-      String reactionUID, String reactionType) async {
-    await reactions.doc(reactionUID).update({"type": reactionType});
-  }
-
   Future<void> deleteReaction(String reactionUID) async {
     if (reactionUID != "") {
       await reactions.doc(reactionUID).delete();
     }
-  }
-
-  Future<bool> checkReacterID(String reacterID) async {
-    bool res = false;
-    QuerySnapshot x =
-        await reactions.where("reacterID", isEqualTo: reacterID).get();
-    if (x.size == 0) {
-      res = true;
-    }
-
-    return res;
   }
 
   Future<bool> checkReaction(PostModel postModel) async {
