@@ -508,24 +508,34 @@ class PostServices {
     }
   }
 
-  Future<List<NotificationActivityModel>> getNotificationReactions()async{
+  Future<List<NotificationActivityModel>> getNotificationReactions()async {
     List<NotificationActivityModel> reactionsList = [];
     String myID = await FirebaseAuth.instance.currentUser!.uid;
     DocumentSnapshot myDoc = await users.doc(myID).get();
     List<String> notIDs = myDoc["notifications"].cast<String>();
-    for (String id in notIDs){
+    for (String id in notIDs) {
       DocumentSnapshot notDoc = await notifications.doc(id).get();
-      if(notDoc["type"]==0){
-        DocumentSnapshot reactionDoc = await reactions.doc(notDoc["reactionID"]).get();
+      if (notDoc["type"] == 0) {
+        DocumentSnapshot reactionDoc = await reactions.doc(notDoc["reactionID"])
+            .get();
         ReactionModel reactionModel = ReactionModel.fromSnapshot(reactionDoc);
-        DocumentSnapshot postDoc =await posts.doc(reactionModel.postID).get();
-        DocumentSnapshot userDoc = await users.doc(reactionModel.reacterID).get();
-        reactionsList.add(NotificationActivityModel(user: UserModel.fromSnapshot(userDoc), reaction: reactionModel, post: PostModel.fromSnapshot(postDoc)));
+        DocumentSnapshot postDoc = await posts.doc(reactionModel.postID).get();
+        DocumentSnapshot userDoc = await users.doc(reactionModel.reacterID)
+            .get();
+        reactionsList.add(NotificationActivityModel(
+            user: UserModel.fromSnapshot(userDoc),
+            reaction: reactionModel,
+            post: PostModel.fromSnapshot(postDoc)));
       }
     }
     return reactionsList;
+<<<<<<< Updated upstream
 }
 Future<List<ActivityModel>> getPostsActivities(String postID) async {
+=======
+  }
+  Future<List<ActivityModel>> getPostsActivities(String postID) async {
+>>>>>>> Stashed changes
 
     DocumentSnapshot postDoc = await posts.doc(postID).get();
     PostModel post = PostModel.fromSnapshot(postDoc);
