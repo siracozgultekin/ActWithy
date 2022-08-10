@@ -4,12 +4,18 @@ class NotificationModel{
   String notificationUID;
   Timestamp time;
   int type; // 0->reaction 1->request
-  String userID; //from who
+  String userID; //from who //gereksiz
   String reactionID; //if type is 0
   String requestID;
 
-  NotificationModel(this.notificationUID, this.time, this.type, this.userID,
-      this.reactionID, this.requestID); //if type is 0
+  NotificationModel(
+      {required this.notificationUID,
+        required this.time,
+        required this.type,
+        required this.userID,
+        required this.reactionID,
+        required this.requestID,
+     }); //if type is 0
 
 
 }

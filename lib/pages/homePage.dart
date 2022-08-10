@@ -47,6 +47,7 @@ class _HomePageState extends State<HomePage> {
               userProf: user,
             ),
       appBar: AppBar(
+        backgroundColor: Color(0xFF48B2FA),
         leading: Builder(
           builder: (context) => InkWell(
             splashColor: Colors.transparent,
@@ -533,6 +534,9 @@ class _HomePageState extends State<HomePage> {
                                       String reactionID= await PostServices().createReaction(mod.userObj.userUID, mod.postObj.postUID, ReactionModel.heart);
                                       mod.postObj.reactionIDs.add(reactionID);
                                       mod.postObj.heartCounter++;
+                                      ///ekle!!
+                                      await PostServices().createNotification(0, mod.userObj.userUID, reactionID, "requestID");
+                                      ///
                                       await PostServices().updatePost(mod.postObj).then((value) {
                                         setState((){
                                         });
@@ -544,6 +548,9 @@ class _HomePageState extends State<HomePage> {
                                         mod.postObj.reactionIDs.remove(reaction.reactionUID);
                                         mod.postObj.heartCounter--;
                                         await PostServices().deleteReaction(reaction.reactionUID);
+                                        ///ekle!!
+                                        await PostServices().deleteReactionNotification(reaction.reactionUID, mod.userObj);
+                                        ///
                                         await PostServices().updatePost(mod.postObj).then((value) {
                                           setState((){
                                           });
