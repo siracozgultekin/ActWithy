@@ -77,7 +77,6 @@ class AuthService{
     String userID = FirebaseAuth.instance.currentUser!.uid;
     DocumentSnapshot doc = await users.doc(userID).get();
     UserModel user = UserModel.fromSnapshot(doc) as UserModel;
-
     return isPP ? user.ppURL : user.backgroundURL;
   }
 
