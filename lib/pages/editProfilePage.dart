@@ -129,6 +129,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           icon: Icon(Icons.camera_enhance_rounded, size: MediaQuery.of(context).size.width*0.1,),
                           onPressed: () {
                             //TODO push||pushRep
+                            print(user.ppURL);
                             Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => ImagePickerPage(isPP: true)));
                           },
                         ))

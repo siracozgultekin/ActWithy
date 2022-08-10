@@ -12,11 +12,10 @@ class PostServices {
 
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   CollectionReference posts = FirebaseFirestore.instance.collection('posts');
-  CollectionReference activities =
-      FirebaseFirestore.instance.collection('activities');
-  CollectionReference reactions =
-      FirebaseFirestore.instance.collection('reactions');
+  CollectionReference activities = FirebaseFirestore.instance.collection('activities');
+  CollectionReference reactions = FirebaseFirestore.instance.collection('reactions');
   CollectionReference notifications = FirebaseFirestore.instance.collection('notifications');
+
 
   Future<String> createActivity(String selectedItem, Timestamp time,
       String location, List<String> participants) async {
@@ -203,7 +202,7 @@ class PostServices {
       DocumentSnapshot friendDoc = await users.doc(friendID).get();
 
       List<String> friendsPosts =
-          friendDoc["posts"].cast<String>(); //friend's post ids
+      friendDoc["posts"].cast<String>(); //friend's post ids
       for (String postID in friendsPosts) {
         DocumentSnapshot postDoc = await posts.doc(postID).get();
         //  DenemeModel deneme = DenemeModel(postObj: PostModel.fromSnapshot(postDoc));
@@ -406,8 +405,23 @@ class PostServices {
       }
     }
     return reactionsList;
-  }
+    
+  Future<List<ActivityModel>> getPostsActivities(String postID) async {
 
+    DocumentSnapshot postDoc = await posts.doc(postID).get();
+    PostModel post = PostModel.fromSnapshot(postDoc);
+
+    List<ActivityModel> activityList = [];
+
+    for (String actID in post.activityUID) {
+      DocumentSnapshot actDoc = await activities.doc(actID).get();
+      ActivityModel act = ActivityModel.fromSnapshot(actDoc);
+      activityList.add(act);
+    }
+
+    return activityList;
+
+  }
 
 }
 
@@ -418,8 +432,8 @@ class DenemeModel {
 
   DenemeModel(
       {required this.userObj,
-      required this.activitiesList,
-      required this.postObj});
+        required this.activitiesList,
+        required this.postObj});
 
   void setUser(UserModel muser) {
     this.userObj = muser;

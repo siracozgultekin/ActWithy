@@ -12,12 +12,10 @@ class ImagePickerPage extends StatefulWidget {
   ImagePickerPage({required this.isPP});
 
   @override
-  State<ImagePickerPage> createState() => _ImagePickerPageState(isPP);
+  State<ImagePickerPage> createState() => _ImagePickerPageState();
 }
 
 class _ImagePickerPageState extends State<ImagePickerPage> {
-  bool isPP;
-  _ImagePickerPageState(this.isPP);
   String url = "";
   String newUrl = "";
 
@@ -29,7 +27,8 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
   Color textColor = Color(0xFF2D3A43);
 
   getURL() async {
-    String u = await AuthService().getUserURL(isPP) as String;
+    String u = await AuthService().getUserURL(widget.isPP) as String;
+    print(u);
     setState(() {
       url = u;
     });
@@ -37,6 +36,7 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
 
   void initState() {
     getURL();
+
     super.initState();
   }
 
@@ -62,15 +62,15 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
             alignment: Alignment.centerRight,
             child: IconButton(onPressed: () async {
 
-
               setState((){
-                if (!newUrl.isEmpty || url==newUrl) {
+                if (!newUrl.isEmpty) {
                   url = newUrl;
                   newUrl ="";
                 }
               });
 
-              AuthService().approveImage(url, isPP);
+
+             await AuthService().approveImage(url, widget.isPP);
 
               String uid = FirebaseAuth.instance.currentUser!.uid;
               DocumentSnapshot dc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
@@ -83,93 +83,108 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
         ],
 
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              child: isPP ? Container(
-                height: MediaQuery.of(context).size.width/2,
-                width: MediaQuery.of(context).size.width/2,
-          decoration: new BoxDecoration(
-              shape: BoxShape.circle,
-              image: new DecorationImage(
-                  fit: BoxFit.cover,
-                  image:
-                  new NetworkImage(
-                      //TODO AuthService().newUrl
-                      (newUrl.isEmpty) ?
-                    url : newUrl
-                  )))
-              ):
-              Container(
-                  height: MediaQuery.of(context).size.height*0.21,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: new BoxDecoration(
-                      image: new DecorationImage(
+      body: FutureBuilder(
+        future: AuthService().getUserURL(widget.isPP),
+        builder: (context, AsyncSnapshot snap) {
+          if (!snap.hasData) {
+            return CircularProgressIndicator();
+          }else{
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  widget.isPP ? Container(
+
+                      height: MediaQuery.of(context).size.width/2,
+                      width: MediaQuery.of(context).size.width/2,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image:  DecorationImage(
                           fit: BoxFit.cover,
-                          image: new NetworkImage(
-                              //TODO AuthService().newUrl
+                          image:
+                          NetworkImage(
+                            //TODO AuthService().newUrl
                               (newUrl.isEmpty) ?
                               url : newUrl
-                          )))
-              )
-              ,
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.width/20,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  border: Border.all(color: textColor),
-                borderRadius: BorderRadius.all(
-                    Radius.circular(30.0) //                 <--- border radius here
-                ),
-              ),
-              width: MediaQuery.of(context).size.width/2,
-              child: TextButton(onPressed: () async {
+                          ),
+                        ),
+                      )
+                  )
+                      :
+                  Container(
 
-                newUrl = await AuthService().takeNewImage(ImageSource.gallery, isPP);
-                setState((){});
+                      height: MediaQuery.of(context).size.height*0.21,
+                      width: MediaQuery.of(context).size.width,
+                      decoration:  BoxDecoration(
+                          image:  DecorationImage(
+                              fit: BoxFit.cover,
+                              image: new NetworkImage(
+                                //TODO AuthService().newUrl
+                                  (newUrl.isEmpty) ?
+                                  url : newUrl
+                              )))
+                  )
+                  ,
 
-                //TODO new url update
+                  SizedBox(
+                    height: MediaQuery.of(context).size.width/20,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: textColor),
+                      borderRadius: BorderRadius.all(
+                          Radius.circular(30.0) //                 <--- border radius here
+                      ),
+                    ),
+                    width: MediaQuery.of(context).size.width/2,
+                    child: TextButton(onPressed: () async {
 
-              } , child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.image_outlined,color: textColor,),
-                  Text('Pick Gallery',style:TextStyle(color: textColor,))
+                      newUrl = await AuthService().takeNewImage(ImageSource.gallery, widget.isPP);
+                      setState((){});
+
+                      //TODO new url update
+
+                    } , child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.image_outlined,color: textColor,),
+                        Text('Pick Gallery',style:TextStyle(color: textColor,))
+                      ],
+                    )),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.width/20,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: textColor),
+                      borderRadius: BorderRadius.all(
+                          Radius.circular(30.0) //                 <--- border radius here
+                      ),
+                    ),
+                    width: MediaQuery.of(context).size.width/2,
+                    child: TextButton(onPressed: () async {
+
+                      newUrl= await AuthService().takeNewImage(ImageSource.camera, widget.isPP);
+                      setState((){});
+                      //TODO AuthService().updateNewUrl(false, Url, isPP);
+
+                    } , child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.camera_alt_outlined,color: textColor,),
+                        Text('Pick Camera',style:TextStyle(color: textColor,))
+                      ],
+                    )),
+                  ),
                 ],
-              )),
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.width/20,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  border: Border.all(color: textColor),
-                borderRadius: BorderRadius.all(
-                    Radius.circular(30.0) //                 <--- border radius here
-                ),
               ),
-              width: MediaQuery.of(context).size.width/2,
-              child: TextButton(onPressed: () async {
-
-                newUrl= await AuthService().takeNewImage(ImageSource.camera, isPP);
-                setState((){});
-                //TODO AuthService().updateNewUrl(false, Url, isPP);
-
-              } , child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.camera_alt_outlined,color: textColor,),
-                  Text('Pick Camera',style:TextStyle(color: textColor,))
-                ],
-              )),
-            ),
-          ],
-        ),
-      ),
+            );
+          }
+        },
+      )
     );
   }
 }
+
+

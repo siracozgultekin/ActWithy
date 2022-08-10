@@ -41,6 +41,7 @@ dependencies:
   firebase_core: ^1.19.1
   emojis: ^0.9.9
   image_picker: ^0.8.5+3
+  image_cropper: ^3.0.0
 
 
 flutter_icons:

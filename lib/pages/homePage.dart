@@ -217,6 +217,20 @@ class _HomePageState extends State<HomePage> {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => ProfilePage(user: currentUser)));
               }
+              switch(selectedIndex){
+                case 0: scrollUp();
+                  break;
+                case 1: showSearch(context: context, delegate: SearchPage(hintText: "Search", hintTextColor: TextStyle(color: Colors.white)));
+                  break;
+                case 2: Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreatingPage(postModel: postModel)));
+                  break;
+                case 3: Navigator.of(context).push(MaterialPageRoute(builder: (context) => NotificationPage()));
+                  break;
+                case 4: Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProfilePage(user: currentUser)));
+                  break;
+
+              }
+
 
              
 
@@ -291,8 +305,10 @@ class _HomePageState extends State<HomePage> {
                               height: mediaqueryHeight,
                               width: mediaqueryHeight,
                               decoration: BoxDecoration(
+
                                 shape: BoxShape.circle,
                                 image: DecorationImage(
+                                    fit: BoxFit.cover,
                                     image: NetworkImage(mod.userObj.ppURL)),
                               ),
                             ),
@@ -393,6 +409,7 @@ class _HomePageState extends State<HomePage> {
                                                               color: Colors.green,
                                                               shape: BoxShape.circle,
                                                               image: DecorationImage(
+                                                                fit: BoxFit.cover,
                                                                 image: NetworkImage(
                                                                     participantList[0].ppURL),
                                                               ),
@@ -415,7 +432,8 @@ class _HomePageState extends State<HomePage> {
                                                                     color: Colors.green,
                                                                     shape: BoxShape.circle,
                                                                     image: DecorationImage(
-                                                                      image: NetworkImage(
+                                                                      fit: BoxFit.cover,
+                                                                       image: NetworkImage(
                                                                           participantList[1].ppURL),
                                                                     )),
                                                               ),
