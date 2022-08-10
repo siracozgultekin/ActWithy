@@ -22,12 +22,12 @@ class _HomePageState extends State<HomePage> {
   late List<UserModel> userMList;
   String reactid="";
   int chosenEmoji=0;
-
   int selectedIndex = 0;
   final controller = ScrollController();
   late UserModel user;
   bool isLoading = true;
   var mediaqueryHeight;
+<<<<<<< Updated upstream
 
  List<int> emojiCheck =[ //TODO HER POST OBJESİ İÇİN AYRI BİR LİSTE ATAYABİLMEN LAZIM (MUHTEMELEN FİREBASE TARAFINDA OLUŞTURULACAK.)
    0,//Hearth
@@ -37,12 +37,14 @@ class _HomePageState extends State<HomePage> {
    0,//Angry
  ];
 
+=======
+  List<bool> isReaction = [];
+>>>>>>> Stashed changes
   @override
   void initState() {
     getMe();
     super.initState();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,7 +80,7 @@ class _HomePageState extends State<HomePage> {
                           : BoxDecoration(
                               shape: BoxShape.circle,
                               image: DecorationImage(
-                                fit: BoxFit.fill,
+                                fit: BoxFit.cover,
                                 image: NetworkImage(user.ppURL),
                               )),
                     ),
@@ -164,9 +166,10 @@ class _HomePageState extends State<HomePage> {
                     itemCount: snap.data.length, //TODO snap.data.length,
                     itemBuilder: (context, index) {
                       mediaqueryHeight=MediaQuery.of(context).size.height*0.06;
+                      isReaction.add(false);
                       DenemeModel postModelObj =
                           snap.data[index] as DenemeModel;
-                      return mainListTile(postModelObj);
+                      return mainListTile(postModelObj, index);
                     }),
               );
             }
@@ -262,7 +265,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Widget mainListTile(DenemeModel mod) {
+  Widget mainListTile(DenemeModel mod, int index) {
 
 
     return SingleChildScrollView(
@@ -487,7 +490,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  Divider(height: 1,color: Colors.blue,),
+                  Divider(height: 1,color: Colors.blue,thickness: 0.7,),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
@@ -502,7 +505,67 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 IconButton(padding: EdgeInsets.zero,
                                   icon: Text("${Emojis.redHeart}",style: TextStyle(fontSize: 15),),
+<<<<<<< Updated upstream
                                   onPressed: ()async{
+=======
+                                  onPressed: isReaction[index] ? () {} : () async {
+                                  ///postun reactionlarına bak şu anki kullanıcıdan reaksiyon varsa
+                                    ///aynısıysa geri al (reaksiyonu sil - database + postmodel)
+                                    ///farklıysa eskisini güncelle.
+                                    ///
+                                    ///
+                                    ///
+
+                                    setState(() {
+                                      isReaction[index] = true;
+                                    });
+
+                                    bool check = await PostServices().checkReaction(mod.postObj);
+                                    if (!check){///reaksiyon yoksa yenisini oluştur.
+                                      String reactionID= await PostServices().createReaction(mod.userObj.userUID, mod.postObj.postUID, ReactionModel.heart);
+                                      mod.postObj.reactionIDs.add(reactionID);
+                                      mod.postObj.heartCounter++;
+                                      await PostServices().updatePost(mod.postObj).then((value) {
+                                        setState((){
+                                        });
+                                      });
+                                    }else{/// reaksiyon var. reaksiyonu databaseden çek düzenle
+                                      ReactionModel reaction = await PostServices().getReaction(mod.postObj);
+                                      if (reaction.type==ReactionModel.heart){/// aynısına tıklanmış her yerden
+                                        /// (database + postun listesi + postun counterı)
+                                        mod.postObj.reactionIDs.remove(reaction.reactionUID);
+                                        mod.postObj.heartCounter--;
+                                        await PostServices().deleteReaction(reaction.reactionUID);
+                                        await PostServices().updatePost(mod.postObj).then((value) {
+                                          setState((){
+                                          });
+                                        });
+                                      }else{/// farklı reaksiyona tıklanmış güncelle
+                                        String oldReactType = reaction.type;
+                                        switch(oldReactType){
+                                          case 'angry':
+                                            mod.postObj.angryCounter--;
+                                            break;
+                                          case 'brokenHeart':
+                                            mod.postObj.brokenHeartCounter--;
+                                            break;
+                                          case 'joy':
+                                            mod.postObj.joyCounter--;
+                                            break;
+                                          case 'sob':
+                                            mod.postObj.sobCounter--;
+                                            break;
+                                        }
+
+                                        reaction.type = ReactionModel.heart;
+                                        mod.postObj.heartCounter++;
+                                        await PostServices().updateReaction(reaction);
+                                        await PostServices().updatePost(mod.postObj).then((value) {
+                                          setState((){
+                                          });
+                                        });
+                                      }
+>>>>>>> Stashed changes
 
 
                                     if(emojiCheck[0]==0){
@@ -537,7 +600,9 @@ class _HomePageState extends State<HomePage> {
                                       emojiCheck[4]=-1;
                                       chosenEmoji=1;
                                     }
-
+                                    setState(() {
+                                      isReaction[index] = false;
+                                    });
                                   },
                                 ),
                                 Text("${mod.postObj.heartCounter}"),
