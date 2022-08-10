@@ -13,9 +13,9 @@ class PostServices {
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   CollectionReference posts = FirebaseFirestore.instance.collection('posts');
   CollectionReference activities =
-  FirebaseFirestore.instance.collection('activities');
+      FirebaseFirestore.instance.collection('activities');
   CollectionReference reactions =
-  FirebaseFirestore.instance.collection('reactions');
+      FirebaseFirestore.instance.collection('reactions');
 
   Future<String> createActivity(String selectedItem, Timestamp time,
       String location, List<String> participants) async {
@@ -198,7 +198,7 @@ class PostServices {
       DocumentSnapshot friendDoc = await users.doc(friendID).get();
 
       List<String> friendsPosts =
-      friendDoc["posts"].cast<String>(); //friend's post ids
+          friendDoc["posts"].cast<String>(); //friend's post ids
       for (String postID in friendsPosts) {
         DocumentSnapshot postDoc = await posts.doc(postID).get();
         //  DenemeModel deneme = DenemeModel(postObj: PostModel.fromSnapshot(postDoc));
@@ -352,6 +352,25 @@ class PostServices {
     await reactions.doc(reactionModel.reactionUID).set(reactionModel.createMap());
   }
 
+  Future<ReactionModel> getReaction(PostModel postModel)async{
+    String currentUser = await FirebaseAuth.instance.currentUser!.uid;
+    String reactID ="";
+    for (String reactionId in postModel.reactionIDs){
+      DocumentSnapshot documentSnapshot = await reactions.doc(reactionId).get();
+      if (documentSnapshot["reacterID"] == currentUser){
+        reactID = documentSnapshot["reactionUID"];
+        break;
+      }
+    }
+    DocumentSnapshot doc = await reactions.doc(reactID).get();
+
+    return ReactionModel.fromSnapshot(doc);
+  }
+
+  Future<void> updateReaction(ReactionModel reactionModel)async {
+    await reactions.doc(reactionModel.reactionUID).set(reactionModel.createMap());
+  }
+
   Future<List<ActivityModel>> getPostsActivities(String postID) async {
 
     DocumentSnapshot postDoc = await posts.doc(postID).get();
@@ -370,7 +389,6 @@ class PostServices {
   }
 
 
-}
 
 class DenemeModel {
   PostModel postObj;
@@ -379,8 +397,8 @@ class DenemeModel {
 
   DenemeModel(
       {required this.userObj,
-        required this.activitiesList,
-        required this.postObj});
+      required this.activitiesList,
+      required this.postObj});
 
   void setUser(UserModel muser) {
     this.userObj = muser;
