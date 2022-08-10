@@ -14,6 +14,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import 'notificationPage.dart';
+
 class ProfilePage extends StatefulWidget {
   final UserModel user;
   ProfilePage({required this.user});
@@ -93,7 +95,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   brokenHeartCounter: 0,
                   joyCounter: 0,
                   sobCounter: 0,
-                  angryCounter: 0);
+                  angryCounter: 0,
+              reactionIDs: []);
             } else {
               //oluşturulmuş demek
               postModel = await PostServices().getDailyPost();
@@ -113,6 +116,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => CreatingPage(postModel: postModel)));
               } else if (selectedIndex == 3) {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => NotificationPage()));
               } else if (selectedIndex == 4) {
                 scrollUp();
 

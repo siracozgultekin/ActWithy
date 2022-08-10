@@ -18,8 +18,6 @@ class AuthService{
     await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: pass)
         .then((value) async {
       String uid = value.user!.uid;
-      List<String> friends =[];
-      List<String> posts =[];
 
       Map<String, dynamic> usermap = {
         "userUID": uid,
@@ -31,13 +29,14 @@ class AuthService{
         "bio": "Hi I am ${name} and this is my ToDo List",
         "ppURL": "https://firebasestorage.googleapis.com/v0/b/actwithy.appspot.com/o/default%2Fpp.png?alt=media&token=9284a7da-2f75-4ea9-8fcf-9919ebe5acfc",
         "backgroundURL": "https://firebasestorage.googleapis.com/v0/b/actwithy.appspot.com/o/default%2Fbgg.png?alt=media&token=bad5930e-bb80-47a7-bec1-7c5aa85dae04x",
-        "friends":friends,
-        "posts": posts,
+        "friends":[],
+        "posts": [],
         "registerDate": Timestamp.now(),
         "lastSeen": Timestamp.now(),
         "postCount": 0,
         "lastPostID":"lastPostID",
-        "lastPostStamp":null,
+        "lastPostStamp":Timestamp.fromDate(DateTime(2000)),
+        "notifications":[],
       };
       print("Result: $result");
       await FirebaseFirestore.instance.collection('users').doc(uid).set(usermap)
@@ -130,6 +129,14 @@ class AuthService{
   }
 
 
+  Future<UserModel> getCurrentUser() async {
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+    DocumentSnapshot doc = await users.doc(uid).get();
+    UserModel user = UserModel.fromSnapshot(doc);
+
+    return user;
+
+  }
 
 }
 

@@ -38,8 +38,6 @@ class _CreatingPageState extends State<CreatingPage> {
 
   List<ActivityModel> activities = [];
 
-  int itemLength = CreatingPage.participants.length;
-
   initState() {
     length = widget.postModel.activityUID.length;
     CreatingPage.participants = CreatingPage.participants;
@@ -230,7 +228,6 @@ class _CreatingPageState extends State<CreatingPage> {
                                                 .then((value) {
                                               setState(() {});
                                             });
-                                            //setState((){CreatingPage.participants = CreatingPage.participants;});
                                           },
                                           icon: Icon(
                                               Icons.person_add_alt_1_outlined)),
@@ -434,8 +431,6 @@ class _CreatingPageState extends State<CreatingPage> {
                             widget.postModel.activityUID.add(ActId);
                             await PostServices().updatePost(widget.postModel);
                             print("activity: ${widget.postModel.activityUID}");
-                            print(
-                                ("eklenen arkadaşlar ${CreatingPage.participants[0].userUID}"));
                             setState(() {
                               length = newLength;
                               CreatingPage.participants = [];
@@ -485,7 +480,11 @@ class _CreatingPageState extends State<CreatingPage> {
                           .getDailyActivities(), //Last post of current user
                       builder: (context, AsyncSnapshot snap) {
                         if (!snap.hasData) {
-                          return CircularProgressIndicator();
+                          return Center(
+                            child: Container(
+                                height: 50,width: 50,
+                                child: CircularProgressIndicator()),
+                          );
                         } else {
                           return Container(
                             height: MediaQuery.of(context).size.height * 0.8,
@@ -657,7 +656,11 @@ class _CreatingPageState extends State<CreatingPage> {
             .getParticipants(activityObj), //Last post of current user
         builder: (context, AsyncSnapshot snap) {
           if (!snap.hasData) {
-            return CircularProgressIndicator();
+            return Center(
+              child: Container(
+                  height: 50,width: 50,
+                  child: CircularProgressIndicator()),
+            );
           } else {
             List<UserModel> participantList = snap.data;
             print("participant sayısı: ${activityObj.participants.length}");
@@ -708,10 +711,13 @@ class _CreatingPageState extends State<CreatingPage> {
                                   padding: EdgeInsets.all(0.0),
                                   child: InkWell(
                                     child: Icon(Icons.edit),
-                                    onTap: () {
+                                    onTap: () async {
                                       EditingPopUp(activityObj).then((value) {
                                         setState(() {});
                                       });
+                                      participantList = await PostServices()
+                                          .getParticipants(activityObj);
+
                                     },
                                   ),
                                 ),
@@ -734,7 +740,7 @@ class _CreatingPageState extends State<CreatingPage> {
                             },
                             child: Row(
                               children: [
-                                if (activityObj.participants.length >= 1)
+                                if (participantList.length >= 1)
                                   Padding(
                                     padding: const EdgeInsets.only(left: 8.0),
                                     child: Container(
@@ -750,7 +756,7 @@ class _CreatingPageState extends State<CreatingPage> {
                                       ),
                                     ),
                                   ),
-                                if (activityObj.participants.length >= 2)
+                                if (participantList.length >= 2)
                                   Padding(
                                     padding: const EdgeInsets.only(
                                       left: 4.0,
@@ -1219,8 +1225,10 @@ class _CreatingPageState extends State<CreatingPage> {
                           activityModel.activityType = activityKey.text +' '+ selectedItem!;
                           activityModel.location = locationKey.text;
                           activityModel.time = myTimeStamp;
-                          await PostServices().updateActivity(activityModel);
-                          Navigator.pop(context);
+                          await PostServices().updateActivity(activityModel).then((value) {
+                            Navigator.pop(context);
+                          });
+
                         },
                         child: Text(
                           " Save",
