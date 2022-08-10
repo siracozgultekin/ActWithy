@@ -62,7 +62,6 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
             alignment: Alignment.centerRight,
             child: IconButton(onPressed: () async {
 
-
               setState((){
                 if (!newUrl.isEmpty || url==newUrl) {
                   url = newUrl;

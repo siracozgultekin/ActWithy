@@ -199,7 +199,7 @@ class _DrawerPageState extends State<DrawerPage> {
                                   child: SingleChildScrollView(
                                     physics: ClampingScrollPhysics(),
                                     child: Column(
-                                      children: [
+                                       children: [
                                         ListView.builder(
                                             itemCount: post.activityUID.length,
                                             scrollDirection: Axis.vertical,

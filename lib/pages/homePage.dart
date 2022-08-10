@@ -197,6 +197,7 @@ class _HomePageState extends State<HomePage> {
 
             setState(() {
               selectedIndex = value;
+<<<<<<< Updated upstream
               if (selectedIndex == 0) {
                 scrollUp();
               } else if (selectedIndex == 1) {
@@ -213,10 +214,20 @@ class _HomePageState extends State<HomePage> {
               } else if (selectedIndex == 4) {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => ProfilePage(user: currentUser)));
+=======
+              switch(selectedIndex){
+                case 0: scrollUp();
+                  break;
+                case 1: showSearch(context: context, delegate: SearchPage(hintText: "Search", hintTextColor: TextStyle(color: Colors.white)));
+                  break;
+                case 2: Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreatingPage(postModel: postModel)));
+                  break;
+                case 3: Navigator.of(context).push(MaterialPageRoute(builder: (context) => NotificationPage()));
+                  break;
+                case 4: Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProfilePage(user: currentUser)));
+                  break;
+>>>>>>> Stashed changes
               }
-
-             
-
             });
           },
           /*  if (selected == 0) {
