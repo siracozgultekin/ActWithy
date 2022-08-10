@@ -472,7 +472,76 @@ class PostServices {
     await reactions.doc(reactionModel.reactionUID).set(reactionModel.createMap());
   }
 
+<<<<<<< Updated upstream
 
+=======
+  Future<String> createNotification(int type, String userID, String reactionID ,String requestID,)async{
+    String notificationId = "";
+    await notifications.add({
+      'time' : Timestamp.now(),
+      "type": type,
+      "userID": userID,
+      "reactionID": reactionID,
+      "requestID": requestID,
+    }).then((value) async {
+      notificationId = value.id;
+      await reactions.doc(value.id).update({"notificationUID": value.id});
+    });
+    DocumentSnapshot doc =await users.doc(userID).get();
+    UserModel userModel = UserModel.fromSnapshot(doc);
+    userModel.notifications.add(notificationId);
+    await updateUser(userModel);
+    return notificationId;
+  }
+
+  Future<void> deleteReactionNotification(String rectionId, UserModel userModel) async {
+    if (rectionId != "") {
+      for (String id in userModel.notifications){
+        DocumentSnapshot doc = await notifications.doc(id).get();
+        if(doc["reactionID"]==rectionId){
+          userModel.notifications.remove(doc["notificationUID"]);
+          await updateUser(userModel);
+          await notifications.doc(doc["notificationUID"]).delete();
+          return;
+        }
+      }
+    }
+  }
+
+  Future<List<NotificationActivityModel>> getNotificationReactions()async{
+    List<NotificationActivityModel> reactionsList = [];
+    String myID = await FirebaseAuth.instance.currentUser!.uid;
+    DocumentSnapshot myDoc = await users.doc(myID).get();
+    List<String> notIDs = myDoc["notifications"].cast<String>();
+    for (String id in notIDs){
+      DocumentSnapshot notDoc = await notifications.doc(id).get();
+      if(notDoc["type"]==0){
+        DocumentSnapshot reactionDoc = await reactions.doc(notDoc["reactionID"]).get();
+        ReactionModel reactionModel = ReactionModel.fromSnapshot(reactionDoc);
+        DocumentSnapshot postDoc =await posts.doc(reactionModel.postID).get();
+        DocumentSnapshot userDoc = await users.doc(reactionModel.reacterID).get();
+        reactionsList.add(NotificationActivityModel(user: UserModel.fromSnapshot(userDoc), reaction: reactionModel, post: PostModel.fromSnapshot(postDoc)));
+      }
+    }
+    return reactionsList;
+}
+Future<List<ActivityModel>> getPostsActivities(String postID) async {
+
+    DocumentSnapshot postDoc = await posts.doc(postID).get();
+    PostModel post = PostModel.fromSnapshot(postDoc);
+
+    List<ActivityModel> activityList = [];
+
+    for (String actID in post.activityUID) {
+      DocumentSnapshot actDoc = await activities.doc(actID).get();
+      ActivityModel act = ActivityModel.fromSnapshot(actDoc);
+      activityList.add(act);
+    }
+
+    return activityList;
+
+  }
+>>>>>>> Stashed changes
 }
 
 class DenemeModel {
