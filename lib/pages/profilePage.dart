@@ -45,6 +45,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   initState()  {
     getIsMyFriend();
+
     super.initState();
   }
 
@@ -95,8 +96,7 @@ class _ProfilePageState extends State<ProfilePage> {
             setState(() {
               selectedIndex = value;
               if (selectedIndex == 0) {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => HomePage()));
+                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=> HomePage()), (route) => false);
               } else if (selectedIndex == 1) {
                 showSearch(
                     context: context,
