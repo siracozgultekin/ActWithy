@@ -105,20 +105,23 @@ class _ProfilePageState extends State<ProfilePage> {
                 case 2: Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => CreatingPage(postModel: postModel)));
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
               } else if (selectedIndex == 3) {
               } else if (selectedIndex == 4) {
                 scrollUp();
 
 =======
+=======
+>>>>>>> Stashed changes
                   break;
                 case 3:  Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => NotificationPage()));
                   break;
                 case 4: scrollUp();
                   break;
->>>>>>> Stashed changes
-              }
-            });
+
+
+            }});
           },
           /*  if (selected == 0) {
 
