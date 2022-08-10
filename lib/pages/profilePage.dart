@@ -93,35 +93,23 @@ class _ProfilePageState extends State<ProfilePage> {
 
             setState(() {
               selectedIndex = value;
-              switch(selectedIndex){
-                case 0: Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=> HomePage()), (route) => false);
-                  break;
-                case 1: showSearch(
+              if (selectedIndex == 0) {
+                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=> HomePage()), (route) => false);
+              } else if (selectedIndex == 1) {
+                showSearch(
                     context: context,
                     delegate: SearchPage(
                         hintText: "Search",
                         hintTextColor: TextStyle(color: Colors.white)));
-                  break;
-                case 2: Navigator.of(context).pushReplacement(MaterialPageRoute(
+              } else if (selectedIndex == 2) {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => CreatingPage(postModel: postModel)));
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
               } else if (selectedIndex == 3) {
               } else if (selectedIndex == 4) {
                 scrollUp();
 
-=======
-=======
->>>>>>> Stashed changes
-                  break;
-                case 3:  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => NotificationPage()));
-                  break;
-                case 4: scrollUp();
-                  break;
-
-
-            }});
+              }
+            });
           },
           /*  if (selected == 0) {
 
