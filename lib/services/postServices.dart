@@ -352,8 +352,43 @@ class PostServices {
     await reactions.doc(reactionModel.reactionUID).set(reactionModel.createMap());
   }
 
+  Future<ReactionModel> getReaction(PostModel postModel)async{
+    String currentUser = await FirebaseAuth.instance.currentUser!.uid;
+    String reactID ="";
+    for (String reactionId in postModel.reactionIDs){
+      DocumentSnapshot documentSnapshot = await reactions.doc(reactionId).get();
+      if (documentSnapshot["reacterID"] == currentUser){
+        reactID = documentSnapshot["reactionUID"];
+        break;
+      }
+    }
+    DocumentSnapshot doc = await reactions.doc(reactID).get();
 
-}
+    return ReactionModel.fromSnapshot(doc);
+  }
+
+  Future<void> updateReaction(ReactionModel reactionModel)async {
+    await reactions.doc(reactionModel.reactionUID).set(reactionModel.createMap());
+  }
+
+  Future<List<ActivityModel>> getPostsActivities(String postID) async {
+
+    DocumentSnapshot postDoc = await posts.doc(postID).get();
+    PostModel post = PostModel.fromSnapshot(postDoc);
+
+    List<ActivityModel> activityList = [];
+
+    for (String actID in post.activityUID) {
+      DocumentSnapshot actDoc = await activities.doc(actID).get();
+      ActivityModel act = ActivityModel.fromSnapshot(actDoc);
+      activityList.add(act);
+    }
+
+    return activityList;
+
+  }
+
+
 
 class DenemeModel {
   PostModel postObj;
