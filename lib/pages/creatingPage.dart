@@ -228,7 +228,6 @@ class _CreatingPageState extends State<CreatingPage> {
                                                 .then((value) {
                                               setState(() {});
                                             });
-                                            //setState((){CreatingPage.participants = CreatingPage.participants;});
                                           },
                                           icon: Icon(
                                               Icons.person_add_alt_1_outlined)),
@@ -718,7 +717,7 @@ class _CreatingPageState extends State<CreatingPage> {
                                       });
                                       participantList = await PostServices()
                                           .getParticipants(activityObj);
-                                      setState(() {});
+
                                     },
                                   ),
                                 ),
@@ -741,7 +740,7 @@ class _CreatingPageState extends State<CreatingPage> {
                             },
                             child: Row(
                               children: [
-                                if (activityObj.participants.length >= 1)
+                                if (participantList.length >= 1)
                                   Padding(
                                     padding: const EdgeInsets.only(left: 8.0),
                                     child: Container(
@@ -757,7 +756,7 @@ class _CreatingPageState extends State<CreatingPage> {
                                       ),
                                     ),
                                   ),
-                                if (activityObj.participants.length >= 2)
+                                if (participantList.length >= 2)
                                   Padding(
                                     padding: const EdgeInsets.only(
                                       left: 4.0,

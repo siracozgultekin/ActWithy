@@ -4,6 +4,7 @@ import 'package:actwithy/Models/ReactionModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
 import 'package:actwithy/pages/creatingPage.dart';
 import 'package:actwithy/pages/drawerPage.dart';
+import 'package:actwithy/pages/notificationPage.dart';
 import 'package:actwithy/pages/profilePage.dart';
 import 'package:actwithy/pages/searchPage.dart';
 import 'package:actwithy/services/authService.dart';
@@ -209,7 +210,8 @@ class _HomePageState extends State<HomePage> {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => CreatingPage(postModel: postModel)));
               } else if (selectedIndex == 3) {
-
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => NotificationPage()));
               } else if (selectedIndex == 4) {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => ProfilePage(user: currentUser)));
@@ -219,10 +221,6 @@ class _HomePageState extends State<HomePage> {
 
             });
           },
-          /*  if (selected == 0) {
-
-            }
-            print(selected); */
           destinations: [
             NavigationDestination(
               icon: Icon(Icons.home, color: Colors.white),
@@ -508,10 +506,6 @@ class _HomePageState extends State<HomePage> {
                                   ///postun reactionlarına bak şu anki kullanıcıdan reaksiyon varsa
                                     ///aynısıysa geri al (reaksiyonu sil - database + postmodel)
                                     ///farklıysa eskisini güncelle.
-                                    ///
-                                    ///
-                                    ///
-
                                     setState(() {
                                       isReaction[index] = true;
                                     });
@@ -575,8 +569,11 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 IconButton(padding: EdgeInsets.zero,
                                   icon: Text("${Emojis.brokenHeart}",style: TextStyle(fontSize: 15),),
-                                  onPressed: ()async{
-                                    bool check = await PostServices().checkReaction(mod.postObj);
+                                  onPressed: isReaction[index] ? () {} : ()async{
+                                    setState(() {
+                                      isReaction[index] = true;
+                                    });
+                                  bool check = await PostServices().checkReaction(mod.postObj);
                                     if (!check){///reaksiyon yoksa yenisini oluştur.
                                       String reactionID= await PostServices().createReaction(mod.userObj.userUID, mod.postObj.postUID, ReactionModel.brokenHeart);
                                       mod.postObj.reactionIDs.add(reactionID);
@@ -614,6 +611,9 @@ class _HomePageState extends State<HomePage> {
                                         });
                                       }
                                     }
+                                    setState(() {
+                                      isReaction[index] = false;
+                                    });
                                   },
                                 ), Text("${mod.postObj.brokenHeartCounter}"),
                               ],
@@ -621,8 +621,11 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 IconButton(padding: EdgeInsets.zero,
                                   icon: Text("${Emojis.rollingOnTheFloorLaughing}",style: TextStyle(fontSize: 15),),
-                                  onPressed: ()async{
-                                    bool check = await PostServices().checkReaction(mod.postObj);
+                                  onPressed: isReaction[index] ? () {} : ()async{
+                                    setState(() {
+                                      isReaction[index] = true;
+                                    });
+                                  bool check = await PostServices().checkReaction(mod.postObj);
                                     if (!check){
                                       String reactionID= await PostServices().createReaction(mod.userObj.userUID, mod.postObj.postUID, ReactionModel.joy);
                                       mod.postObj.reactionIDs.add(reactionID);
@@ -660,7 +663,9 @@ class _HomePageState extends State<HomePage> {
                                         });
                                       }
                                     }
-
+                                    setState(() {
+                                      isReaction[index] = false;
+                                    });
                                  },
                                 ),  Text("${mod.postObj.joyCounter}"),
                               ],
@@ -668,7 +673,10 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 IconButton(padding: EdgeInsets.zero,
                                   icon: Text("${Emojis.sadButRelievedFace}",style: TextStyle(fontSize: 15),),
-                                  onPressed: ()async{
+                                  onPressed: isReaction[index] ? () {} : ()async{
+                                    setState(() {
+                                      isReaction[index] = true;
+                                    });
                                     bool check = await PostServices().checkReaction(mod.postObj);
                                     if (!check){
                                       String reactionID= await PostServices().createReaction(mod.userObj.userUID, mod.postObj.postUID, ReactionModel.sob);
@@ -707,8 +715,9 @@ class _HomePageState extends State<HomePage> {
                                         });
                                       }
                                     }
-
-
+                                    setState(() {
+                                      isReaction[index] = false;
+                                    });
                                  },
                                 ), Text("${mod.postObj.sobCounter}"),
                               ],
@@ -716,7 +725,10 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 IconButton(padding: EdgeInsets.zero,
                                   icon: Text("${Emojis.angryFace}",style: TextStyle(fontSize: 15),),
-                                  onPressed: ()async{
+                                  onPressed: isReaction[index] ? () {} : ()async{
+                                    setState(() {
+                                      isReaction[index] = true;
+                                    });
                                     bool check = await PostServices().checkReaction(mod.postObj);
                                     if (!check){
                                       String reactionID= await PostServices().createReaction(mod.userObj.userUID, mod.postObj.postUID, ReactionModel.angry);
@@ -756,7 +768,9 @@ class _HomePageState extends State<HomePage> {
                                       }
                                     }
 
-
+                                    setState(() {
+                                      isReaction[index] = false;
+                                    });
                                   },
                                 ), Text("${mod.postObj.angryCounter}"),
                               ],
