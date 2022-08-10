@@ -64,7 +64,7 @@ class _DrawerPageState extends State<DrawerPage> {
                               : BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(
-                              fit: BoxFit.fill,
+                              fit: BoxFit.cover,
                               image: NetworkImage(widget.userProf.ppURL),
                             ),
                           ),
@@ -272,6 +272,7 @@ class _DrawerPageState extends State<DrawerPage> {
                                                                       padding:
                                                                       const EdgeInsets.only(left: 8.0),
                                                                       child: CircleAvatar(
+                                                                        
                                                                            radius: 10,
                                                                         backgroundImage: NetworkImage(participantList[0].ppURL),
                                                                      ),

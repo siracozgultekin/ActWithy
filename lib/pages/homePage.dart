@@ -306,8 +306,10 @@ class _HomePageState extends State<HomePage> {
                               height: mediaqueryHeight,
                               width: mediaqueryHeight,
                               decoration: BoxDecoration(
+
                                 shape: BoxShape.circle,
                                 image: DecorationImage(
+                                    fit: BoxFit.cover,
                                     image: NetworkImage(mod.userObj.ppURL)),
                               ),
                             ),
@@ -408,6 +410,7 @@ class _HomePageState extends State<HomePage> {
                                                               color: Colors.green,
                                                               shape: BoxShape.circle,
                                                               image: DecorationImage(
+                                                                fit: BoxFit.cover,
                                                                 image: NetworkImage(
                                                                     participantList[0].ppURL),
                                                               ),
@@ -430,7 +433,8 @@ class _HomePageState extends State<HomePage> {
                                                                     color: Colors.green,
                                                                     shape: BoxShape.circle,
                                                                     image: DecorationImage(
-                                                                      image: NetworkImage(
+                                                                      fit: BoxFit.cover,
+                                                                       image: NetworkImage(
                                                                           participantList[1].ppURL),
                                                                     )),
                                                               ),
