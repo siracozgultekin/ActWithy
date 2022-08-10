@@ -28,7 +28,6 @@ class _HomePageState extends State<HomePage> {
   late UserModel user;
   bool isLoading = true;
   var mediaqueryHeight;
-
   List<bool> isReaction = [];
   @override
   void initState() {
@@ -505,7 +504,6 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 IconButton(padding: EdgeInsets.zero,
                                   icon: Text("${Emojis.redHeart}",style: TextStyle(fontSize: 15),),
-
                                   onPressed: isReaction[index] ? () {} : () async {
                                   ///postun reactionlarına bak şu anki kullanıcıdan reaksiyon varsa
                                     ///aynısıysa geri al (reaksiyonu sil - database + postmodel)
@@ -517,7 +515,6 @@ class _HomePageState extends State<HomePage> {
                                     setState(() {
                                       isReaction[index] = true;
                                     });
-
 
                                     bool check = await PostServices().checkReaction(mod.postObj);
                                     if (!check){///reaksiyon yoksa yenisini oluştur.
@@ -541,7 +538,6 @@ class _HomePageState extends State<HomePage> {
                                         });
                                       }else{/// farklı reaksiyona tıklanmış güncelle
                                         String oldReactType = reaction.type;
-
                                         switch(oldReactType){
                                           case 'angry':
                                             mod.postObj.angryCounter--;
@@ -556,8 +552,7 @@ class _HomePageState extends State<HomePage> {
                                             mod.postObj.sobCounter--;
                                             break;
                                         }
-
-
+                                       
                                         reaction.type = ReactionModel.heart;
                                         mod.postObj.heartCounter++;
                                         await PostServices().updateReaction(reaction);
@@ -567,48 +562,10 @@ class _HomePageState extends State<HomePage> {
                                         });
                                       }
 
-
-
-                                    if(emojiCheck[0]==0){
-                                      reactid= await PostServices().createReact(user.userUID, mod.userObj.userUID, mod.postObj.postUID, "redHeart");
-                                      PostServices().setHeartCounter(mod.postObj.postUID, true);
-                                      emojiCheck[0]=1;
-                                      emojiCheck[1]=-1;
-                                      emojiCheck[2]=-1;
-                                      emojiCheck[3]=-1;
-                                      emojiCheck[4]=-1;
-                                      chosenEmoji=1;
-
-                                    }
-                                    else if(emojiCheck[0]==1){
-                                     PostServices().deleteReaction(reactid);
-                                     PostServices().setHeartCounter(mod.postObj.postUID, false);
-                                     emojiCheck[0]=0;
-                                     emojiCheck[1]=0;
-                                     emojiCheck[2]=0;
-                                     emojiCheck[3]=0;
-                                     emojiCheck[4]=0;
-
-                                    }
-                                    else if(emojiCheck[0]==-1){
-                                      PostServices().updateReactionType(reactid, "redHeart");
-                                      PostServices().checkEmoji(chosenEmoji, mod.postObj.postUID);
-                                      PostServices().setHeartCounter(mod.postObj.postUID, true);
-                                      emojiCheck[0]=1;
-                                      emojiCheck[1]=-1;
-                                      emojiCheck[2]=-1;
-                                      emojiCheck[3]=-1;
-                                      emojiCheck[4]=-1;
-                                      chosenEmoji=1;
                                     }
                                     setState(() {
                                       isReaction[index] = false;
                                     });
-
-
-                                    }
-
-
                                   },
                                 ),
                                 Text("${mod.postObj.heartCounter}"),
