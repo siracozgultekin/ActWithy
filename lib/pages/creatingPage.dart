@@ -38,8 +38,6 @@ class _CreatingPageState extends State<CreatingPage> {
 
   List<ActivityModel> activities = [];
 
-  int itemLength = CreatingPage.participants.length;
-
   initState() {
     length = widget.postModel.activityUID.length;
     CreatingPage.participants = CreatingPage.participants;
@@ -434,8 +432,6 @@ class _CreatingPageState extends State<CreatingPage> {
                             widget.postModel.activityUID.add(ActId);
                             await PostServices().updatePost(widget.postModel);
                             print("activity: ${widget.postModel.activityUID}");
-                            print(
-                                ("eklenen arkadaşlar ${CreatingPage.participants[0].userUID}"));
                             setState(() {
                               length = newLength;
                               CreatingPage.participants = [];
@@ -716,10 +712,13 @@ class _CreatingPageState extends State<CreatingPage> {
                                   padding: EdgeInsets.all(0.0),
                                   child: InkWell(
                                     child: Icon(Icons.edit),
-                                    onTap: () {
+                                    onTap: () async {
                                       EditingPopUp(activityObj).then((value) {
                                         setState(() {});
                                       });
+                                      participantList = await PostServices()
+                                          .getParticipants(activityObj);
+                                      setState(() {});
                                     },
                                   ),
                                 ),
@@ -1227,8 +1226,10 @@ class _CreatingPageState extends State<CreatingPage> {
                           activityModel.activityType = activityKey.text +' '+ selectedItem!;
                           activityModel.location = locationKey.text;
                           activityModel.time = myTimeStamp;
-                          await PostServices().updateActivity(activityModel);
-                          Navigator.pop(context);
+                          await PostServices().updateActivity(activityModel).then((value) {
+                            Navigator.pop(context);
+                          });
+
                         },
                         child: Text(
                           " Save",

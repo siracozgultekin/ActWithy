@@ -1,6 +1,9 @@
 import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
+import 'package:actwithy/pages/creatingPage.dart';
 import 'package:actwithy/pages/editProfilePage.dart';
+import 'package:actwithy/pages/homePage.dart';
+import 'package:actwithy/pages/searchPage.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:actwithy/services/searchService.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -24,6 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
   bool isToDo = true;
   bool isMyFriend = false;
   String buttonText = "";
+  final controller = ScrollController();
 
   bool additional = true;
 
@@ -39,6 +43,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   initState()  {
     getIsMyFriend();
+
     super.initState();
   }
 
@@ -48,14 +53,93 @@ class _ProfilePageState extends State<ProfilePage> {
   Color appbarColor = Color(0xFF48B2FA); //neon blue
   Color textColor = Color(0xFF2D3A43);
   NumberFormat formatter = new NumberFormat("00");
-  
+
   @override
   Widget build(BuildContext context) {
-
+    int selectedIndex = 4;
     bool isMyPage = user.userUID==FirebaseAuth.instance.currentUser!.uid;
+
 
     return Scaffold(
       backgroundColor: bgColor,
+      bottomNavigationBar: NavigationBarTheme(
+        data: NavigationBarThemeData(
+          height: MediaQuery.of(context).size.height * 0.075,
+          indicatorColor: Colors.transparent,
+          backgroundColor: Color(0xFF9AC6C5),
+        ),
+        child: NavigationBar(
+          selectedIndex: selectedIndex,
+          onDestinationSelected: (value) async {
+            bool check = await PostServices().checkDailyPost();
+
+            PostModel postModel;
+
+            if (!check) {
+              postModel = PostModel(
+                  postUID: "postUID",
+                  date: Timestamp.now(),
+                  activityUID: [],
+                  heartCounter: 0,
+                  brokenHeartCounter: 0,
+                  joyCounter: 0,
+                  sobCounter: 0,
+                  angryCounter: 0,
+              reactionIDs: []);
+            } else {
+              //oluşturulmuş demek
+              postModel = await PostServices().getDailyPost();
+            }
+
+            setState(() {
+              selectedIndex = value;
+              if (selectedIndex == 0) {
+                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context)=> HomePage()), (route) => false);
+              } else if (selectedIndex == 1) {
+                showSearch(
+                    context: context,
+                    delegate: SearchPage(
+                        hintText: "Search",
+                        hintTextColor: TextStyle(color: Colors.white)));
+              } else if (selectedIndex == 2) {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => CreatingPage(postModel: postModel)));
+              } else if (selectedIndex == 3) {
+              } else if (selectedIndex == 4) {
+                scrollUp();
+
+              }
+            });
+          },
+          /*  if (selected == 0) {
+
+            }
+            print(selected); */
+          destinations: [
+            NavigationDestination(
+              icon: Icon(Icons.home, color: Colors.white),
+              label: '',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.search, color: Colors.white),
+              label: '',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.post_add, color: Colors.white),
+              label: '',
+            ),
+            NavigationDestination(
+              icon:
+              Icon(Icons.notifications_none_outlined, color: Colors.white),
+              label: '',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.person, color: Colors.white),
+              label: '',
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
         backgroundColor: appbarColor,
         centerTitle: true,
@@ -68,7 +152,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 Text('${user.postCount} Posts', style: TextStyle(fontSize: 15),),
               ],
             ),
-                    ],
+          ],
         ): Container(),
         leading: isMyPage ? Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -79,7 +163,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ): BackButton(
           color: negativeColor,
         ),
-        leadingWidth: MediaQuery.of(context).size.width * 0.4,
+        leadingWidth: isMyPage? MediaQuery.of(context).size.width * 0.5 :MediaQuery.of(context).size.width * 0.2,
         actions: [
           Container(
             width: MediaQuery.of(context).size.width * 0.2,
@@ -94,7 +178,7 @@ class _ProfilePageState extends State<ProfilePage> {
         children: [
           ProfileWidget(isMyPage),
           DividerWidget(),
-          isToDo ? ToDoWidget() : FriendWidget(),
+          Expanded(child: isToDo ? ToDoWidget() : FriendWidget()),
         ],
       ),
 
@@ -115,7 +199,7 @@ class _ProfilePageState extends State<ProfilePage> {
             left: 0,
             child: Container(
               child:
-              Image.network(user.backgroundURL, height: MediaQuery.of(context).size.height*0.21, width: MediaQuery.of(context).size.width,fit: BoxFit.fill,),
+              Image.network(user.backgroundURL, height: MediaQuery.of(context).size.height*0.21, width: MediaQuery.of(context).size.width,fit: BoxFit.cover,),
               //NetworkImage(user.backgroundURL); //height width
               //Image.asset("assets/images/img.png",height: MediaQuery.of(context).size.height*0.21, width: MediaQuery.of(context).size.width,fit: BoxFit.fill,),
             ),
@@ -148,25 +232,16 @@ class _ProfilePageState extends State<ProfilePage> {
                 if(isMyPage) {
                   ///TODO editle profili
                   //UserModel userModel = UserModel.fromSnapshot(await FirebaseFirestore.instance.collection('users').doc(user.userUID).get()) as UserModel;
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=> EditProfilePage(userModel: user))).then((value) {setState((){});});
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> EditProfilePage(userModel: user))).then((value) {setState((){});});
                   //Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfilePage(userModel: user,)));
                 }else if (!isMyPage && isMyFriend) {
-                  await SearchService().removeFriend(user.userUID);
+                  await SearchService().removeFriend(user.userUID).then((value) {
+                    setState((){isMyFriend = !isMyFriend;buttonText = "Add Friend";});
+                  });
                 }else if (!isMyPage && !isMyFriend) {
-                  await SearchService().addFriend(user.userUID);
+                  await SearchService().addFriend(user.userUID).then((value) {setState((){isMyFriend = !isMyFriend; buttonText = "Remove Friend";});});
                 }
 
-                setState((){
-                  isMyFriend = !isMyFriend;
-                });
-
-                setState(() {
-                  if(!isMyFriend) {
-                    buttonText = "Add Friend";
-                  }else if (isMyFriend){
-                    buttonText = "Remove Friend";
-                  }
-                });
               },
               child: Text(isMyPage? "Edit Profile":buttonText,style: TextStyle(color: negativeColor,fontSize: MediaQuery.of(context).size.width*0.028),),
               style: ElevatedButton.styleFrom(
@@ -192,54 +267,54 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget DividerWidget() {
     return
-    SizedBox(
-      width: MediaQuery.of(context).size.width,
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              InkWell(
-                onTap: () {
-                  setState(() {
-                    isToDo = true;
-                  });
-                },
-                child: Container(
-                  width: MediaQuery.of(context).size.width / 2,
+      SizedBox(
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      isToDo = true;
+                    });
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width / 2,
 
-                  child: Center(child: Text('ToDo List', style: TextStyle(color: isToDo ? selectedColor: negativeColor, fontWeight: isToDo ? FontWeight.bold : FontWeight.normal),)),
-                  decoration: BoxDecoration(
-                    border: Border(
+                    child: Center(child: Text('ToDo List', style: TextStyle(color: isToDo ? selectedColor: negativeColor, fontWeight: isToDo ? FontWeight.bold : FontWeight.normal),)),
+                    decoration: BoxDecoration(
+                      border: Border(
 
-                      bottom: isToDo ? BorderSide(width: 2.2, color: selectedColor) :  BorderSide(width: 1.5, color: negativeColor),
+                        bottom: isToDo ? BorderSide(width: 2.2, color: selectedColor) :  BorderSide(width: 1.5, color: negativeColor),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              InkWell(
-                onTap: () {
-                  setState((){
-                    isToDo = false;
-                  });
-                },
-                child: Container(
-                  width: MediaQuery.of(context).size.width / 2,
-                  child: Center(child: Text('Friends', style: TextStyle(color: !isToDo ? selectedColor: negativeColor, fontWeight: !isToDo ? FontWeight.bold : FontWeight.normal),)),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: !isToDo ? BorderSide(width: 2.2, color: selectedColor): BorderSide(width: 1.5, color: negativeColor),
+                InkWell(
+                  onTap: () {
+                    setState((){
+                      isToDo = false;
+                    });
+                  },
+                  child: Container(
+                    width: MediaQuery.of(context).size.width / 2,
+                    child: Center(child: Text('Friends', style: TextStyle(color: !isToDo ? selectedColor: negativeColor, fontWeight: !isToDo ? FontWeight.bold : FontWeight.normal),)),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: !isToDo ? BorderSide(width: 2.2, color: selectedColor): BorderSide(width: 1.5, color: negativeColor),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
 
-        ],
-      ),
-    )
-      ;
+          ],
+        ),
+      )
+    ;
   }
 
   Widget ToDoWidget() {
@@ -249,56 +324,55 @@ class _ProfilePageState extends State<ProfilePage> {
       SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: FutureBuilder(
-            future: PostServices().getPosts(user.userUID),
+          future: PostServices().getPosts(user.userUID),
           builder: (context, AsyncSnapshot snap) {
-              if(!snap.hasData) {
-                return CircularProgressIndicator();
-              }else{
-                return Column(
-                  children: [
-                    ListView.builder(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.vertical,
-                      physics: ClampingScrollPhysics(),
-                      itemCount: snap.data.length,
-                        itemBuilder: (context, index) {
-                        PostModel post = snap.data[index] as PostModel;
-
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              InkWell(
-                                onTap : (){
-                                  selectedPostID = post.postUID;
-                                  //TODO ikinci tap'ta postu kapat
-                                  //TODO aynı anda sadece bir tane post açık kalabilir
-                                  //TODO sayfaya ilk girişte mutlaka son post açık kalmalı
-                                },
-                                child:  Container(
-                                  decoration: BoxDecoration(
+            if(!snap.hasData) {
+              return CircularProgressIndicator();
+            }else{
+              return Column(
+                children: [
+                  ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    physics: BouncingScrollPhysics(),
+                    itemCount: snap.data.length,
+                    itemBuilder: (context, index) {
+                      PostModel post = snap.data[index] as PostModel;
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            InkWell(
+                              onTap : (){
+                                selectedPostID = post.postUID;
+                                //TODO ikinci tap'ta postu kapat
+                                //TODO aynı anda sadece bir tane post açık kalabilir
+                                //TODO sayfaya ilk girişte mutlaka son post açık kalmalı
+                              },
+                              child:  Container(
+                                decoration: BoxDecoration(
                                     color: negativeColor,
-                                      borderRadius: BorderRadius.all(Radius.circular(25))
-                                  ),
-                                  width: MediaQuery.of(context).size.width*0.95,
-       /*TODO == yap   */                        child: selectedPostID!=post.postUID ?
-                                  OpenPost(post) : ClosedPost(post),
+                                    borderRadius: BorderRadius.all(Radius.circular(25))
                                 ),
-                              )
-                            ],
-                          ),
-                        );
-                        },
-                    ),
-                  ],
-                );
-              }
+                                width: MediaQuery.of(context).size.width*0.95,
+                                /*TODO == yap   */                        child: selectedPostID!=post.postUID ?
+                              OpenPost(post) : ClosedPost(post),
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              );
+            }
           },
         ),
       )
     ;
   }
-  
+
   Widget FriendWidget() {
     return
       SingleChildScrollView(
@@ -321,44 +395,44 @@ class _ProfilePageState extends State<ProfilePage> {
                       return Padding(
                         padding: const EdgeInsets.all(4.0),
                         child : Container(
-                        decoration: BoxDecoration(
-                            color: negativeColor,
-                            borderRadius: BorderRadius.all(Radius.circular(25))
-                        ),
-                        width: MediaQuery.of(context).size.width*0.95,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              InkWell(
-                                onTap: () {
-              //TODO eğer kendi sayfama yönlendirmeye çalışıyosam !isMyPage gibi olmalı
-                                  Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ProfilePage(user: friend,)));
-                                },
-                                child: Row(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundImage: NetworkImage(friend.ppURL),
-                                      radius: MediaQuery.of(context).size.width*0.05,
-                                    ),
-                                    SizedBox(
-                                      width: 8, //TODO dynamiccc
-                                    ),
-                                    Column(
-                                      children: [
-                                        Container(width: MediaQuery.of(context).size.width*0.8,child: Text("${friend.name} ${friend.surname}")),
-                                        Container(width: MediaQuery.of(context).size.width*0.8,child: Text("@${friend.username}"))
-                                      ],
-                                    ),
-
-                                  ],
-                                ),
-                              ),
-                            ],
+                          decoration: BoxDecoration(
+                              color: negativeColor,
+                              borderRadius: BorderRadius.all(Radius.circular(25))
                           ),
-                        ),
-                      ),);
+                          width: MediaQuery.of(context).size.width*0.95,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    //TODO eğer kendi sayfama yönlendirmeye çalışıyosam !isMyPage gibi olmalı
+                                    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ProfilePage(user: friend,)));
+                                  },
+                                  child: Row(
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundImage: NetworkImage(friend.ppURL),
+                                        radius: MediaQuery.of(context).size.width*0.05,
+                                      ),
+                                      SizedBox(
+                                        width: 8, //TODO dynamiccc
+                                      ),
+                                      Column(
+                                        children: [
+                                          Container(width: MediaQuery.of(context).size.width*0.8,child: Text("${friend.name} ${friend.surname}")),
+                                          Container(width: MediaQuery.of(context).size.width*0.8,child: Text("@${friend.username}"))
+                                        ],
+                                      ),
+
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),);
                     },
 
                   ),
@@ -465,6 +539,10 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  void scrollUp() {
+    final double start = 0;
+    controller.jumpTo(start);
+  }
 
 
 }

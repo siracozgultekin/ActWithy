@@ -12,6 +12,8 @@ class PostModel{
   int sobCounter;
   int angryCounter;
 
+  List<String> reactionIDs;
+
   PostModel(
       { required this.postUID,
         required this.date,
@@ -20,7 +22,8 @@ class PostModel{
         required this.brokenHeartCounter,
         required this.joyCounter,
         required this.sobCounter,
-        required this.angryCounter
+        required this.angryCounter,
+        required this.reactionIDs,
       });
 
 
@@ -35,6 +38,7 @@ class PostModel{
       'joyCounter':this.joyCounter,
       'sobCounter':this.sobCounter,
       'angryCounter':this.angryCounter,
+      'reactionIDs':this.reactionIDs,
     };
     return map;
   }
@@ -50,7 +54,7 @@ class PostModel{
       joyCounter: doc['joyCounter'],
       sobCounter: doc['sobCounter'],
       angryCounter: doc['angryCounter'],
-
+      reactionIDs: doc['reactionIDs'].cast<String>(),
     );
 
 
