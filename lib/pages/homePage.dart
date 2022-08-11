@@ -396,7 +396,7 @@ class _HomePageState extends State<HomePage> {
                                                   },
                                                   child: Row(
                                                     children: [
-                                                      if (activity.participants
+                                                      if (participantList
                                                           .length >=
                                                           1)
                                                         Padding(
@@ -416,7 +416,7 @@ class _HomePageState extends State<HomePage> {
                                                             ),
                                                           ),
                                                         ),
-                                                      if (activity.participants
+                                                      if (participantList
                                                           .length >=
                                                           2)
                                                         Padding(
@@ -603,6 +603,11 @@ class _HomePageState extends State<HomePage> {
                                       String reactionID= await PostServices().createReaction(mod.userObj.userUID, mod.postObj.postUID, ReactionModel.brokenHeart);
                                       mod.postObj.reactionIDs.add(reactionID);
                                       mod.postObj.brokenHeartCounter++;
+                                      await PostServices().createNotification(0, mod.userObj.userUID, reactionID, "requestID");
+<<<<<<< Updated upstream
+
+=======
+>>>>>>> Stashed changes
                                       await PostServices().updatePost(mod.postObj).then((value) {
                                         setState((){
                                         });
@@ -612,6 +617,7 @@ class _HomePageState extends State<HomePage> {
                                       if(reaction.type == ReactionModel.brokenHeart){
                                         mod.postObj.reactionIDs.remove(reaction.reactionUID);
                                         mod.postObj.brokenHeartCounter--;
+                                        await PostServices().deleteReactionNotification(reaction.reactionUID, mod.userObj);
                                         await PostServices().deleteReaction(reaction.reactionUID);
                                         await PostServices().updatePost(mod.postObj).then((value) {
                                           setState((){
@@ -655,6 +661,8 @@ class _HomePageState extends State<HomePage> {
                                       String reactionID= await PostServices().createReaction(mod.userObj.userUID, mod.postObj.postUID, ReactionModel.joy);
                                       mod.postObj.reactionIDs.add(reactionID);
                                       mod.postObj.joyCounter++;
+                                      await PostServices().createNotification(0, mod.userObj.userUID, reactionID, "requestID");
+
                                       await PostServices().updatePost(mod.postObj).then((value) {
                                         setState((){
                                         });
@@ -664,6 +672,8 @@ class _HomePageState extends State<HomePage> {
                                       if(reaction.type==ReactionModel.joy){
                                         mod.postObj.reactionIDs.remove(reaction.reactionUID);
                                         mod.postObj.joyCounter--;
+                                        await PostServices().deleteReactionNotification(reaction.reactionUID, mod.userObj);
+
                                         await PostServices().deleteReaction(reaction.reactionUID);
                                         await PostServices().updatePost(mod.postObj).then((value) {
                                           setState((){
@@ -707,6 +717,8 @@ class _HomePageState extends State<HomePage> {
                                       String reactionID= await PostServices().createReaction(mod.userObj.userUID, mod.postObj.postUID, ReactionModel.sob);
                                       mod.postObj.reactionIDs.add(reactionID);
                                       mod.postObj.sobCounter++;
+                                      await PostServices().createNotification(0, mod.userObj.userUID, reactionID, "requestID");
+
                                       await PostServices().updatePost(mod.postObj).then((value) {
                                         setState((){
                                         });
@@ -716,6 +728,8 @@ class _HomePageState extends State<HomePage> {
                                       if(reaction.type==ReactionModel.sob){
                                         mod.postObj.reactionIDs.remove(reaction.reactionUID);
                                         mod.postObj.sobCounter--;
+                                        await PostServices().deleteReactionNotification(reaction.reactionUID, mod.userObj);
+
                                         await PostServices().deleteReaction(reaction.reactionUID);
                                         await PostServices().updatePost(mod.postObj).then((value) {
                                           setState((){
@@ -759,6 +773,8 @@ class _HomePageState extends State<HomePage> {
                                       String reactionID= await PostServices().createReaction(mod.userObj.userUID, mod.postObj.postUID, ReactionModel.angry);
                                       mod.postObj.reactionIDs.add(reactionID);
                                       mod.postObj.angryCounter++;
+                                      await PostServices().createNotification(0, mod.userObj.userUID, reactionID, "requestID");
+
                                       await PostServices().updatePost(mod.postObj).then((value) {
                                         setState((){
                                         });
@@ -768,6 +784,8 @@ class _HomePageState extends State<HomePage> {
                                       if(reaction.type==ReactionModel.angry){
                                         mod.postObj.reactionIDs.remove(reaction.reactionUID);
                                         mod.postObj.angryCounter--;
+                                        await PostServices().deleteReactionNotification(reaction.reactionUID, mod.userObj);
+
                                         await PostServices().deleteReaction(reaction.reactionUID);
                                         await PostServices().updatePost(mod.postObj).then((value) {
                                           setState((){
