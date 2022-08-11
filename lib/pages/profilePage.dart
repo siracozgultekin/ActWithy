@@ -1,3 +1,4 @@
+
 import 'package:actwithy/Models/ActivityModel.dart';
 import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/Models/ReactionModel.dart';
@@ -36,6 +37,8 @@ class _ProfilePageState extends State<ProfilePage> {
   String buttonText = "";
   final controller = ScrollController();
 
+  List<bool> boolList = [];
+
 
 
   getIsMyFriend() async {
@@ -44,7 +47,9 @@ class _ProfilePageState extends State<ProfilePage> {
       isMyFriend = result;
       if (isMyFriend) {
         buttonText = "Remove Friend";
-      }else buttonText = "Add Friend";
+      }else {
+        buttonText = "Add Friend";
+      }
     });
   }
 
@@ -52,18 +57,19 @@ class _ProfilePageState extends State<ProfilePage> {
     actList = await PostServices().getPostsActivities(postId);
   }
 
+  @override
   initState()  {
     getActList(user.lastPostID);
     getIsMyFriend();
     super.initState();
   }
 
-  Color selectedColor = Color(0xFF4C6170); //dark blue
-  Color negativeColor = Color(0xFFFFFFFF);//white
-  Color bgColor = Color(0xFFD6E6F1); //light blue
-  Color appbarColor = Color(0xFF48B2FA); //neon blue
-  Color textColor = Color(0xFF2D3A43);
-  NumberFormat formatter = new NumberFormat("00");
+  Color selectedColor = const Color(0xFF4C6170); //dark blue
+  Color negativeColor = const Color(0xFFFFFFFF);//white
+  Color bgColor = const Color(0xFFD6E6F1); //light blue
+  Color appbarColor = const Color(0xFF48B2FA); //neon blue
+  Color textColor = const Color(0xFF2D3A43);
+  NumberFormat formatter = NumberFormat("00");
 
   @override
   Widget build(BuildContext context) {
@@ -331,8 +337,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget ToDoWidget() {
-
-    String selectedPostID = user.lastPostID;
+    
+    //String selectedPostID = user.lastPostID;
     return
       SingleChildScrollView(
         physics: BouncingScrollPhysics(),
@@ -351,36 +357,37 @@ class _ProfilePageState extends State<ProfilePage> {
                     itemCount: snap.data.length,
                     itemBuilder: (context, index) {
                       PostModel post = snap.data[index] as PostModel;
+                      bool opened;
+                      (post.postUID == user.lastPostID) ? opened = true : opened=false;
+                      boolList.add(opened);
                       getActList(post.postUID);
                       DenemeModel denemeModel = DenemeModel(userObj: user, activitiesList: actList, postObj: post);
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Column(
                           children: [
-                            InkWell(
-                              onTap : () {
-                                if (selectedPostID == post.postUID) {
-                                  selectedPostID = user.lastPostID;
-                                }else {
-                                  selectedPostID = post.postUID;
-                                }
-                                setState((){});
-                                print(selectedPostID);
-                                //TODO ikinci tap'ta postu kapat
-                                //TODO aynı anda sadece bir tane post açık kalabilir
-                                //TODO sayfaya ilk girişte mutlaka son post açık kalmalı
-                              },
-                              child:  Container(
-                                decoration: BoxDecoration(
-                                    color: negativeColor,
-                                    borderRadius: BorderRadius.all(Radius.circular(25))
-                                ),
-                                width: MediaQuery.of(context).size.width*0.95,
-
-                                /*TODO == yap   */
-                                child: selectedPostID==post.postUID ?
-                                OpenPost(denemeModel) : ClosedPost(post), //DenemeModel???
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: negativeColor,
+                                  borderRadius: BorderRadius.all(Radius.circular(25))
                               ),
+                              width: MediaQuery.of(context).size.width*0.95,
+
+                              /*TODO == yap   */
+                              child: ExpansionTile(
+                                initiallyExpanded: post.postUID==user.lastPostID,
+                                title: boolList[index] ? Text("openedd"):Text("denemeee"),
+                                leading: CircleAvatar(backgroundImage: NetworkImage(user.ppURL),radius: 20,),
+                                children: [
+                                  OpenPost(denemeModel)
+                                ],
+                                onExpansionChanged: (state) => setState((){
+                                  boolList[index] = !state;
+
+                                })
+                                ,
+                              )/*selectedPostID==post.postUID ?
+                              OpenPost(denemeModel) : ClosedPost(post), *///DenemeModel???
                             )
                           ],
                         ),
@@ -469,7 +476,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget OpenPost(DenemeModel mod) {
-    var postDate = mod.postObj.date.toDate();
     var mediaqueryHeight=MediaQuery.of(context).size.height*0.06;
     return SingleChildScrollView(
       physics: NeverScrollableScrollPhysics(),
@@ -481,49 +487,11 @@ class _ProfilePageState extends State<ProfilePage> {
               height: mod.activitiesList.length<=2 ? MediaQuery.of(context).size.height * 0.33 :MediaQuery.of(context).size.height * 0.45,
               width: MediaQuery.of(context).size.width * 0.9,
               decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                  color: Colors.white, ),
               child: Center(
                   child: Column(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  height: mediaqueryHeight,
-                                  width: mediaqueryHeight,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    image: DecorationImage(
-                                      fit: BoxFit.cover,
-                                        image: NetworkImage(mod.userObj.ppURL)),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        ("${mod.userObj.name} ${mod.userObj.surname}"),
-                                        style: TextStyle(fontWeight: FontWeight.bold),
-                                      ),
-                                      Text(
-                                        "@${mod.userObj.username}",
-                                        style: TextStyle(fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Text("${mod.postObj.date.toDate().day}/${mod.postObj.date.toDate().month}/${mod.postObj.date.toDate().year}",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 17),),
-                          ],
-                        ),
-                      ),
+
                       //TODO HATA Text(mod.activitiesList![0].activityUID),
                       Expanded(
                         child: Container(
