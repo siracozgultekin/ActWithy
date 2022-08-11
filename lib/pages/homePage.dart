@@ -604,7 +604,10 @@ class _HomePageState extends State<HomePage> {
                                       mod.postObj.reactionIDs.add(reactionID);
                                       mod.postObj.brokenHeartCounter++;
                                       await PostServices().createNotification(0, mod.userObj.userUID, reactionID, "requestID");
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
                                       await PostServices().updatePost(mod.postObj).then((value) {
                                         setState((){
                                         });
