@@ -25,7 +25,7 @@ class AuthService{
         "password":pass,
         "name": name,
         "surname":surname,
-        "kullaniciadi": username,
+        "username": username,
         "bio": "Hi I am ${name} and this is my ToDo List",
         "ppURL": "https://firebasestorage.googleapis.com/v0/b/actwithy.appspot.com/o/default%2Fpp.png?alt=media&token=9284a7da-2f75-4ea9-8fcf-9919ebe5acfc",
         "backgroundURL": "https://firebasestorage.googleapis.com/v0/b/actwithy.appspot.com/o/default%2Fbgg.png?alt=media&token=bad5930e-bb80-47a7-bec1-7c5aa85dae04x",
