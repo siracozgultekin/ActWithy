@@ -356,7 +356,7 @@ class PostServices {
     await reactions.doc(reactionModel.reactionUID).set(reactionModel.createMap());
   }
 
-  Future<String> createNotification(int type, String userID, String reactionID ,String requestID,)async{
+  Future<void> createNotification(int type, String userID, String reactionID ,String requestID,)async{
     String notificationId = "";
     await notifications.add({
       'time' : Timestamp.now(),
@@ -366,13 +366,13 @@ class PostServices {
       "requestID": requestID,
     }).then((value) async {
       notificationId = value.id;
-      await reactions.doc(value.id).update({"notificationUID": value.id});
+      await notifications.doc(value.id).update({"notificationUID": value.id});
     });
-    DocumentSnapshot doc =await users.doc(userID).get();
+    DocumentSnapshot doc = await users.doc(userID).get();
     UserModel userModel = UserModel.fromSnapshot(doc);
     userModel.notifications.add(notificationId);
     await updateUser(userModel);
-    return notificationId;
+    //return notificationId;
   }
 
   Future<void> deleteReactionNotification(String rectionId, UserModel userModel) async {

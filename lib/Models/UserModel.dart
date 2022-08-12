@@ -71,7 +71,7 @@ class UserModel {
         bio: doc['bio'],
         email: doc['email'],
         friends: doc["friends"].cast<String>(),
-        username: doc['kullaniciadi'],
+        username: doc['username'],
         lastSeen: doc['lastSeen'],
         name: doc['name'],
         password: doc['password'],
