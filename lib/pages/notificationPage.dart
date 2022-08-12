@@ -88,8 +88,13 @@ class _NotificationPageState extends State<NotificationPage> {
       )
     ;
   }
+<<<<<<< Updated upstream
 
   Widget ReactionWidget(){
+=======
+  //Widget RequestWidget(){}
+  Widget ReactionWidget() {
+>>>>>>> Stashed changes
     return SingleChildScrollView(
       physics: BouncingScrollPhysics(),
       child: FutureBuilder(
@@ -115,6 +120,7 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 
+<<<<<<< Updated upstream
   Widget ListViewTile(NotificationActivityModel model){
     PostModel postObj = model.post;
     UserModel userObj = model.user;
@@ -124,6 +130,85 @@ class _NotificationPageState extends State<NotificationPage> {
       width: MediaQuery.of(context).size.width*0.8,
       color: Colors.blueGrey,
       child: Text(userObj.username),
+=======
+  Widget ListViewTile(NotificationActivityModel model) {
+
+    PostModel postObj = model.post;
+    UserModel userObj = model.user;
+    ReactionModel reactionObj = model.reaction;
+    String reactionString = "left ";
+
+    switch(reactionObj.type){
+      case 'heart': reactionString+= Emojis.redHeart;
+        break;
+      case 'brokenHeart': reactionString+= Emojis.brokenHeart;
+        break;
+      case 'joy': reactionString += Emojis.rollingOnTheFloorLaughing;
+        break;
+      case 'sob': reactionString += Emojis.sadButRelievedFace;
+        break;
+      case 'angry': reactionString += Emojis.angryFace;
+        break;
+    }
+    reactionString += " to your " + postObj.date.toDate().day.toString() + "/" +postObj.date.toDate().month.toString() + "/" + postObj.date.toDate().year.toString() + " ToDo";
+      return Center(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: Container(
+          //padding: EdgeInsets.fromLTRB(20,10,20,10),
+          height: MediaQuery.of(context).size.height * 0.1,
+          width: MediaQuery.of(context).size.width * 0.9,
+          decoration: BoxDecoration(
+            color: Color(0XFFD6E6F1),
+            border: Border.all(
+              color: Colors.black,
+              width: 1,
+            ),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  height: MediaQuery.of(context).size.height * 0.08,
+                  width: MediaQuery.of(context).size.height * 0.08,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: NetworkImage(userObj.ppURL),
+                    ),
+                  ),
+                ),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "${userObj.name} ${userObj.surname}",
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    "@${userObj.username}",
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
+                  
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 10.0),
+                child: Container(
+                    height: MediaQuery.of(context).size.height * 0.05,
+                    width: MediaQuery.of(context).size.width * 0.35,
+                    child: Text(reactionString, maxLines: 3,)),
+              ),
+            ],
+          ),
+        ),
+      ),
+>>>>>>> Stashed changes
     );
   }
 
