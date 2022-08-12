@@ -457,13 +457,14 @@ class _ProfilePageState extends State<ProfilePage> {
                               /*TODO == yap   */
                               child: ExpansionTile(
                                 //initiallyExpanded: post.postUID==user.lastPostID,
+                                textColor: textColor,
                                 title: boolList[index]
-                                    ? Text("openedd")
-                                    : ClosedPost(post),
-                                leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(user.ppURL),
-                                  radius: 20,
-                                ),
+                                    ? ClosedPost(post)
+                                    : InfoWidget(post),
+                                // leading: CircleAvatar(
+                                //   backgroundImage: NetworkImage(user.ppURL),
+                                //   radius: 20,
+                                // ),
                                 children: [
                                   SingleChildScrollView(
                                     physics: NeverScrollableScrollPhysics(),
@@ -649,358 +650,359 @@ class _ProfilePageState extends State<ProfilePage> {
                                                             ),
                                                           ],
                                                         ),
-                                                        Divider(
-                                                          height: 1,
-                                                          color: Colors.blue,
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(8.0),
-                                                          child: Container(
-                                                            height: MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .height *
-                                                                0.05,
-                                                            width: MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width *
-                                                                0.9,
-                                                            child:
-                                                                SingleChildScrollView(
-                                                              scrollDirection:
-                                                                  Axis.horizontal,
-                                                              child: Row(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .start,
-                                                                children: [
-                                                                  Row(
-                                                                    children: [
-                                                                      IconButton(
-                                                                        padding:
-                                                                            EdgeInsets.zero,
-                                                                        icon:
-                                                                            Text(
-                                                                          "${Emojis.redHeart}",
-                                                                          style:
-                                                                              TextStyle(fontSize: 15),
-                                                                        ),
-                                                                        onPressed:
-                                                                            () async {
-                                                                          ///postun reactionlarına bak şu anki kullanıcıdan reaksiyon varsa
-                                                                          ///aynısıysa geri al (reaksiyonu sil - database + postmodel)
-                                                                          ///farklıysa eskisini güncelle.
-                                                                          bool
-                                                                              check =
-                                                                              await PostServices().checkReaction(post);
-                                                                          if (!check) {
-                                                                            ///reaksiyon yoksa yenisini oluştur.
-                                                                            String
-                                                                                reactionID =
-                                                                                await PostServices().createReaction(user.userUID, post.postUID, ReactionModel.heart);
-                                                                            post.reactionIDs.add(reactionID);
-                                                                            post.heartCounter++;
-                                                                            await PostServices().updatePost(post).then((value) {
-                                                                              setState(() {});
-                                                                            });
-                                                                          } else {
-                                                                            /// reaksiyon var. reaksiyonu databaseden çek düzenle
-                                                                            ReactionModel
-                                                                                reaction =
-                                                                                await PostServices().getReaction(post);
-                                                                            if (reaction.type ==
-                                                                                ReactionModel.heart) {
-                                                                              /// aynısına tıklanmış her yerden
-                                                                              /// (database + postun listesi + postun counterı)
-                                                                              post.reactionIDs.remove(reaction.reactionUID);
-                                                                              post.heartCounter--;
-                                                                              await PostServices().deleteReaction(reaction.reactionUID);
-                                                                              await PostServices().updatePost(post).then((value) {
-                                                                                setState(() {});
-                                                                              });
-                                                                            } else {
-                                                                              /// farklı reaksiyona tıklanmış güncelle
-                                                                              String oldReactType = reaction.type;
-                                                                              if (oldReactType == ReactionModel.angry)
-                                                                                post.angryCounter--;
-                                                                              else if (oldReactType == ReactionModel.brokenHeart)
-                                                                                post.brokenHeartCounter--;
-                                                                              else if (oldReactType == ReactionModel.joy)
-                                                                                post.joyCounter--;
-                                                                              else if (oldReactType == ReactionModel.sob)
-                                                                                post.sobCounter--;
-                                                                              reaction.type = ReactionModel.heart;
-                                                                              post.heartCounter++;
-                                                                              await PostServices().updateReaction(reaction);
-                                                                              await PostServices().updatePost(post).then((value) {
-                                                                                setState(() {});
-                                                                              });
-                                                                            }
-                                                                          }
-                                                                        },
-                                                                      ),
-                                                                      Text(
-                                                                          "${post.heartCounter}"),
-                                                                    ],
-                                                                  ),
-                                                                  Row(
-                                                                    children: [
-                                                                      IconButton(
-                                                                        padding:
-                                                                            EdgeInsets.zero,
-                                                                        icon:
-                                                                            Text(
-                                                                          "${Emojis.brokenHeart}",
-                                                                          style:
-                                                                              TextStyle(fontSize: 15),
-                                                                        ),
-                                                                        onPressed:
-                                                                            () async {
-                                                                          bool
-                                                                              check =
-                                                                              await PostServices().checkReaction(post);
-                                                                          if (!check) {
-                                                                            ///reaksiyon yoksa yenisini oluştur.
-                                                                            String
-                                                                                reactionID =
-                                                                                await PostServices().createReaction(user.userUID, post.postUID, ReactionModel.brokenHeart);
-                                                                            post.reactionIDs.add(reactionID);
-                                                                            post.brokenHeartCounter++;
-                                                                            await PostServices().updatePost(post).then((value) {
-                                                                              setState(() {});
-                                                                            });
-                                                                          } else {
-                                                                            ReactionModel
-                                                                                reaction =
-                                                                                await PostServices().getReaction(post);
-                                                                            if (reaction.type ==
-                                                                                ReactionModel.brokenHeart) {
-                                                                              post.reactionIDs.remove(reaction.reactionUID);
-                                                                              post.brokenHeartCounter--;
-                                                                              await PostServices().deleteReaction(reaction.reactionUID);
-                                                                              await PostServices().updatePost(post).then((value) {
-                                                                                setState(() {});
-                                                                              });
-                                                                            } else {
-                                                                              String oldReactType = reaction.type;
-                                                                              if (oldReactType == ReactionModel.angry)
-                                                                                post.angryCounter--;
-                                                                              else if (oldReactType == ReactionModel.heart)
-                                                                                post.heartCounter--;
-                                                                              else if (oldReactType == ReactionModel.joy)
-                                                                                post.joyCounter--;
-                                                                              else if (oldReactType == ReactionModel.sob)
-                                                                                post.sobCounter--;
-                                                                              reaction.type = ReactionModel.brokenHeart;
-                                                                              post.brokenHeartCounter++;
-                                                                              await PostServices().updateReaction(reaction);
-                                                                              await PostServices().updatePost(post).then((value) {
-                                                                                setState(() {});
-                                                                              });
-                                                                            }
-                                                                          }
-                                                                        },
-                                                                      ),
-                                                                      Text(
-                                                                          "${post.brokenHeartCounter}"),
-                                                                    ],
-                                                                  ),
-                                                                  Row(
-                                                                    children: [
-                                                                      IconButton(
-                                                                        padding:
-                                                                            EdgeInsets.zero,
-                                                                        icon:
-                                                                            Text(
-                                                                          "${Emojis.rollingOnTheFloorLaughing}",
-                                                                          style:
-                                                                              TextStyle(fontSize: 15),
-                                                                        ),
-                                                                        onPressed:
-                                                                            () async {
-                                                                          bool
-                                                                              check =
-                                                                              await PostServices().checkReaction(post);
-                                                                          if (!check) {
-                                                                            String
-                                                                                reactionID =
-                                                                                await PostServices().createReaction(user.userUID, post.postUID, ReactionModel.joy);
-                                                                            post.reactionIDs.add(reactionID);
-                                                                            post.joyCounter++;
-                                                                            await PostServices().updatePost(post).then((value) {
-                                                                              setState(() {});
-                                                                            });
-                                                                          } else {
-                                                                            ReactionModel
-                                                                                reaction =
-                                                                                await PostServices().getReaction(post);
-                                                                            if (reaction.type ==
-                                                                                ReactionModel.joy) {
-                                                                              post.reactionIDs.remove(reaction.reactionUID);
-                                                                              post.joyCounter--;
-                                                                              await PostServices().deleteReaction(reaction.reactionUID);
-                                                                              await PostServices().updatePost(post).then((value) {
-                                                                                setState(() {});
-                                                                              });
-                                                                            } else {
-                                                                              String oldReactType = reaction.type;
-                                                                              if (oldReactType == ReactionModel.angry)
-                                                                                post.angryCounter--;
-                                                                              else if (oldReactType == ReactionModel.heart)
-                                                                                post.heartCounter--;
-                                                                              else if (oldReactType == ReactionModel.brokenHeart)
-                                                                                post.brokenHeartCounter--;
-                                                                              else if (oldReactType == ReactionModel.sob)
-                                                                                post.sobCounter--;
-                                                                              reaction.type = ReactionModel.joy;
-                                                                              post.joyCounter++;
-                                                                              await PostServices().updateReaction(reaction);
-                                                                              await PostServices().updatePost(post).then((value) {
-                                                                                setState(() {});
-                                                                              });
-                                                                            }
-                                                                          }
-                                                                        },
-                                                                      ),
-                                                                      Text(
-                                                                          "${post.joyCounter}"),
-                                                                    ],
-                                                                  ),
-                                                                  Row(
-                                                                    children: [
-                                                                      IconButton(
-                                                                        padding:
-                                                                            EdgeInsets.zero,
-                                                                        icon:
-                                                                            Text(
-                                                                          "${Emojis.sadButRelievedFace}",
-                                                                          style:
-                                                                              TextStyle(fontSize: 15),
-                                                                        ),
-                                                                        onPressed:
-                                                                            () async {
-                                                                          bool
-                                                                              check =
-                                                                              await PostServices().checkReaction(post);
-                                                                          if (!check) {
-                                                                            String
-                                                                                reactionID =
-                                                                                await PostServices().createReaction(user.userUID, post.postUID, ReactionModel.sob);
-                                                                            post.reactionIDs.add(reactionID);
-                                                                            post.sobCounter++;
-                                                                            await PostServices().updatePost(post).then((value) {
-                                                                              setState(() {});
-                                                                            });
-                                                                          } else {
-                                                                            ReactionModel
-                                                                                reaction =
-                                                                                await PostServices().getReaction(post);
-                                                                            if (reaction.type ==
-                                                                                ReactionModel.sob) {
-                                                                              post.reactionIDs.remove(reaction.reactionUID);
-                                                                              post.sobCounter--;
-                                                                              await PostServices().deleteReaction(reaction.reactionUID);
-                                                                              await PostServices().updatePost(post).then((value) {
-                                                                                setState(() {});
-                                                                              });
-                                                                            } else {
-                                                                              String oldReactType = reaction.type;
-                                                                              if (oldReactType == ReactionModel.angry)
-                                                                                post.angryCounter--;
-                                                                              else if (oldReactType == ReactionModel.heart)
-                                                                                post.heartCounter--;
-                                                                              else if (oldReactType == ReactionModel.brokenHeart)
-                                                                                post.brokenHeartCounter--;
-                                                                              else if (oldReactType == ReactionModel.joy)
-                                                                                post.joyCounter--;
-                                                                              reaction.type = ReactionModel.sob;
-                                                                              post.sobCounter++;
-                                                                              await PostServices().updateReaction(reaction);
-                                                                              await PostServices().updatePost(post).then((value) {
-                                                                                setState(() {});
-                                                                              });
-                                                                            }
-                                                                          }
-                                                                        },
-                                                                      ),
-                                                                      Text(
-                                                                          "${post.sobCounter}"),
-                                                                    ],
-                                                                  ),
-                                                                  Row(
-                                                                    children: [
-                                                                      IconButton(
-                                                                        padding:
-                                                                            EdgeInsets.zero,
-                                                                        icon:
-                                                                            Text(
-                                                                          "${Emojis.angryFace}",
-                                                                          style:
-                                                                              TextStyle(fontSize: 15),
-                                                                        ),
-                                                                        onPressed:
-                                                                            () async {
-                                                                          bool
-                                                                              check =
-                                                                              await PostServices().checkReaction(post);
-                                                                          if (!check) {
-                                                                            String
-                                                                                reactionID =
-                                                                                await PostServices().createReaction(user.userUID, post.postUID, ReactionModel.angry);
-                                                                            post.reactionIDs.add(reactionID);
-                                                                            post.angryCounter++;
-                                                                            await PostServices().updatePost(post).then((value) {
-                                                                              setState(() {});
-                                                                            });
-                                                                          } else {
-                                                                            ReactionModel
-                                                                                reaction =
-                                                                                await PostServices().getReaction(post);
-                                                                            if (reaction.type ==
-                                                                                ReactionModel.angry) {
-                                                                              post.reactionIDs.remove(reaction.reactionUID);
-                                                                              post.angryCounter--;
-                                                                              await PostServices().deleteReaction(reaction.reactionUID);
-                                                                              await PostServices().updatePost(post).then((value) {
-                                                                                setState(() {});
-                                                                              });
-                                                                            } else {
-                                                                              String oldReactType = reaction.type;
-                                                                              if (oldReactType == ReactionModel.sob)
-                                                                                post.sobCounter--;
-                                                                              else if (oldReactType == ReactionModel.heart)
-                                                                                post.heartCounter--;
-                                                                              else if (oldReactType == ReactionModel.brokenHeart)
-                                                                                post.brokenHeartCounter--;
-                                                                              else if (oldReactType == ReactionModel.joy)
-                                                                                post.joyCounter--;
-                                                                              reaction.type = ReactionModel.angry;
-                                                                              post.angryCounter++;
-                                                                              await PostServices().updateReaction(reaction);
-                                                                              await PostServices().updatePost(post).then((value) {
-                                                                                setState(() {});
-                                                                              });
-                                                                            }
-                                                                          }
-                                                                        },
-                                                                      ),
-                                                                      Text(
-                                                                          "${post.angryCounter}"),
-                                                                    ],
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
+
                                                       ],
                                                     )),
                                                   );
                                                 },
-                                              )
+                                              ),
+                                              Divider(
+                                                height: 1,
+                                                color: Colors.blue,
+                                              ),
+                                              Padding(
+                                                padding:
+                                                const EdgeInsets
+                                                    .all(8.0),
+                                                child: Container(
+                                                  height: MediaQuery.of(
+                                                      context)
+                                                      .size
+                                                      .height *
+                                                      0.05,
+                                                  width: MediaQuery.of(
+                                                      context)
+                                                      .size
+                                                      .width *
+                                                      0.9,
+                                                  child:
+                                                  SingleChildScrollView(
+                                                    scrollDirection:
+                                                    Axis.horizontal,
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .start,
+                                                      children: [
+                                                        Row(
+                                                          children: [
+                                                            IconButton(
+                                                              padding:
+                                                              EdgeInsets.zero,
+                                                              icon:
+                                                              Text(
+                                                                "${Emojis.redHeart}",
+                                                                style:
+                                                                TextStyle(fontSize: 15),
+                                                              ),
+                                                              onPressed:
+                                                                  () async {
+                                                                ///postun reactionlarına bak şu anki kullanıcıdan reaksiyon varsa
+                                                                ///aynısıysa geri al (reaksiyonu sil - database + postmodel)
+                                                                ///farklıysa eskisini güncelle.
+                                                                bool
+                                                                check =
+                                                                await PostServices().checkReaction(post);
+                                                                if (!check) {
+                                                                  ///reaksiyon yoksa yenisini oluştur.
+                                                                  String
+                                                                  reactionID =
+                                                                  await PostServices().createReaction(user.userUID, post.postUID, ReactionModel.heart);
+                                                                  post.reactionIDs.add(reactionID);
+                                                                  post.heartCounter++;
+                                                                  await PostServices().updatePost(post).then((value) {
+                                                                    setState(() {});
+                                                                  });
+                                                                } else {
+                                                                  /// reaksiyon var. reaksiyonu databaseden çek düzenle
+                                                                  ReactionModel
+                                                                  reaction =
+                                                                  await PostServices().getReaction(post);
+                                                                  if (reaction.type ==
+                                                                      ReactionModel.heart) {
+                                                                    /// aynısına tıklanmış her yerden
+                                                                    /// (database + postun listesi + postun counterı)
+                                                                    post.reactionIDs.remove(reaction.reactionUID);
+                                                                    post.heartCounter--;
+                                                                    await PostServices().deleteReaction(reaction.reactionUID);
+                                                                    await PostServices().updatePost(post).then((value) {
+                                                                      setState(() {});
+                                                                    });
+                                                                  } else {
+                                                                    /// farklı reaksiyona tıklanmış güncelle
+                                                                    String oldReactType = reaction.type;
+                                                                    if (oldReactType == ReactionModel.angry)
+                                                                      post.angryCounter--;
+                                                                    else if (oldReactType == ReactionModel.brokenHeart)
+                                                                      post.brokenHeartCounter--;
+                                                                    else if (oldReactType == ReactionModel.joy)
+                                                                      post.joyCounter--;
+                                                                    else if (oldReactType == ReactionModel.sob)
+                                                                      post.sobCounter--;
+                                                                    reaction.type = ReactionModel.heart;
+                                                                    post.heartCounter++;
+                                                                    await PostServices().updateReaction(reaction);
+                                                                    await PostServices().updatePost(post).then((value) {
+                                                                      setState(() {});
+                                                                    });
+                                                                  }
+                                                                }
+                                                              },
+                                                            ),
+                                                            Text(
+                                                                "${post.heartCounter}"),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            IconButton(
+                                                              padding:
+                                                              EdgeInsets.zero,
+                                                              icon:
+                                                              Text(
+                                                                "${Emojis.brokenHeart}",
+                                                                style:
+                                                                TextStyle(fontSize: 15),
+                                                              ),
+                                                              onPressed:
+                                                                  () async {
+                                                                bool
+                                                                check =
+                                                                await PostServices().checkReaction(post);
+                                                                if (!check) {
+                                                                  ///reaksiyon yoksa yenisini oluştur.
+                                                                  String
+                                                                  reactionID =
+                                                                  await PostServices().createReaction(user.userUID, post.postUID, ReactionModel.brokenHeart);
+                                                                  post.reactionIDs.add(reactionID);
+                                                                  post.brokenHeartCounter++;
+                                                                  await PostServices().updatePost(post).then((value) {
+                                                                    setState(() {});
+                                                                  });
+                                                                } else {
+                                                                  ReactionModel
+                                                                  reaction =
+                                                                  await PostServices().getReaction(post);
+                                                                  if (reaction.type ==
+                                                                      ReactionModel.brokenHeart) {
+                                                                    post.reactionIDs.remove(reaction.reactionUID);
+                                                                    post.brokenHeartCounter--;
+                                                                    await PostServices().deleteReaction(reaction.reactionUID);
+                                                                    await PostServices().updatePost(post).then((value) {
+                                                                      setState(() {});
+                                                                    });
+                                                                  } else {
+                                                                    String oldReactType = reaction.type;
+                                                                    if (oldReactType == ReactionModel.angry)
+                                                                      post.angryCounter--;
+                                                                    else if (oldReactType == ReactionModel.heart)
+                                                                      post.heartCounter--;
+                                                                    else if (oldReactType == ReactionModel.joy)
+                                                                      post.joyCounter--;
+                                                                    else if (oldReactType == ReactionModel.sob)
+                                                                      post.sobCounter--;
+                                                                    reaction.type = ReactionModel.brokenHeart;
+                                                                    post.brokenHeartCounter++;
+                                                                    await PostServices().updateReaction(reaction);
+                                                                    await PostServices().updatePost(post).then((value) {
+                                                                      setState(() {});
+                                                                    });
+                                                                  }
+                                                                }
+                                                              },
+                                                            ),
+                                                            Text(
+                                                                "${post.brokenHeartCounter}"),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            IconButton(
+                                                              padding:
+                                                              EdgeInsets.zero,
+                                                              icon:
+                                                              Text(
+                                                                "${Emojis.rollingOnTheFloorLaughing}",
+                                                                style:
+                                                                TextStyle(fontSize: 15),
+                                                              ),
+                                                              onPressed:
+                                                                  () async {
+                                                                bool
+                                                                check =
+                                                                await PostServices().checkReaction(post);
+                                                                if (!check) {
+                                                                  String
+                                                                  reactionID =
+                                                                  await PostServices().createReaction(user.userUID, post.postUID, ReactionModel.joy);
+                                                                  post.reactionIDs.add(reactionID);
+                                                                  post.joyCounter++;
+                                                                  await PostServices().updatePost(post).then((value) {
+                                                                    setState(() {});
+                                                                  });
+                                                                } else {
+                                                                  ReactionModel
+                                                                  reaction =
+                                                                  await PostServices().getReaction(post);
+                                                                  if (reaction.type ==
+                                                                      ReactionModel.joy) {
+                                                                    post.reactionIDs.remove(reaction.reactionUID);
+                                                                    post.joyCounter--;
+                                                                    await PostServices().deleteReaction(reaction.reactionUID);
+                                                                    await PostServices().updatePost(post).then((value) {
+                                                                      setState(() {});
+                                                                    });
+                                                                  } else {
+                                                                    String oldReactType = reaction.type;
+                                                                    if (oldReactType == ReactionModel.angry)
+                                                                      post.angryCounter--;
+                                                                    else if (oldReactType == ReactionModel.heart)
+                                                                      post.heartCounter--;
+                                                                    else if (oldReactType == ReactionModel.brokenHeart)
+                                                                      post.brokenHeartCounter--;
+                                                                    else if (oldReactType == ReactionModel.sob)
+                                                                      post.sobCounter--;
+                                                                    reaction.type = ReactionModel.joy;
+                                                                    post.joyCounter++;
+                                                                    await PostServices().updateReaction(reaction);
+                                                                    await PostServices().updatePost(post).then((value) {
+                                                                      setState(() {});
+                                                                    });
+                                                                  }
+                                                                }
+                                                              },
+                                                            ),
+                                                            Text(
+                                                                "${post.joyCounter}"),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            IconButton(
+                                                              padding:
+                                                              EdgeInsets.zero,
+                                                              icon:
+                                                              Text(
+                                                                "${Emojis.sadButRelievedFace}",
+                                                                style:
+                                                                TextStyle(fontSize: 15),
+                                                              ),
+                                                              onPressed:
+                                                                  () async {
+                                                                bool
+                                                                check =
+                                                                await PostServices().checkReaction(post);
+                                                                if (!check) {
+                                                                  String
+                                                                  reactionID =
+                                                                  await PostServices().createReaction(user.userUID, post.postUID, ReactionModel.sob);
+                                                                  post.reactionIDs.add(reactionID);
+                                                                  post.sobCounter++;
+                                                                  await PostServices().updatePost(post).then((value) {
+                                                                    setState(() {});
+                                                                  });
+                                                                } else {
+                                                                  ReactionModel
+                                                                  reaction =
+                                                                  await PostServices().getReaction(post);
+                                                                  if (reaction.type ==
+                                                                      ReactionModel.sob) {
+                                                                    post.reactionIDs.remove(reaction.reactionUID);
+                                                                    post.sobCounter--;
+                                                                    await PostServices().deleteReaction(reaction.reactionUID);
+                                                                    await PostServices().updatePost(post).then((value) {
+                                                                      setState(() {});
+                                                                    });
+                                                                  } else {
+                                                                    String oldReactType = reaction.type;
+                                                                    if (oldReactType == ReactionModel.angry)
+                                                                      post.angryCounter--;
+                                                                    else if (oldReactType == ReactionModel.heart)
+                                                                      post.heartCounter--;
+                                                                    else if (oldReactType == ReactionModel.brokenHeart)
+                                                                      post.brokenHeartCounter--;
+                                                                    else if (oldReactType == ReactionModel.joy)
+                                                                      post.joyCounter--;
+                                                                    reaction.type = ReactionModel.sob;
+                                                                    post.sobCounter++;
+                                                                    await PostServices().updateReaction(reaction);
+                                                                    await PostServices().updatePost(post).then((value) {
+                                                                      setState(() {});
+                                                                    });
+                                                                  }
+                                                                }
+                                                              },
+                                                            ),
+                                                            Text(
+                                                                "${post.sobCounter}"),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            IconButton(
+                                                              padding:
+                                                              EdgeInsets.zero,
+                                                              icon:
+                                                              Text(
+                                                                "${Emojis.angryFace}",
+                                                                style:
+                                                                TextStyle(fontSize: 15),
+                                                              ),
+                                                              onPressed:
+                                                                  () async {
+                                                                bool
+                                                                check =
+                                                                await PostServices().checkReaction(post);
+                                                                if (!check) {
+                                                                  String
+                                                                  reactionID =
+                                                                  await PostServices().createReaction(user.userUID, post.postUID, ReactionModel.angry);
+                                                                  post.reactionIDs.add(reactionID);
+                                                                  post.angryCounter++;
+                                                                  await PostServices().updatePost(post).then((value) {
+                                                                    setState(() {});
+                                                                  });
+                                                                } else {
+                                                                  ReactionModel
+                                                                  reaction =
+                                                                  await PostServices().getReaction(post);
+                                                                  if (reaction.type ==
+                                                                      ReactionModel.angry) {
+                                                                    post.reactionIDs.remove(reaction.reactionUID);
+                                                                    post.angryCounter--;
+                                                                    await PostServices().deleteReaction(reaction.reactionUID);
+                                                                    await PostServices().updatePost(post).then((value) {
+                                                                      setState(() {});
+                                                                    });
+                                                                  } else {
+                                                                    String oldReactType = reaction.type;
+                                                                    if (oldReactType == ReactionModel.sob)
+                                                                      post.sobCounter--;
+                                                                    else if (oldReactType == ReactionModel.heart)
+                                                                      post.heartCounter--;
+                                                                    else if (oldReactType == ReactionModel.brokenHeart)
+                                                                      post.brokenHeartCounter--;
+                                                                    else if (oldReactType == ReactionModel.joy)
+                                                                      post.joyCounter--;
+                                                                    reaction.type = ReactionModel.angry;
+                                                                    post.angryCounter++;
+                                                                    await PostServices().updateReaction(reaction);
+                                                                    await PostServices().updatePost(post).then((value) {
+                                                                      setState(() {});
+                                                                    });
+                                                                  }
+                                                                }
+                                                              },
+                                                            ),
+                                                            Text(
+                                                                "${post.angryCounter}"),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
                                             ],
                                           );
                                         }
@@ -1023,6 +1025,49 @@ class _ProfilePageState extends State<ProfilePage> {
             );
           }
         },
+      ),
+    );
+  }
+
+  Widget InfoWidget(post){
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                height: MediaQuery.of(context).size.height*0.06,
+                width: MediaQuery.of(context).size.height*0.06,
+                decoration: BoxDecoration(
+
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: NetworkImage(user.ppURL)),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      ("${user.name} ${user.surname}"),
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      "@${user.username}",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Text("${post.date.toDate().day}/${post.date.toDate().month}/${post.date.toDate().year}",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 17),),
+        ],
       ),
     );
   }

@@ -111,7 +111,7 @@ class PostServices {
     return models;
   }
 
-  Future<List<PostModel>> getPosts(String profileID) async {
+  Future<List<PostModel>> getPosticipants(String profileID) async {
     List<PostModel> post = [];
     DocumentSnapshot dc = await users.doc(profileID).get();
 
@@ -433,15 +433,19 @@ class PostServices {
   Future<List<PartivityModel>> getActPart(PostModel post) async {
 
     List<PartivityModel> list = [];
+    List<ActivityModel> activityList= [];
 
     for (String actID in post.activityUID){
       DocumentSnapshot actDoc = await activities.doc(actID).get();
       ActivityModel act = ActivityModel.fromSnapshot(actDoc);
+      activityList.add(act);
+    }
+    activityList.sort((a, b) => a.time.compareTo(b.time));
 
+    for (ActivityModel act in activityList) {
       List<UserModel> partList = [];
       DocumentSnapshot dc;
       UserModel part;
-
       for (String id in act.participants) {
         dc = await users.doc(id).get();
         part = UserModel.fromSnapshot(dc);
@@ -449,7 +453,6 @@ class PostServices {
       }
       PartivityModel model = PartivityModel(activity: act, participantList: partList);
       list.add(model);
-
     }
 
     return list;
@@ -502,6 +505,24 @@ class PartivityModel {
   void setParts(List<UserModel> m) {
     this.participantList = m;
   }
+}
+
+class PosticipantModel{
+  PostModel post;
+  List<UserModel> participantList;
+
+  PosticipantModel(
+      {required this.post,
+        required this.participantList
+      });
+
+  void setPost(PostModel postModel) {
+    this.post = postModel;
+  }
+  void setParts(List<UserModel> m) {
+    this.participantList = m;
+  }
+
 }
 
 class DenemeModel {
