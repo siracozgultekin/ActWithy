@@ -15,7 +15,7 @@ class PostServices {
   CollectionReference activities = FirebaseFirestore.instance.collection('activities');
   CollectionReference reactions = FirebaseFirestore.instance.collection('reactions');
   CollectionReference notifications = FirebaseFirestore.instance.collection('notifications');
-
+  CollectionReference requests = FirebaseFirestore.instance.collection('requests');
 
   Future<String> createActivity(String selectedItem, Timestamp time,
       String location, List<String> participants) async {
@@ -361,7 +361,7 @@ class PostServices {
     await notifications.add({
       'time' : Timestamp.now(),
       "type": type,
-      "userID": userID,
+      "userID": userID, // bildirimi alan kişi
       "reactionID": reactionID,
       "requestID": requestID,
     }).then((value) async {
@@ -397,16 +397,16 @@ class PostServices {
     for (String id in notIDs) {
       DocumentSnapshot notDoc = await notifications.doc(id).get();
       if (notDoc["type"] == 0) {
-        DocumentSnapshot reactionDoc = await reactions.doc(notDoc["reactionID"])
-            .get();
-        ReactionModel reactionModel = ReactionModel.fromSnapshot(reactionDoc);
-        DocumentSnapshot postDoc = await posts.doc(reactionModel.postID).get();
-        DocumentSnapshot userDoc = await users.doc(reactionModel.reacterID)
-            .get();
+        DocumentSnapshot reactionDoc = await reactions.doc(notDoc["reactionID"]).get();
+        DocumentSnapshot postDoc = await posts.doc(reactionDoc["postID"]).get();
+        DocumentSnapshot userDoc = await users.doc(reactionDoc["reacterID"]).get();
         reactionsList.add(NotificationActivityModel(
             user: UserModel.fromSnapshot(userDoc),
-            reaction: reactionModel,
+            reaction: ReactionModel.fromSnapshot(reactionDoc),
             post: PostModel.fromSnapshot(postDoc)));
+      }
+      else if(notDoc["type"] == 1){
+
       }
     }
     return reactionsList;
@@ -428,6 +428,23 @@ class PostServices {
 
   }
 
+  Future<String> createRequest(String requesteeUID, int requestType) async {
+    String requestId = "";
+    await requests.add({
+      "requestUID": "requestUID",
+      "type": requestType,
+      "requesterUID": myId,
+      "requesteeUID": requesteeUID,
+      "requestStatus": 0,
+      "time": Timestamp.now(),
+      "activityUID": "activityUID",
+    }).then((value) async {
+      requestId = value.id;
+      await requests.doc(requestId).update({"requestUID": requestId});
+    });
+
+    return requestId;
+  }
 }
 
 class DenemeModel {

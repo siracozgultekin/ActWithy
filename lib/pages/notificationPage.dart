@@ -110,7 +110,7 @@ class _NotificationPageState extends State<NotificationPage> {
       ),
     );
   }
-
+  
   Widget ReactionWidget() {
     return SingleChildScrollView(
       physics: BouncingScrollPhysics(),
@@ -139,20 +139,23 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 
   Widget ListViewTile(NotificationActivityModel model) {
+
     PostModel postObj = model.post;
     UserModel userObj = model.user;
     ReactionModel reactionObj = model.reaction;
     String reactionString = "left ";
-    if (reactionObj.type == ReactionModel.heart){
-      reactionString+= Emojis.redHeart;
-    }else if (reactionObj.type == ReactionModel.brokenHeart){
-      reactionString+= Emojis.brokenHeart;
-    }else if (reactionObj.type == ReactionModel.joy) {
-      reactionString += Emojis.rollingOnTheFloorLaughing;
-    }else if (reactionObj.type == ReactionModel.sob) {
-      reactionString += Emojis.sadButRelievedFace;
-    }else if (reactionObj.type == ReactionModel.angry) {
-      reactionString += Emojis.angryFace;
+
+    switch(reactionObj.type){
+      case 'heart': reactionString+= Emojis.redHeart;
+        break;
+      case 'brokenHeart': reactionString+= Emojis.brokenHeart;
+        break;
+      case 'joy': reactionString += Emojis.rollingOnTheFloorLaughing;
+        break;
+      case 'sob': reactionString += Emojis.sadButRelievedFace;
+        break;
+      case 'angry': reactionString += Emojis.angryFace;
+        break;
     }
     reactionString += " to your " + postObj.date.toDate().day.toString() + "/" +postObj.date.toDate().month.toString() + "/" + postObj.date.toDate().year.toString() + " ToDo";
       return Center(
