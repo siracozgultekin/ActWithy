@@ -1,6 +1,7 @@
 import 'package:actwithy/Models/ActivityModel.dart';
 import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/Models/ReactionModel.dart';
+import 'package:actwithy/Models/RequestModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
 import 'package:actwithy/pages/creatingPage.dart';
 import 'package:actwithy/pages/drawerPage.dart';
@@ -31,6 +32,7 @@ class _HomePageState extends State<HomePage> {
   var mediaqueryHeight;
   List<bool> isReaction = [];
   List<List<int>> amIparticipateList = [];
+
   @override
   void initState() {
     getMe();
@@ -163,16 +165,10 @@ class _HomePageState extends State<HomePage> {
                       isReaction.add(false);
                       DenemeModel postModelObj =
                           snap.data[index] as DenemeModel;
-                      List<int> list = [];
-                      for(ActivityModel activityModel in postModelObj.activitiesList){
-                        if (activityModel.participants.contains(user.userUID)) {
-                          list.add(1);
-                        }
-                        else {
-                          list.add(-1);
-                        }
-                      }
-                      amIparticipateList.add(list);
+
+                      /// her post oluşturulduğunda tekrar ekliyor. En yukarıda oluşturulursa çözülebilir.
+                      createList(postModelObj.activitiesList);
+
                       return mainListTile(postModelObj, index);
                     }),
               );
@@ -343,13 +339,19 @@ class _HomePageState extends State<HomePage> {
                                 itemBuilder: (context, indexx) {
                                   return FutureBuilder(
                                     future: PostServices()
-                                        .getParticipants(mod.activitiesList[indexx]),
+                                        .getParticipantsAndRequest(mod.activitiesList[indexx]),
                                     builder: (context, AsyncSnapshot snap) {
                                       if (!snap.hasData) {
                                         return CircularProgressIndicator();
                                       }else{
                                         ActivityModel activity = mod.activitiesList[indexx];
-                                        List<UserModel> participantList = snap.data;
+                                        List<UserModel> participantList = snap.data[0].cast<UserModel>();
+                                        List<RequestModel> requestList = snap.data[1].cast<RequestModel>();
+                                        for(RequestModel req in requestList){
+                                          if (req.requesterUID==user.userUID && req.requestStatus==0){
+                                              amIparticipateList[index][indexx]= 0;
+                                          }
+                                        }
                                         print( " asdfasd: ${amIparticipateList}");
                                         return Column(
                                           children: [
@@ -493,7 +495,9 @@ class _HomePageState extends State<HomePage> {
                                                  InkWell(
                                                  child:Text("Çıkra",style: TextStyle(color: Colors.red),),
                                                  onTap: ()async{
-                                                   await PostServices().deleteMyParticipate(activity);
+                                                   await PostServices().deleteMyParticipate(activity).then((value) {
+                                                     setState(() {});});
+
                                                    setState(() {
                                                      amIparticipateList[index][indexx]=-1;
                                                    });
@@ -503,7 +507,13 @@ class _HomePageState extends State<HomePage> {
                                                   child: Text("Participate! ",style: TextStyle(color: Colors.green),),
                                                 onTap: ()async{
                                                   String requestID=  await PostServices().createRequest(mod.userObj.userUID, 1);
-                                                  await PostServices().createNotification(1, mod.userObj.userUID, "reactionID", requestID);
+                                                  activity.requests.add(requestID);
+                                                  await PostServices().updateActivity(activity);
+                                                  await PostServices().createNotification(1, mod.userObj.userUID, "reactionID", requestID).then((value) {
+                                                    setState(() {
+
+                                                    });
+                                                  });
                                                     setState(() {
                                                       amIparticipateList[index][indexx]=0;
                                                     });
@@ -514,11 +524,21 @@ class _HomePageState extends State<HomePage> {
                                                    InkWell(
                                                      child: Text("Waiting ",style: TextStyle(color: Colors.orangeAccent),),
                                                      onTap: ()async{
-                                                       ///DELETE REQUEST AND NOTİFİCATİON
                                                        setState(() {
                                                          amIparticipateList[index][indexx]=-1;
                                                        });
 
+                                                       ///DELETE REQUEST AND NOTİFİCATİON
+                                                       for (RequestModel req in requestList){
+                                                         if(req.requesterUID==user.userUID){
+                                                           requestList.remove(req);
+                                                           await PostServices().deleteActivityRequest(activity, req, mod.userObj).then((value) {
+                                                             setState(() {
+                                                             });
+                                                           });
+                                                           break;
+                                                         }
+                                                       }
 
                                                      },
                                                    )
@@ -981,6 +1001,20 @@ class _HomePageState extends State<HomePage> {
                     child: Text("Ok")),
               ],
             ));
+  }
+
+  void createList(List<ActivityModel> activityList){
+
+    List<int> list = [];
+    for(ActivityModel activityModel in activityList){
+      if (activityModel.participants.contains(user.userUID)) {
+        list.add(1);
+      }
+      else {
+        list.add(-1);
+      }
+    }
+    amIparticipateList.add(list);
   }
 
 }

@@ -1,7 +1,10 @@
 import 'package:actwithy/Models/ActivityModel.dart';
+import 'package:actwithy/Models/NotificationModel.dart';
 import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/Models/ReactionModel.dart';
+import 'package:actwithy/Models/RequestModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
+import 'package:actwithy/pages/notificationPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -165,6 +168,22 @@ class PostServices {
       usersList.add(UserModel.fromSnapshot(myDoc));
     }
     return usersList;
+  }
+  Future<List<List<dynamic>>> getParticipantsAndRequest(ActivityModel activityModel) async {
+    List<List<dynamic>> result=[];
+    List<UserModel> usersList = [];
+    for (String userID in activityModel.participants) {
+      DocumentSnapshot myDoc = await users.doc(userID).get();
+      usersList.add(UserModel.fromSnapshot(myDoc));
+    }
+    result.add(usersList);
+    List<RequestModel> requestList = [];
+    for(String id in activityModel.requests){
+      DocumentSnapshot doc = await requests.doc(id).get();
+      requestList.add(RequestModel.fromSnapshot(doc));
+    }
+    result.add(requestList);
+    return result;
   }
 
   Future<Map<ActivityModel, List<UserModel>>> getParticipantsByID(
@@ -451,6 +470,27 @@ class PostServices {
     activityModel.participants.remove(myId);
     await updateActivity(activityModel);
      /// TODO notification ve request objelerini sil
+  }
+
+  Future<void> deleteActivityRequest(ActivityModel activityModel,RequestModel requestModel, UserModel userModel)async{
+    activityModel.requests.remove(requestModel.requestUID);
+    await updateActivity(activityModel);
+    String idNotification ="";
+    for(String notificationId in userModel.notifications){
+      DocumentSnapshot doc =await notifications.doc(notificationId).get();
+      if(doc["requestID"] == requestModel.requestUID){
+        idNotification = notificationId;
+        break;
+      }
+    }
+    if(idNotification!="") {
+      userModel.notifications.remove(idNotification);
+      await updateUser(userModel);
+      await notifications.doc(idNotification).delete();
+    }
+
+    await requests.doc(requestModel.requestUID).delete();
+
   }
 }
 
