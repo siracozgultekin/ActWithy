@@ -198,24 +198,7 @@ class _HomePageState extends State<HomePage> {
 
             setState(() {
               selectedIndex = value;
-              if (selectedIndex == 0) {
-                scrollUp();
-              } else if (selectedIndex == 1) {
-                showSearch(
-                    context: context,
-                    delegate: SearchPage(
-                        hintText: "Search",
-                        hintTextColor: TextStyle(color: Colors.white)));
-              } else if (selectedIndex == 2) {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => CreatingPage(postModel: postModel)));
-              } else if (selectedIndex == 3) {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => NotificationPage()));
-              } else if (selectedIndex == 4) {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => ProfilePage(user: currentUser)));
-              }
+
               switch(selectedIndex){
                 case 0: scrollUp();
                   break;

@@ -369,7 +369,50 @@ class PostServices {
 
   }
 
+  Future<List<PartivityModel>> getActPart(PostModel post) async {
 
+    List<PartivityModel> list = [];
+
+    for (String actID in post.activityUID){
+      DocumentSnapshot actDoc = await activities.doc(actID).get();
+      ActivityModel act = ActivityModel.fromSnapshot(actDoc);
+
+      List<UserModel> partList = [];
+      DocumentSnapshot dc;
+      UserModel part;
+
+      for (String id in act.participants) {
+        dc = await users.doc(id).get();
+        part = UserModel.fromSnapshot(dc);
+        partList.add(part);
+      }
+      PartivityModel model = PartivityModel(activity: act, participantList: partList);
+      list.add(model);
+
+    }
+
+    return list;
+
+  }
+
+
+}
+
+class PartivityModel {
+  ActivityModel activity;
+  List<UserModel> participantList;
+
+  PartivityModel(
+      {required this.activity,
+    required this.participantList
+  });
+
+  void setAct(ActivityModel act) {
+    this.activity = act;
+  }
+  void setParts(List<UserModel> m) {
+    this.participantList = m;
+  }
 }
 
 class DenemeModel {
