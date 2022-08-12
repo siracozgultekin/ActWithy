@@ -30,6 +30,7 @@ class _HomePageState extends State<HomePage> {
   bool isLoading = true;
   var mediaqueryHeight;
   List<bool> isReaction = [];
+  List<List<int>> amIparticipateList = [];
   @override
   void initState() {
     getMe();
@@ -162,6 +163,16 @@ class _HomePageState extends State<HomePage> {
                       isReaction.add(false);
                       DenemeModel postModelObj =
                           snap.data[index] as DenemeModel;
+                      List<int> list = [];
+                      for(ActivityModel activityModel in postModelObj.activitiesList){
+                        if (activityModel.participants.contains(user.userUID)) {
+                          list.add(1);
+                        }
+                        else {
+                          list.add(-1);
+                        }
+                      }
+                      amIparticipateList.add(list);
                       return mainListTile(postModelObj, index);
                     }),
               );
@@ -199,24 +210,7 @@ class _HomePageState extends State<HomePage> {
 
             setState(() {
               selectedIndex = value;
-              if (selectedIndex == 0) {
-                scrollUp();
-              } else if (selectedIndex == 1) {
-                showSearch(
-                    context: context,
-                    delegate: SearchPage(
-                        hintText: "Search",
-                        hintTextColor: TextStyle(color: Colors.white)));
-              } else if (selectedIndex == 2) {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => CreatingPage(postModel: postModel)));
-              } else if (selectedIndex == 3) {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => NotificationPage()));
-              } else if (selectedIndex == 4) {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => ProfilePage(user: currentUser)));
-              }
+
               switch(selectedIndex){
                 case 0: scrollUp();
                   break;
@@ -346,16 +340,17 @@ class _HomePageState extends State<HomePage> {
                                 scrollDirection: Axis.vertical,
                                 physics: ClampingScrollPhysics(),
                                 shrinkWrap: true,
-                                itemBuilder: (context, index) {
+                                itemBuilder: (context, indexx) {
                                   return FutureBuilder(
                                     future: PostServices()
-                                        .getParticipants(mod.activitiesList[index]),
+                                        .getParticipants(mod.activitiesList[indexx]),
                                     builder: (context, AsyncSnapshot snap) {
                                       if (!snap.hasData) {
                                         return CircularProgressIndicator();
                                       }else{
-                                        ActivityModel activity = mod.activitiesList[index];
+                                        ActivityModel activity = mod.activitiesList[indexx];
                                         List<UserModel> participantList = snap.data;
+                                        print( " asdfasd: ${amIparticipateList}");
                                         return Column(
                                           children: [
                                             Padding(
@@ -375,123 +370,159 @@ class _HomePageState extends State<HomePage> {
                                                                 .watch_later_outlined)),
                                                       ),
                                                       Text(
-                                                          "${activity.time.toDate().hour}:${mod.activitiesList[index].time.toDate().minute}"),
+                                                          "${activity.time.toDate().hour}:${mod.activitiesList[indexx].time.toDate().minute}"),
                                                     ],
                                                   )
                                                 ],
                                               ),
                                             ),
-                                            Row(
+                                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
-                                                Row(
-                                                  children: [
-                                                    Icon(Icons.location_on),
-                                                    Text(
-                                                        "${activity.location}"),
-                                                  ],
-                                                ),
-                                                InkWell(
-                                                  onTap: () {
-                                                    ParticipantPopUp(participantList);
-                                                  },
-                                                  child: Row(
-                                                    children: [
-                                                      if (participantList
-                                                          .length >=
-                                                          1)
-                                                        Padding(
-                                                          padding:
-                                                          const EdgeInsets.only(left: 8.0),
-                                                          child: Container(
-                                                            height: 20,
-                                                            width: 20,
-                                                            decoration: BoxDecoration(
-                                                              color: Colors.green,
-                                                              shape: BoxShape.circle,
-                                                              image: DecorationImage(
-                                                                fit: BoxFit.cover,
-                                                                image: NetworkImage(
-                                                                    participantList[0].ppURL),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      if (participantList
-                                                          .length >=
-                                                          2)
-                                                        Padding(
-                                                          padding: const EdgeInsets.only(
-                                                            left: 4.0,
-                                                          ),
-                                                          child: Row(
-                                                            children: [
-                                                              Container(
-                                                                height: 20,
-                                                                width: 20,
-                                                                decoration: BoxDecoration(
-                                                                    color: Colors.green,
-                                                                    shape: BoxShape.circle,
-                                                                    image: DecorationImage(
-                                                                      fit: BoxFit.cover,
+                                               Row(children: [
+                                                 Row(
+                                                   children: [
+                                                     Icon(Icons.location_on),
+                                                     Text(
+                                                         "${activity.location}"),
+                                                   ],
+                                                 ),
+                                                 InkWell(
+                                                   onTap: () {
+                                                     ParticipantPopUp(participantList);
+                                                   },
+                                                   child: Row(
+                                                     children: [
+                                                       if (participantList
+                                                           .length >=
+                                                           1)
+                                                         Padding(
+                                                           padding:
+                                                           const EdgeInsets.only(left: 8.0),
+                                                           child: Container(
+                                                             height: 20,
+                                                             width: 20,
+                                                             decoration: BoxDecoration(
+                                                               color: Colors.green,
+                                                               shape: BoxShape.circle,
+                                                               image: DecorationImage(
+                                                                 fit: BoxFit.cover,
+                                                                 image: NetworkImage(
+                                                                     participantList[0].ppURL),
+                                                               ),
+                                                             ),
+                                                           ),
+                                                         ),
+                                                       if (participantList
+                                                           .length >=
+                                                           2)
+                                                         Padding(
+                                                           padding: const EdgeInsets.only(
+                                                             left: 4.0,
+                                                           ),
+                                                           child: Row(
+                                                             children: [
+                                                               Container(
+                                                                 height: 20,
+                                                                 width: 20,
+                                                                 decoration: BoxDecoration(
+                                                                     color: Colors.green,
+                                                                     shape: BoxShape.circle,
+                                                                     image: DecorationImage(
+                                                                       fit: BoxFit.cover,
                                                                        image: NetworkImage(
-                                                                          participantList[1].ppURL),
-                                                                    )),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      if (activity.participants
-                                                          .length >
-                                                          2)
-                                                        Padding(
-                                                          padding:
-                                                          const EdgeInsets.only(left: 8.0),
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                            CrossAxisAlignment.start,
-                                                            children: [
-                                                              Text(
-                                                                  "+${activity.participants.length - 2}"),
-                                                              Row(
-                                                                children: [
-                                                                  Container(
-                                                                    height: 5,
-                                                                    width: 5,
-                                                                    decoration: BoxDecoration(
-                                                                      color: Colors.black,
-                                                                      shape: BoxShape.circle,
-                                                                    ),
-                                                                  ),
-                                                                  Padding(
-                                                                    padding:
-                                                                    const EdgeInsets.only(
-                                                                        left: 2.0,
-                                                                        right: 2),
-                                                                    child: Container(
-                                                                      height: 5,
-                                                                      width: 5,
-                                                                      decoration: BoxDecoration(
-                                                                        color: Colors.black,
-                                                                        shape: BoxShape.circle,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  Container(
-                                                                    height: 5,
-                                                                    width: 5,
-                                                                    decoration: BoxDecoration(
-                                                                      color: Colors.black,
-                                                                      shape: BoxShape.circle,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                    ],
-                                                  ),
-                                                ),
+                                                                           participantList[1].ppURL),
+                                                                     )),
+                                                               ),
+                                                             ],
+                                                           ),
+                                                         ),
+                                                       if (activity.participants
+                                                           .length >
+                                                           2)
+                                                         Padding(
+                                                           padding:
+                                                           const EdgeInsets.only(left: 8.0),
+                                                           child: Column(
+                                                             crossAxisAlignment:
+                                                             CrossAxisAlignment.start,
+                                                             children: [
+                                                               Text(
+                                                                   "+${activity.participants.length - 2}"),
+                                                               Row(
+                                                                 children: [
+                                                                   Container(
+                                                                     height: 5,
+                                                                     width: 5,
+                                                                     decoration: BoxDecoration(
+                                                                       color: Colors.black,
+                                                                       shape: BoxShape.circle,
+                                                                     ),
+                                                                   ),
+                                                                   Padding(
+                                                                     padding:
+                                                                     const EdgeInsets.only(
+                                                                         left: 2.0,
+                                                                         right: 2),
+                                                                     child: Container(
+                                                                       height: 5,
+                                                                       width: 5,
+                                                                       decoration: BoxDecoration(
+                                                                         color: Colors.black,
+                                                                         shape: BoxShape.circle,
+                                                                       ),
+                                                                     ),
+                                                                   ),
+                                                                   Container(
+                                                                     height: 5,
+                                                                     width: 5,
+                                                                     decoration: BoxDecoration(
+                                                                       color: Colors.black,
+                                                                       shape: BoxShape.circle,
+                                                                     ),
+                                                                   ),
+                                                                 ],
+                                                               ),
+                                                             ],
+                                                           ),
+                                                         ),
+                                                     ],
+                                                   ),
+                                                 ),
+                                               ],),
+                                               if (amIparticipateList[index][indexx]==1)
+                                                 InkWell(
+                                                 child:Text("Çıkra",style: TextStyle(color: Colors.red),),
+                                                 onTap: ()async{
+                                                   await PostServices().deleteMyParticipate(activity);
+                                                   setState(() {
+                                                     amIparticipateList[index][indexx]=-1;
+                                                   });
+                                                 },
+                                               )else if(amIparticipateList[index][indexx]==-1)
+                                                 InkWell(
+                                                  child: Text("Participate! ",style: TextStyle(color: Colors.green),),
+                                                onTap: ()async{
+                                                  String requestID=  await PostServices().createRequest(mod.userObj.userUID, 1);
+                                                  await PostServices().createNotification(1, mod.userObj.userUID, "reactionID", requestID);
+                                                    setState(() {
+                                                      amIparticipateList[index][indexx]=0;
+                                                    });
+
+
+                                                },
+                                                )else if(amIparticipateList[index][indexx]==0)
+                                                   InkWell(
+                                                     child: Text("Waiting ",style: TextStyle(color: Colors.orangeAccent),),
+                                                     onTap: ()async{
+                                                       ///DELETE REQUEST AND NOTİFİCATİON
+                                                       setState(() {
+                                                         amIparticipateList[index][indexx]=-1;
+                                                       });
+
+
+                                                     },
+                                                   )
+
                                               ],
                                             ),
                                             Divider(height: 3,thickness: 1.50,),

@@ -5,7 +5,7 @@ class ActivityModel{
   String activityType;
   Timestamp time;
   String location;
-
+  List<String> requests;
   List<String> participants; //stores user uids
 
   ActivityModel(
@@ -13,7 +13,7 @@ class ActivityModel{
      required this.activityUID,
     required  this.time,
      required this.location,
-
+required this.requests,
       required this.participants
 
    });
@@ -25,7 +25,7 @@ class ActivityModel{
       'activityType':activityType,
       'time':this.time,
       'location':this.location,
-
+'requests':this.requests,
   'participants':this.participants
 
     };
@@ -40,7 +40,7 @@ class ActivityModel{
      activityType: doc['activityType'],
      time: doc['time'],
      location: doc["location"],
-
+       requests:doc["requests"].cast<String>(),
    participants: doc['participants'].cast<String>(),
 
 

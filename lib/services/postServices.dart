@@ -26,6 +26,7 @@ class PostServices {
       "time": time,
       //TODO participant parametresi oluşturup CreatingPage'den participants'a değer yolla.
       "participants": participants,
+      "requests":[],
     }).then((value) async {
       returnID = value.id;
       await activities.doc(value.id).update({"activityUID": value.id});
@@ -444,6 +445,12 @@ class PostServices {
     });
 
     return requestId;
+  }
+
+  Future<void> deleteMyParticipate(ActivityModel activityModel)async{
+    activityModel.participants.remove(myId);
+    await updateActivity(activityModel);
+     /// TODO notification ve request objelerini sil
   }
 }
 
