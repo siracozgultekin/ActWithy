@@ -434,6 +434,7 @@ class _HomePageState extends State<HomePage> {
                                                                     image: DecorationImage(
                                                                       fit: BoxFit.cover,
                                                                        image: NetworkImage(
+<<<<<<< Updated upstream
                                                                           participantList[1].ppURL),
                                                                     )),
                                                               ),
@@ -492,6 +493,119 @@ class _HomePageState extends State<HomePage> {
                                                     ],
                                                   ),
                                                 ),
+=======
+                                                                           participantList[1].ppURL),
+                                                                     )),
+                                                               ),
+                                                             ],
+                                                           ),
+                                                         ),
+                                                       if (activity.participants
+                                                           .length >
+                                                           2)
+                                                         Padding(
+                                                           padding:
+                                                           const EdgeInsets.only(left: 8.0),
+                                                           child: Column(
+                                                             crossAxisAlignment:
+                                                             CrossAxisAlignment.start,
+                                                             children: [
+                                                               Text(
+                                                                   "+${activity.participants.length - 2}"),
+                                                               Row(
+                                                                 children: [
+                                                                   Container(
+                                                                     height: 5,
+                                                                     width: 5,
+                                                                     decoration: BoxDecoration(
+                                                                       color: Colors.black,
+                                                                       shape: BoxShape.circle,
+                                                                     ),
+                                                                   ),
+                                                                   Padding(
+                                                                     padding:
+                                                                     const EdgeInsets.only(
+                                                                         left: 2.0,
+                                                                         right: 2),
+                                                                     child: Container(
+                                                                       height: 5,
+                                                                       width: 5,
+                                                                       decoration: BoxDecoration(
+                                                                         color: Colors.black,
+                                                                         shape: BoxShape.circle,
+                                                                       ),
+                                                                     ),
+                                                                   ),
+                                                                   Container(
+                                                                     height: 5,
+                                                                     width: 5,
+                                                                     decoration: BoxDecoration(
+                                                                       color: Colors.black,
+                                                                       shape: BoxShape.circle,
+                                                                     ),
+                                                                   ),
+                                                                 ],
+                                                               ),
+                                                             ],
+                                                           ),
+                                                         ),
+                                                     ],
+                                                   ),
+                                                 ),
+                                               ],),
+                                               if (amIparticipateList[index][indexx]==1)
+                                                 InkWell(
+                                                 child:Text("Çıkra",style: TextStyle(color: Colors.red),),
+                                                 onTap: ()async{
+                                                   await PostServices().deleteMyParticipate(activity).then((value) {
+                                                     setState(() {});});
+
+                                                   setState(() {
+                                                     amIparticipateList[index][indexx]=-1;
+                                                   });
+                                                 },
+                                               )else if(amIparticipateList[index][indexx]==-1)
+                                                 InkWell(
+                                                  child: Text("Participate! ",style: TextStyle(color: Colors.green),),
+                                                onTap: ()async{
+                                                  String requestID=  await PostServices().createRequest(mod.userObj.userUID, 1,activity.activityUID);
+                                                  activity.requests.add(requestID);
+                                                  await PostServices().updateActivity(activity);
+                                                  await PostServices().createNotification(1, mod.userObj.userUID, "reactionID", requestID).then((value) {
+                                                    setState(() {
+
+                                                    });
+                                                  });
+                                                    setState(() {
+                                                      amIparticipateList[index][indexx]=0;
+                                                    });
+
+
+                                                },
+                                                )else if(amIparticipateList[index][indexx]==0)
+                                                   InkWell(
+                                                     child: Text("Waiting ",style: TextStyle(color: Colors.orangeAccent),),
+                                                     onTap: ()async{
+                                                       setState(() {
+                                                         amIparticipateList[index][indexx]=-1;
+                                                       });
+
+                                                       ///DELETE REQUEST AND NOTİFİCATİON
+                                                       for (RequestModel req in requestList){
+                                                         if(req.requesterUID==user.userUID){
+                                                           requestList.remove(req);
+                                                           await PostServices().deleteActivityRequest(activity, req, mod.userObj).then((value) {
+                                                             setState(() {
+                                                             });
+                                                           });
+                                                           break;
+                                                         }
+                                                       }
+
+                                                     },
+                                                   )
+
+>>>>>>> Stashed changes
                                               ],
                                             ),
                                             Divider(height: 3,thickness: 1.50,),

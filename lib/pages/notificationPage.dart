@@ -1,5 +1,7 @@
+import 'package:actwithy/Models/ActivityModel.dart';
 import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/Models/ReactionModel.dart';
+import 'package:actwithy/Models/RequestModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -33,9 +35,7 @@ class _NotificationPageState extends State<NotificationPage> {
           Expanded(
               child: isReaction
                   ? ReactionWidget()
-                  : Container(
-                      color: Colors.red,
-                    )),
+                  : RequestWidget()),
         ],
       ),
     );
@@ -143,6 +143,7 @@ class _NotificationPageState extends State<NotificationPage> {
     UserModel userObj = model.user;
     ReactionModel reactionObj = model.reaction;
     String reactionString = "left ";
+<<<<<<< Updated upstream
     if (reactionObj.type == ReactionModel.heart){
       reactionString+= Emojis.redHeart;
     }else if (reactionObj.type == ReactionModel.brokenHeart){
@@ -153,9 +154,34 @@ class _NotificationPageState extends State<NotificationPage> {
       reactionString += Emojis.sadButRelievedFace;
     }else if (reactionObj.type == ReactionModel.angry) {
       reactionString += Emojis.angryFace;
+=======
+
+    switch (reactionObj.type) {
+      case 'heart':
+        reactionString += Emojis.redHeart;
+        break;
+      case 'brokenHeart':
+        reactionString += Emojis.brokenHeart;
+        break;
+      case 'joy':
+        reactionString += Emojis.rollingOnTheFloorLaughing;
+        break;
+      case 'sob':
+        reactionString += Emojis.sadButRelievedFace;
+        break;
+      case 'angry':
+        reactionString += Emojis.angryFace;
+        break;
+>>>>>>> Stashed changes
     }
-    reactionString += " to your " + postObj.date.toDate().day.toString() + "/" +postObj.date.toDate().month.toString() + "/" + postObj.date.toDate().year.toString() + " ToDo";
-      return Center(
+    reactionString += " to your " +
+        postObj.date.toDate().day.toString() +
+        "/" +
+        postObj.date.toDate().month.toString() +
+        "/" +
+        postObj.date.toDate().year.toString() +
+        " ToDo";
+    return Center(
       child: Padding(
         padding: const EdgeInsets.only(top: 8.0),
         child: Container(
@@ -198,7 +224,6 @@ class _NotificationPageState extends State<NotificationPage> {
                     "@${userObj.username}",
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
-                  
                 ],
               ),
               Padding(
@@ -206,10 +231,100 @@ class _NotificationPageState extends State<NotificationPage> {
                 child: Container(
                     height: MediaQuery.of(context).size.height * 0.05,
                     width: MediaQuery.of(context).size.width * 0.35,
-                    child: Text(reactionString, maxLines: 3,)),
+                    child: Text(
+                      reactionString,
+                      maxLines: 3,
+                    )),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget RequestWidget() {
+    return SingleChildScrollView(
+      physics: BouncingScrollPhysics(),
+      child: FutureBuilder(
+          future: PostServices().getActivityRequestNotification(),
+          builder: (context, AsyncSnapshot snap) {
+            if (!snap.hasData) {
+              return CircularProgressIndicator();
+            } else {
+              List<List<dynamic>> notifications = snap.data;
+              return Column(
+                children: [
+                  ListView.builder(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      physics: ClampingScrollPhysics(),
+                      itemCount: notifications.length,
+                      itemBuilder: (context, index) {
+                        return ListViewRequests(notifications[index]);
+                      })
+                ],
+              );
+            }
+          }),
+    );
+  }
+
+  Widget ListViewRequests(List<dynamic> list) {
+    UserModel user = list[1] as UserModel;
+    ActivityModel activity = list[2] as ActivityModel;
+    RequestModel request = list[0] as RequestModel;
+    return Center(
+      child: Container(
+        height: MediaQuery.of(context).size.height * 0.1,
+        width: MediaQuery.of(context).size.width * 0.9,
+        decoration: BoxDecoration(
+          color: Color(0XFFD6E6F1),
+          border: Border.all(
+            color: Colors.black,
+            width: 1,
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: EdgeInsets.all(8),
+              child: Container( height: MediaQuery.of(context).size.height * 0.08,
+                width: MediaQuery.of(context).size.height * 0.08,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    fit: BoxFit.cover,
+                    image: NetworkImage(user.ppURL),
+                  ),
+                ),),
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "${user.name} ${user.surname}",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "@${user.username}",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0),
+              child: Container(
+                  height: MediaQuery.of(context).size.height * 0.05,
+                  width: MediaQuery.of(context).size.width * 0.35,
+                  child: Text(
+                    "slmslmslm",
+                    maxLines: 3,
+                  )),
+            ),
+          ],
         ),
       ),
     );
