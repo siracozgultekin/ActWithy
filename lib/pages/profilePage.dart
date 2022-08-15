@@ -435,7 +435,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   physics: BouncingScrollPhysics(),
                   itemCount: snap.data.length,
                   itemBuilder: (context, index) {
-                    PostModel post = snap.data[index] as PostModel;
+                    PosticipantModel posticipant = snap.data[index];
+                    PostModel post = posticipant.post;
+                    var partList = posticipant.participantList;
                     bool opened;
                     (post.postUID == user.lastPostID)
                         ? opened = true
