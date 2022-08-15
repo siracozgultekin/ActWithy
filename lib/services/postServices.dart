@@ -117,7 +117,7 @@ class PostServices {
   Future<List<PosticipantModel>> getPosticipants(String profileID) async {
     List<PosticipantModel> posticipant = [];
 
-     //TODO getPost
+    //TODO getPost
 
     DocumentSnapshot dc = await users.doc(profileID).get();
     UserModel user = UserModel.fromSnapshot(dc);
@@ -511,27 +511,9 @@ class PostServices {
   Future<void> deleteMyParticipate(ActivityModel activityModel)async{
     activityModel.participants.remove(myId);
     await updateActivity(activityModel);
-     /// TODO notification ve request objelerini sil
+    /// TODO notification ve request objelerini sil
 
   }
-}
-
-class PartivityModel {
-  ActivityModel activity;
-  List<UserModel> participantList;
-
-  PartivityModel(
-      {required this.activity,
-    required this.participantList
-  });
-
-  void setAct(ActivityModel act) {
-    this.activity = act;
-  }
-  void setParts(List<UserModel> m) {
-    this.participantList = m;
-  }
-
   Future<void> deleteActivityRequest(ActivityModel activityModel,RequestModel requestModel, UserModel userModel)async{
     activityModel.requests.remove(requestModel.requestUID);
     await updateActivity(activityModel);
@@ -552,6 +534,25 @@ class PartivityModel {
     await requests.doc(requestModel.requestUID).delete();
 
   }
+}
+
+class PartivityModel {
+  ActivityModel activity;
+  List<UserModel> participantList;
+
+  PartivityModel(
+      {required this.activity,
+        required this.participantList
+      });
+
+  void setAct(ActivityModel act) {
+    this.activity = act;
+  }
+  void setParts(List<UserModel> m) {
+    this.participantList = m;
+  }
+
+  
 }
 
 class PosticipantModel{
