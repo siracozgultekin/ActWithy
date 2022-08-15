@@ -422,7 +422,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return SingleChildScrollView(
       physics: BouncingScrollPhysics(),
       child: FutureBuilder(
-        future: PostServices().getPosts(user.userUID),
+        future: PostServices().getPosticipants(user.userUID),
         builder: (context, AsyncSnapshot snap) {
           if (!snap.hasData) {
             return CircularProgressIndicator();
