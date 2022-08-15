@@ -470,8 +470,13 @@ class PostServices {
     activityModel.participants.remove(myId);
     await updateActivity(activityModel);
      /// TODO notification ve request objelerini sil
+<<<<<<< Updated upstream
   }
 
+=======
+
+  }
+>>>>>>> Stashed changes
   Future<void> deleteActivityRequest(ActivityModel activityModel,RequestModel requestModel, UserModel userModel)async{
     activityModel.requests.remove(requestModel.requestUID);
     await updateActivity(activityModel);
@@ -494,6 +499,46 @@ class PostServices {
   }
 }
 
+<<<<<<< Updated upstream
+=======
+class PartivityModel {
+  ActivityModel activity;
+  List<UserModel> participantList;
+
+  PartivityModel(
+      {required this.activity,
+    required this.participantList
+  });
+
+  void setAct(ActivityModel act) {
+    this.activity = act;
+  }
+  void setParts(List<UserModel> m) {
+    this.participantList = m;
+  }
+
+
+}
+
+class PosticipantModel{
+  PostModel post;
+  List<UserModel> participantList;
+
+  PosticipantModel(
+      {required this.post,
+        required this.participantList
+      });
+
+  void setPost(PostModel postModel) {
+    this.post = postModel;
+  }
+  void setParts(List<UserModel> m) {
+    this.participantList = m;
+  }
+
+}
+
+>>>>>>> Stashed changes
 class DenemeModel {
   PostModel postObj;
   List<ActivityModel> activitiesList;
