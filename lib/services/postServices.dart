@@ -111,17 +111,26 @@ class PostServices {
     return models;
   }
 
-  Future<List<PostModel>> getPosticipants(String profileID) async {
-    List<PostModel> post = [];
+  Future<List<PosticipantModel>> getPosticipants(String profileID) async {
+    List<PosticipantModel> posticipant = [];
+
+     //TODO getPost
+
     DocumentSnapshot dc = await users.doc(profileID).get();
+    UserModel user = UserModel.fromSnapshot(dc);
 
-    List<String> postList = dc["posts"].cast<String>();
+    for (String postID in user.posts) {
 
-    for (String postID in postList.reversed) {
-      DocumentSnapshot postDoc = await posts.doc(postID).get();
-      post.add(PostModel.fromSnapshot(postDoc));
+      DocumentSnapshot doc = await posts.doc(postID).get();
+      PostModel post = PostModel.fromSnapshot(doc);
+
+      List<UserModel> parts = await getAllParticipants(post.activityUID);
+
+      PosticipantModel posticipantModel = PosticipantModel(post: post, participantList: parts);
+      posticipant.add(posticipantModel);
     }
-    return post;
+
+    return posticipant;
   }
 
   Future<bool> checkDailyPost() async {
@@ -412,6 +421,7 @@ class PostServices {
     }
     return reactionsList;
   }
+
   Future<List<ActivityModel>> getPostsActivities(String postID) async {
 
     DocumentSnapshot postDoc = await posts.doc(postID).get();
@@ -458,9 +468,6 @@ class PostServices {
     return list;
 
   }
-
-
-
 
 
 
