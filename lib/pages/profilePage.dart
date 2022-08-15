@@ -461,7 +461,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 //initiallyExpanded: post.postUID==user.lastPostID,
                                 textColor: textColor,
                                 title: boolList[index]
-                                    ? ClosedPost(post)
+                                    ? ClosedPost(posticipant)
                                     : InfoWidget(post),
                                 // leading: CircleAvatar(
                                 //   backgroundImage: NetworkImage(user.ppURL),
@@ -1768,12 +1768,14 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget ClosedPost(PostModel post) {
+  Widget ClosedPost(PosticipantModel posticipant) {
+    PostModel post = posticipant.post;
+    List<UserModel> participants = posticipant.participantList;
     var postDate = post.date.toDate();
     int day = postDate.day;
     var month = postDate.month;
     var year = postDate.year;
-    List<UserModel> participants = [];
+
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -1792,7 +1794,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           Text(participants.length.toString()),
 
-          //TODO iki kişiden fazlasını artı olarak göster
+
         ],
       ),
     );
