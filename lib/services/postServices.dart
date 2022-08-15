@@ -114,17 +114,26 @@ class PostServices {
     return models;
   }
 
-  Future<List<PostModel>> getPosts(String profileID) async {
-    List<PostModel> post = [];
+  Future<List<PosticipantModel>> getPosticipants(String profileID) async {
+    List<PosticipantModel> posticipant = [];
+
+    //TODO getPost
+
     DocumentSnapshot dc = await users.doc(profileID).get();
+    UserModel user = UserModel.fromSnapshot(dc);
 
-    List<String> postList = dc["posts"].cast<String>();
+    for (String postID in user.posts) {
 
-    for (String postID in postList.reversed) {
-      DocumentSnapshot postDoc = await posts.doc(postID).get();
-      post.add(PostModel.fromSnapshot(postDoc));
+      DocumentSnapshot doc = await posts.doc(postID).get();
+      PostModel post = PostModel.fromSnapshot(doc);
+
+      List<UserModel> parts = await getAllParticipants(post.activityUID);
+
+      PosticipantModel posticipantModel = PosticipantModel(post: post, participantList: parts);
+      posticipant.add(posticipantModel);
     }
-    return post;
+
+    return posticipant;
   }
 
   Future<bool> checkDailyPost() async {
@@ -431,6 +440,7 @@ class PostServices {
     }
     return reactionsList;
   }
+
   Future<List<ActivityModel>> getPostsActivities(String postID) async {
 
     DocumentSnapshot postDoc = await posts.doc(postID).get();
@@ -447,6 +457,38 @@ class PostServices {
     return activityList;
 
   }
+
+
+  Future<List<PartivityModel>> getActPart(PostModel post) async {
+
+    List<PartivityModel> list = [];
+    List<ActivityModel> activityList= [];
+
+    for (String actID in post.activityUID){
+      DocumentSnapshot actDoc = await activities.doc(actID).get();
+      ActivityModel act = ActivityModel.fromSnapshot(actDoc);
+      activityList.add(act);
+    }
+    activityList.sort((a, b) => a.time.compareTo(b.time));
+
+    for (ActivityModel act in activityList) {
+      List<UserModel> partList = [];
+      DocumentSnapshot dc;
+      UserModel part;
+      for (String id in act.participants) {
+        dc = await users.doc(id).get();
+        part = UserModel.fromSnapshot(dc);
+        partList.add(part);
+      }
+      PartivityModel model = PartivityModel(activity: act, participantList: partList);
+      list.add(model);
+    }
+
+    return list;
+
+  }
+
+
 
   Future<String> createRequest(String requesteeUID, int requestType) async {
     String requestId = "";
@@ -469,14 +511,9 @@ class PostServices {
   Future<void> deleteMyParticipate(ActivityModel activityModel)async{
     activityModel.participants.remove(myId);
     await updateActivity(activityModel);
-     /// TODO notification ve request objelerini sil
-<<<<<<< Updated upstream
-  }
-
-=======
+    /// TODO notification ve request objelerini sil
 
   }
->>>>>>> Stashed changes
   Future<void> deleteActivityRequest(ActivityModel activityModel,RequestModel requestModel, UserModel userModel)async{
     activityModel.requests.remove(requestModel.requestUID);
     await updateActivity(activityModel);
@@ -499,16 +536,14 @@ class PostServices {
   }
 }
 
-<<<<<<< Updated upstream
-=======
 class PartivityModel {
   ActivityModel activity;
   List<UserModel> participantList;
 
   PartivityModel(
       {required this.activity,
-    required this.participantList
-  });
+        required this.participantList
+      });
 
   void setAct(ActivityModel act) {
     this.activity = act;
@@ -517,7 +552,7 @@ class PartivityModel {
     this.participantList = m;
   }
 
-
+  
 }
 
 class PosticipantModel{
@@ -538,7 +573,6 @@ class PosticipantModel{
 
 }
 
->>>>>>> Stashed changes
 class DenemeModel {
   PostModel postObj;
   List<ActivityModel> activitiesList;
