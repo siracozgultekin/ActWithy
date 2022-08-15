@@ -506,7 +506,7 @@ class _HomePageState extends State<HomePage> {
                                                  InkWell(
                                                   child: Text("Participate! ",style: TextStyle(color: Colors.green),),
                                                 onTap: ()async{
-                                                  String requestID=  await PostServices().createRequest(mod.userObj.userUID, 1);
+                                                  String requestID=  await PostServices().createRequest(mod.userObj.userUID, 1,activity.activityUID);
                                                   activity.requests.add(requestID);
                                                   await PostServices().updateActivity(activity);
                                                   await PostServices().createNotification(1, mod.userObj.userUID, "reactionID", requestID).then((value) {

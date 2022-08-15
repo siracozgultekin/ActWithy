@@ -496,7 +496,8 @@ class PostServices {
 
 
 
-  Future<String> createRequest(String requesteeUID, int requestType) async {
+  Future<String> createRequest(
+      String requesteeUID, int requestType, String activityId) async {
     String requestId = "";
     await requests.add({
       "requestUID": "requestUID",
@@ -505,7 +506,7 @@ class PostServices {
       "requesteeUID": requesteeUID,
       "requestStatus": 0,
       "time": Timestamp.now(),
-      "activityUID": "activityUID",
+      "activityUID": activityId,
     }).then((value) async {
       requestId = value.id;
       await requests.doc(requestId).update({"requestUID": requestId});
@@ -540,6 +541,33 @@ class PostServices {
     await requests.doc(requestModel.requestUID).delete();
 
   }
+
+  Future<List<List<dynamic>>> getActivityRequestNotification() async {
+    List<List<dynamic>> returnList = [
+    /*[usermodel, activitymodel, requestmodel]*/
+    ];
+    DocumentSnapshot myDoc = await users.doc(myId).get();
+    List<String> notIDs = myDoc["notifications"].cast<String>();
+    for (String id in notIDs) {
+    DocumentSnapshot notDoc = await notifications.doc(id).get();
+    if (notDoc["type"] == 1) {
+    DocumentSnapshot requestDoc =
+    await requests.doc(notDoc["requestID"]).get();
+    if (requestDoc["type"] == 1) {
+    DocumentSnapshot userDoc =
+    await users.doc(requestDoc["requesterUID"]).get();
+    DocumentSnapshot activityDoc =
+    await activities.doc(requestDoc["activityUID"]).get();
+    returnList.add([
+    RequestModel.fromSnapshot(requestDoc),
+    UserModel.fromSnapshot(userDoc),
+    ActivityModel.fromSnapshot(activityDoc)
+    ]);
+    }
+    }
+    }
+    return returnList;
+  }
 }
 
 class PartivityModel {
@@ -558,7 +586,7 @@ class PartivityModel {
     this.participantList = m;
   }
 
-  
+
 }
 
 class PosticipantModel{
