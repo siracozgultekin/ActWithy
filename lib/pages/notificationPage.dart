@@ -143,18 +143,6 @@ class _NotificationPageState extends State<NotificationPage> {
     UserModel userObj = model.user;
     ReactionModel reactionObj = model.reaction;
     String reactionString = "left ";
-<<<<<<< Updated upstream
-    if (reactionObj.type == ReactionModel.heart){
-      reactionString+= Emojis.redHeart;
-    }else if (reactionObj.type == ReactionModel.brokenHeart){
-      reactionString+= Emojis.brokenHeart;
-    }else if (reactionObj.type == ReactionModel.joy) {
-      reactionString += Emojis.rollingOnTheFloorLaughing;
-    }else if (reactionObj.type == ReactionModel.sob) {
-      reactionString += Emojis.sadButRelievedFace;
-    }else if (reactionObj.type == ReactionModel.angry) {
-      reactionString += Emojis.angryFace;
-=======
 
     switch (reactionObj.type) {
       case 'heart':
@@ -172,7 +160,6 @@ class _NotificationPageState extends State<NotificationPage> {
       case 'angry':
         reactionString += Emojis.angryFace;
         break;
->>>>>>> Stashed changes
     }
     reactionString += " to your " +
         postObj.date.toDate().day.toString() +
