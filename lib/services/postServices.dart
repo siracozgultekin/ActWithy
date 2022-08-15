@@ -292,7 +292,13 @@ class PostServices {
       for (String part in actPartList) {
         DocumentSnapshot partDoc = await users.doc(part).get();
         UserModel user = UserModel.fromSnapshot(partDoc);
-        if (!participants.contains(user.userUID)) {
+        bool notIn = true;
+
+        for (UserModel model in participants) {
+          if(model.userUID==user.userUID) notIn = false;
+        }
+
+        if(notIn) {
           participants.add(user);
         }
       }
