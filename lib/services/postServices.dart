@@ -597,6 +597,26 @@ class PostServices {
     await requests.doc(requestModel.requestUID).delete();
   }
 
+  Future<List<List<dynamic>>> getFriendRequests()async{
+    List<List<dynamic>> returnList =[/*requestModel, usermodel,*/];
+    DocumentSnapshot myDoc = await users.doc(myId).get();
+    List<String> notIDs = myDoc["notifications"].cast<String>();
+    for (String id in notIDs) {
+      DocumentSnapshot notDoc = await notifications.doc(id).get();
+      if (notDoc["type"] == 1) {
+        DocumentSnapshot requestDoc = await requests.doc(notDoc["requestID"])
+            .get();
+        if (requestDoc["type"] == 0) {
+          DocumentSnapshot userDoc = await users.doc(requestDoc["requesterUID"]).get();
+          returnList.add([RequestModel.fromSnapshot(requestDoc),
+            UserModel.fromSnapshot(userDoc),]);
+        }
+      }
+    }
+    returnList.sort((a, b) => b[0].time.compareTo(a[0].time));
+    return returnList;
+  }
+
 }
 
 class PartivityModel {
