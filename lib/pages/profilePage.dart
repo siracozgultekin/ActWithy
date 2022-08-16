@@ -41,7 +41,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   getIsMyFriend() async {
     bool result = await SearchService().isMyFriend(user.userUID);
-    pending = await SearchService().isPending();
+    pending = await SearchService().isPending(user.userUID);
     //bool isPenging = await ;
     setState(() {
       isMyFriend = result;
@@ -315,6 +315,7 @@ class _ProfilePageState extends State<ProfilePage> {
             child: ElevatedButton(
               onPressed: () async {
                 if (isMyPage) {
+                  print(1);
                   ///TODO editle profili
                   //UserModel userModel = UserModel.fromSnapshot(await FirebaseFirestore.instance.collection('users').doc(user.userUID).get()) as UserModel;
                   Navigator.pushReplacement(
@@ -326,8 +327,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   });
                   //Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfilePage(userModel: user,)));
                 } else if (pending) {
+                  print(2);
 
-                  await SearchService().deleteRequest().then((value){
+                  await SearchService().deleteRequest(user.userUID).then((value){
                     setState((){
                       hidden = true;
                       buttonText = "Add Friend";
@@ -337,6 +339,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 }
                 else if (!isMyPage && isMyFriend) {
+                  print(3);
+
                   await SearchService()
                       .removeFriend(user.userUID)
                       .then((value) {
@@ -348,6 +352,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     });
                   });
                 } else if (!isMyPage && !isMyFriend && !pending) {
+                  print(4);
+
                   await SearchService().sendRequest(user.userUID).then((value) {
                     setState(() {
                       buttonText = "Pending";
