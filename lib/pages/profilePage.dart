@@ -41,7 +41,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
   getIsMyFriend() async {
     bool result = await SearchService().isMyFriend(user.userUID);
-    pending = await SearchService().isPending(user.userUID);
+    String temp = await SearchService().isPending(user.userUID);
+
+    pending = !temp.isEmpty;
+    print(pending);
     //bool isPenging = await ;
     setState(() {
       isMyFriend = result;
@@ -85,7 +88,9 @@ class _ProfilePageState extends State<ProfilePage> {
     int selectedIndex = 4;
     bool isMyPage = user.userUID == FirebaseAuth.instance.currentUser!.uid;
     
-    if (isMyPage) hidden =false;
+    if (isMyPage) {
+      hidden = false;
+    }
     if(!isMyPage && isMyFriend) hidden =false;
 
     return Scaffold(
@@ -135,10 +140,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => CreatingPage(postModel: postModel)));
               } else if (selectedIndex == 3) {
-                Navigator.of(context).push(MaterialPageRoute(
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => NotificationPage()));
               } else if (selectedIndex == 4) {
-                scrollUp();
+
               }
             });
           },
@@ -326,7 +331,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     setState(() {});
                   });
                   //Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfilePage(userModel: user,)));
-                } else if (pending) {
+                } else if (!isMyFriend && pending) {
                   print(2);
 
                   await SearchService().deleteRequest(user.userUID).then((value){

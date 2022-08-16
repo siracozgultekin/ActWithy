@@ -18,4 +18,18 @@ class NotificationModel{
      }); //if type is 0
 
 
+  factory NotificationModel.fromSnapshot(DocumentSnapshot doc) {
+
+    return NotificationModel(
+      notificationUID: doc['notificationUID'],
+      time: doc['time'],
+      type: doc['type'],
+      userID: doc["userID"],
+      reactionID: doc['reactionID'],
+      requestID: doc['requestID'],
+
+    );
+
+  }
+
 }

@@ -1,3 +1,5 @@
+import 'package:actwithy/Models/NotificationModel.dart';
+import 'package:actwithy/Models/RequestModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,6 +11,8 @@ class SearchService{
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   CollectionReference posts = FirebaseFirestore.instance.collection('posts');
   CollectionReference activities = FirebaseFirestore.instance.collection('activities');
+  CollectionReference notifications = FirebaseFirestore.instance.collection("notifications");
+  CollectionReference requests = FirebaseFirestore.instance.collection("requests");
 
 
   Future<List<UserModel>> getAllProfiles(String search) async {
@@ -57,28 +61,46 @@ class SearchService{
 
   Future<void> sendRequest(String id) async {
     String requestID = await PostServices().createRequest(id, 0,"activityID");
-    PostServices().createNotification(1, myId, "reactionID", requestID);
+    PostServices().createNotification(1, id, "reactionID", requestID);
   }
 
-  Future<void> deleteRequest(String requestee) async {
+  Future<void> deleteRequest(String requesteeID) async {
 
-    Query<Map<String, dynamic>> query = await FirebaseFirestore.instance.collection("requests").where("requesterUID", isEqualTo: myId).where("requesteeUID", isEqualTo: requestee).where("type", isEqualTo: 0).where("requestStatus", isEqualTo: 0);
+    DocumentSnapshot doc = await users.doc(requesteeID).get();
+    UserModel requestee = UserModel.fromSnapshot(doc);
 
+    String requestID = await isPending(requesteeID);
 
-
-
+    PostServices().deleteFriendRequest(requestee, requestID);
 
       //TODO del notification 2
   }
 
-  Future<bool> isPending(String requestee) async {
-    
-    Query<Map<String, dynamic>> query = await FirebaseFirestore.instance.collection("requests").where("requesterUID", isEqualTo: myId).where("requesteeUID", isEqualTo: requestee).where("type", isEqualTo: 0).where("requestStatus", isEqualTo: 0);
+  Future<String> isPending(String requesteeID) async {
+    String requestID = "";
+    if (requesteeID==myId) return requestID;
 
-    if (query.parameters.isEmpty){
-      return false;
+    DocumentSnapshot doc = await users.doc(requesteeID).get();
+    UserModel requestee = UserModel.fromSnapshot(doc);
+
+    for (String notID in requestee.notifications) {
+      DocumentSnapshot notdoc = await notifications.doc(notID).get();
+      NotificationModel notificationModel = NotificationModel.fromSnapshot(notdoc);
+
+      if ( notificationModel.type==1) {
+        String request = notificationModel.requestID;
+
+        DocumentSnapshot reqdoc = await requests.doc(request).get();
+        RequestModel requestModel = RequestModel.fromSnapshot(reqdoc);
+
+        if (requestModel.type==0 && requestModel.requesteeUID==requesteeID && requestModel.requesterUID==myId){
+          requestID = requestModel.requestUID;
+          break;
+        }
+      }
+
     }
-    return true;
+    return requestID;
   }
 
 }
