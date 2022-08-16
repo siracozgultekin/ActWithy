@@ -532,7 +532,7 @@ class _HomePageState extends State<HomePage> {
                                                        for (RequestModel req in requestList){
                                                          if(req.requesterUID==user.userUID){
                                                            requestList.remove(req);
-                                                           await PostServices().deleteActivityRequest(activity, req, mod.userObj).then((value) {
+                                                           await PostServices().deleteActivityRequest(activity, req).then((value) {
                                                              setState(() {
                                                              });
                                                            });
