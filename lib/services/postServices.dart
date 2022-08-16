@@ -126,7 +126,7 @@ class PostServices {
     DocumentSnapshot dc = await users.doc(profileID).get();
     UserModel user = UserModel.fromSnapshot(dc);
 
-    for (String postID in user.posts) {
+    for (String postID in user.posts.reversed) {
       DocumentSnapshot doc = await posts.doc(postID).get();
       PostModel post = PostModel.fromSnapshot(doc);
 
