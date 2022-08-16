@@ -527,7 +527,9 @@ class PostServices {
   }
 
   Future<void> deleteActivityRequest(ActivityModel activityModel,
-      RequestModel requestModel, UserModel userModel) async {
+      RequestModel requestModel) async {
+    DocumentSnapshot doc1 = await users.doc(requestModel.requesteeUID).get();
+    UserModel userModel = UserModel.fromSnapshot(doc1) ;
     activityModel.requests.remove(requestModel.requestUID);
     await updateActivity(activityModel);
 
@@ -572,6 +574,7 @@ class PostServices {
         }
       }
     }
+    returnList.sort((a, b) => b[0].time.compareTo(a[0].time));
     return returnList;
   }
 
