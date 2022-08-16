@@ -3,6 +3,11 @@ import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/Models/ReactionModel.dart';
 import 'package:actwithy/Models/RequestModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
+import 'package:actwithy/pages/creatingPage.dart';
+import 'package:actwithy/pages/homePage.dart';
+import 'package:actwithy/pages/profilePage.dart';
+import 'package:actwithy/pages/searchPage.dart';
+import 'package:actwithy/services/authService.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emojis/emojis.dart';
@@ -18,6 +23,7 @@ class NotificationPage extends StatefulWidget {
 }
 
 class _NotificationPageState extends State<NotificationPage> {
+  int selectedIndex = 0;
   bool isReaction = true;
   Color negativeColor = Color(0xFFD6E6F1); //light blue
   Color selectedColor = Color(0xFF2D3A43); //dark blue
@@ -28,6 +34,12 @@ class _NotificationPageState extends State<NotificationPage> {
       appBar: AppBar(
         title: Text("Notifications"),
         backgroundColor: Color(0xFF48B2FA),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Icon(Icons.person_add_alt_1),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -37,6 +49,81 @@ class _NotificationPageState extends State<NotificationPage> {
                   ? ReactionWidget()
                   : RequestWidget()),
         ],
+      ),
+      bottomNavigationBar: NavigationBarTheme(
+        data: NavigationBarThemeData(
+          height: MediaQuery.of(context).size.height * 0.075,
+          indicatorColor: Colors.transparent,
+          backgroundColor: Color(0xFF9AC6C5),
+        ),
+        child: NavigationBar(
+          selectedIndex: selectedIndex,
+          onDestinationSelected: (value) async {
+            bool check = await PostServices().checkDailyPost();
+
+            PostModel postModel;
+
+            if (!check) {
+              postModel = PostModel(
+                  postUID: "postUID",
+                  date: Timestamp.now(),
+                  activityUID: [],
+                  heartCounter: 0,
+                  brokenHeartCounter: 0,
+                  joyCounter: 0,
+                  sobCounter: 0,
+                  angryCounter: 0,
+                  reactionIDs: []);
+            } else {
+              //oluşturulmuş demek
+              postModel = await PostServices().getDailyPost();
+            }
+            UserModel currentUser = await AuthService().getCurrentUser();
+
+            setState(() {
+              selectedIndex = value;
+
+              switch(selectedIndex){
+                case 0: Navigator.of(context).pop();
+                break;
+                case 1: showSearch(context: context, delegate: SearchPage(hintText: "Search", hintTextColor: TextStyle(color: Colors.white)));
+                break;
+                case 2: Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => CreatingPage(postModel: postModel)));
+                break;
+                case 4: Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => ProfilePage(user: currentUser)));
+                break;
+
+              }
+
+
+
+
+            });
+          },
+          destinations: [
+            NavigationDestination(
+              icon: Icon(Icons.home, color: Colors.white),
+              label: '',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.search, color: Colors.white),
+              label: '',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.post_add, color: Colors.white),
+              label: '',
+            ),
+            NavigationDestination(
+              icon:
+              Icon(Icons.notifications_none_outlined, color: Colors.white),
+              label: '',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.person, color: Colors.white),
+              label: '',
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -202,6 +289,7 @@ class _NotificationPageState extends State<NotificationPage> {
               ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     "${userObj.name} ${userObj.surname}",
@@ -262,58 +350,103 @@ class _NotificationPageState extends State<NotificationPage> {
     ActivityModel activity = list[2] as ActivityModel;
     RequestModel request = list[0] as RequestModel;
     return Center(
-      child: Container(
-        height: MediaQuery.of(context).size.height * 0.1,
-        width: MediaQuery.of(context).size.width * 0.9,
-        decoration: BoxDecoration(
-          color: Color(0XFFD6E6F1),
-          border: Border.all(
-            color: Colors.black,
-            width: 1,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.13,
+          width: MediaQuery.of(context).size.width * 0.9,
+          decoration: BoxDecoration(
+            color: Color(0XFFD6E6F1),
+            border: Border.all(
+              color: Colors.black,
+              width: 1,
+            ),
+            borderRadius: BorderRadius.circular(20),
           ),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(8),
-              child: Container( height: MediaQuery.of(context).size.height * 0.08,
-                width: MediaQuery.of(context).size.height * 0.08,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: NetworkImage(user.ppURL),
-                  ),
-                ),),
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "${user.name} ${user.surname}",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+          child: Row(
+
+            children: [
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: Container( height: MediaQuery.of(context).size.height * 0.08,
+                  width: MediaQuery.of(context).size.height * 0.08,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: NetworkImage(user.ppURL),
+                    ),
+                  ),),
+              ),
+              Expanded(
+                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${user.name} ${user.surname.substring(0,1)}.",
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          "@${user.username}",
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+
+                        ),
+                      ],
+                    ),
+                    Container(
+                       height: MediaQuery.of(context).size.height * 0.12,
+                       width: MediaQuery.of(context).size.width * 0.35,
+                        child: Center(
+                          child: Text(
+                            "Wants to attend the '${activity.activityType}' event on ${activity.time.toDate().day}/${activity.time.toDate().month}/${activity.time.toDate().year} at ${activity.time.toDate().hour}.${activity.time.toDate().minute} ",style: TextStyle(fontSize: 12.5),
+                            maxLines: 5,
+                          ),
+                        )),
+                    Row(
+                      children:  (!controlDate(activity.time.toDate())) ?[
+                        Icon(Icons.clear,color: Colors.transparent,),
+                        Icon(Icons.done, color: Colors.transparent,),
+                      ]:  [
+                          InkWell(
+                            child: Icon(Icons.clear,color: Colors.red,),
+                            onTap: ()async{
+                              await PostServices().deleteActivityRequest(activity, request);
+                            },
+                          ),
+                          InkWell(child: Padding(
+                            padding: const EdgeInsets.only(right: 4.0),
+                            child: Icon(Icons.done, color: Colors.green,),
+
+                          ),
+                            onTap: ()async{
+                            if(await PostServices().controlRequest(user.userUID)){
+                              activity.participants.add(user.userUID);
+                              await PostServices().updateActivity(activity);
+                              await PostServices().deleteActivityRequest(activity, request);
+                            }
+                            },),
+                       
+                        
+                      ],
+                    ),
+                  ],
                 ),
-                Text(
-                  "@${user.username}",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 10.0),
-              child: Container(
-                  height: MediaQuery.of(context).size.height * 0.05,
-                  width: MediaQuery.of(context).size.width * 0.35,
-                  child: Text(
-                    "slmslmslm",
-                    maxLines: 3,
-                  )),
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  bool controlDate(DateTime dateTime){
+    DateTime today = DateTime.now();
+    if(dateTime.year==today.year&&dateTime.month==today.month&&dateTime.day==today.day)
+      return true;
+    return false;
+
   }
 }
