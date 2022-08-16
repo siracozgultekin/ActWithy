@@ -56,18 +56,29 @@ class SearchService{
   }
 
   Future<void> sendRequest(String id) async {
-    String requestID = await PostServices().createRequest(id, 0);
+    String requestID = await PostServices().createRequest(id, 0,"activityID");
     PostServices().createNotification(1, myId, "reactionID", requestID);
   }
 
-  Future<void> deleteRequest() async {
-    //del request and notification
+  Future<void> deleteRequest(String requestee) async {
+
+    Query<Map<String, dynamic>> query = await FirebaseFirestore.instance.collection("requests").where("requesterUID", isEqualTo: myId).where("requesteeUID", isEqualTo: requestee).where("type", isEqualTo: 0).where("requestStatus", isEqualTo: 0);
 
 
+
+
+
+      //TODO del notification 2
   }
 
-  Future<bool> isPending() async {
-    return false;
+  Future<bool> isPending(String requestee) async {
+    
+    Query<Map<String, dynamic>> query = await FirebaseFirestore.instance.collection("requests").where("requesterUID", isEqualTo: myId).where("requesteeUID", isEqualTo: requestee).where("type", isEqualTo: 0).where("requestStatus", isEqualTo: 0);
+
+    if (query.parameters.isEmpty){
+      return false;
+    }
+    return true;
   }
 
 }
