@@ -1770,7 +1770,7 @@ class _ProfilePageState extends State<ProfilePage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Icon(Icons.calendar_today,
-            color: textColor, size: MediaQuery.of(context).size.width * 0.1),
+            color: textColor, size: MediaQuery.of(context).size.width * 0.09),
         Text(
           "${formatter.format(day)}-${formatter.format(month)}-${year}",
           style: TextStyle(
