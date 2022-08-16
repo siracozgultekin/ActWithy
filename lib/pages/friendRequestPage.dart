@@ -5,6 +5,7 @@ import 'package:actwithy/Models/RequestModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
 import 'package:actwithy/pages/homePage.dart';
 import 'package:actwithy/services/postServices.dart';
+import 'package:actwithy/services/searchService.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emojis/emojis.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -64,56 +65,107 @@ class _FriendRequestPageState extends State<FriendRequestPage> {
     UserModel user = list[1] as UserModel;
     RequestModel request = list[0] as RequestModel;
     return Center(
-      child: Container(
-        height: MediaQuery.of(context).size.height * 0.1,
-        width: MediaQuery.of(context).size.width * 0.9,
-        decoration: BoxDecoration(
-          color: Color(0XFFD6E6F1),
-          border: Border.all(
-            color: Colors.black,
-            width: 1,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.1,
+          width: MediaQuery.of(context).size.width * 0.9,
+          decoration: BoxDecoration(
+            color: Color(0XFFD6E6F1),
+            border: Border.all(
+              color: Colors.black,
+              width: 1,
+            ),
+            borderRadius: BorderRadius.circular(20),
           ),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(8),
-              child: Container( height: MediaQuery.of(context).size.height * 0.08,
-                width: MediaQuery.of(context).size.height * 0.08,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: NetworkImage(user.ppURL),
+          child: Row(
+            children: [
+              Padding(
+                padding: EdgeInsets.all(8),
+                child: Container(
+                  height: MediaQuery.of(context).size.height * 0.07,
+                  width: MediaQuery.of(context).size.height * 0.07,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: NetworkImage(user.ppURL),
+                    ),
                   ),
-                ),),
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "${user.name} ${user.surname}",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                 ),
-                Text(
-                  "@${user.username}",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              ),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${user.name} ${user.surname}",
+                          style: TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          "@${user.username}",
+                          maxLines: 2,
+                          style: TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.bold,),
+
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10.0),
+                      child: Container(
+                          height: MediaQuery.of(context).size.height * 0.05,
+                          width: MediaQuery.of(context).size.width * 0.25,
+                          child: Text(
+                            "sent a friend request",
+                            maxLines: 2,
+                          )),
+                    ),
+                    InkWell(
+                      child: Icon(
+                        Icons.clear,
+                        color: Colors.red,
+                        size: 32,
+                      ),
+                      onTap: () async {
+                        // requesti ve notificationu sil userı güncelle
+                        UserModel me = UserModel.fromSnapshot(
+                            await PostServices().getMyDoc());
+                        await PostServices()
+                            .deleteFriendRequest(me, request.requestUID).then((value) {
+                              setState((){});
+                        });
+                      },
+                    ),
+                    InkWell(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Icon(
+                          Icons.done,
+                          color: Colors.green,
+                          size: 35,
+                        ),
+                      ),
+                      onTap: () async {
+                        await SearchService().addFriend(user.userUID);
+                        UserModel me = UserModel.fromSnapshot(
+                            await PostServices().getMyDoc());
+                        await PostServices()
+                            .deleteFriendRequest(me, request.requestUID).then((value) {
+                              setState((){});
+                        });
+                      },
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 10.0),
-              child: Container(
-                  height: MediaQuery.of(context).size.height * 0.05,
-                  width: MediaQuery.of(context).size.width * 0.35,
-                  child: Text(
-                    "sent a friend request",
-                    maxLines: 3,
-                  )),
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
