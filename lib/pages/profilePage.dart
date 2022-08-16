@@ -31,6 +31,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   bool isToDo = true;
   bool isMyFriend = false;
+  bool pending = false;
   String buttonText = "";
   final controller = ScrollController();
   bool hidden =true;
@@ -40,11 +41,17 @@ class _ProfilePageState extends State<ProfilePage> {
 
   getIsMyFriend() async {
     bool result = await SearchService().isMyFriend(user.userUID);
+    pending = await SearchService().isPending();
+    //bool isPenging = await ;
     setState(() {
       isMyFriend = result;
       if (isMyFriend) {
         buttonText = "Remove Friend";
-      } else {
+      }
+      else if (pending) {
+        buttonText = "Pending";
+      }
+      else {
         buttonText = "Add Friend";
       }
     });
@@ -318,22 +325,34 @@ class _ProfilePageState extends State<ProfilePage> {
                     setState(() {});
                   });
                   //Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfilePage(userModel: user,)));
-                } else if (!isMyPage && isMyFriend) {
+                } else if (pending) {
+
+                  await SearchService().deleteRequest().then((value){
+                    setState((){
+                      hidden = true;
+                      buttonText = "Add Friend";
+                      pending = false;
+                    });
+                  });
+
+                }
+                else if (!isMyPage && isMyFriend) {
                   await SearchService()
                       .removeFriend(user.userUID)
                       .then((value) {
                     setState(() {
                       isMyFriend = !isMyFriend;
                       buttonText = "Add Friend";
+                      pending = false; //gereksiz??
                       hidden = true;
                     });
                   });
-                } else if (!isMyPage && !isMyFriend) {
-                  await SearchService().addFriend(user.userUID).then((value) {
+                } else if (!isMyPage && !isMyFriend && !pending) {
+                  await SearchService().sendRequest(user.userUID).then((value) {
                     setState(() {
-                      isMyFriend = !isMyFriend;
-                      buttonText = "Remove Friend";
-                      hidden = false;
+                      buttonText = "Pending";
+                      pending = true;
+                      hidden = true;
                     });
                   });
                 }
@@ -455,11 +474,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     PosticipantModel posticipant = snap.data[index];
                     PostModel post = posticipant.post;
                     var partList = posticipant.participantList;
-                    bool opened;
-                    (post.postUID == user.lastPostID)
-                        ? opened = true
-                        : opened = false;
-                    boolList.add(opened);
+                    boolList.add(true);
                     //getActList(post.postUID);
                     //DenemeModel denemeModel = DenemeModel(userObj: user, activitiesList: actList[index], postObj: post);
                     return Padding(
@@ -1770,9 +1785,9 @@ class _ProfilePageState extends State<ProfilePage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Icon(Icons.calendar_today,
-            color: textColor, size: MediaQuery.of(context).size.width * 0.1),
+            color: textColor, size: MediaQuery.of(context).size.width * 0.09),
         Text(
-          "${formatter.format(day)}-${formatter.format(month)}-${year}",
+          "${formatter.format(day)}/${formatter.format(month)}/${year}",
           style: TextStyle(
             color: textColor,
             fontWeight: FontWeight.bold,
@@ -1805,6 +1820,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           .circle,
                       image:
                       DecorationImage(
+                        fit: BoxFit.cover,
                         image: NetworkImage(
                             participants[
                             0]
@@ -1835,8 +1851,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                 .circle,
                             image:
                             DecorationImage(
+                              fit: BoxFit.cover,
                               image:
-                              NetworkImage(participants[1].ppURL),
+                              NetworkImage(
+                                  participants[1].ppURL),
                             )),
                       ),
                     ],
