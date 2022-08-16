@@ -526,76 +526,7 @@ class PostServices {
     /// TODO notification ve request objelerini sil
   }
 
-  Future<void> deleteActivityRequest(ActivityModel activityModel,
-      RequestModel requestModel) async {
-    DocumentSnapshot doc1 = await users.doc(requestModel.requesteeUID).get();
-    UserModel userModel = UserModel.fromSnapshot(doc1) ;
-    activityModel.requests.remove(requestModel.requestUID);
-    await updateActivity(activityModel);
 
-    String idNotification = "";
-    for (String notificationId in userModel.notifications) {
-      DocumentSnapshot doc = await notifications.doc(notificationId).get();
-      if (doc["requestID"] == requestModel.requestUID) {
-        idNotification = notificationId;
-        break;
-      }
-    }
-    if (idNotification != "") {
-      userModel.notifications.remove(idNotification);
-      await updateUser(userModel);
-      await notifications.doc(idNotification).delete();
-    }
-
-    await requests.doc(requestModel.requestUID).delete();
-  }
-
-  Future<List<List<dynamic>>> getActivityRequestNotification() async {
-    List<List<dynamic>> returnList = [
-      /*[usermodel, activitymodel, requestmodel]*/
-    ];
-    DocumentSnapshot myDoc = await users.doc(myId).get();
-    List<String> notIDs = myDoc["notifications"].cast<String>();
-    for (String id in notIDs) {
-      DocumentSnapshot notDoc = await notifications.doc(id).get();
-      if (notDoc["type"] == 1) {
-        DocumentSnapshot requestDoc =
-            await requests.doc(notDoc["requestID"]).get();
-        if (requestDoc["type"] == 1) {
-          DocumentSnapshot userDoc =
-              await users.doc(requestDoc["requesterUID"]).get();
-          DocumentSnapshot activityDoc =
-              await activities.doc(requestDoc["activityUID"]).get();
-          returnList.add([
-            RequestModel.fromSnapshot(requestDoc),
-            UserModel.fromSnapshot(userDoc),
-            ActivityModel.fromSnapshot(activityDoc)
-          ]);
-        }
-      }
-    }
-    returnList.sort((a, b) => b[0].time.compareTo(a[0].time));
-    return returnList;
-  }
-
-  Future<void> deleteFriendRequest(RequestModel requestModel)async{
-    UserModel requestee = UserModel.fromSnapshot(await users.doc(requestModel.requesteeUID).get());
-    String idNotification = "";
-    for (String notID in requestee.notifications){
-      DocumentSnapshot doc = await notifications.doc(notID).get();
-      if (doc["requestID"] == requestModel.requestUID) {
-        idNotification = notID;
-        break;
-      }
-    }
-    if (idNotification != "") {
-      requestee.notifications.remove(idNotification);
-      await updateUser(requestee);
-      await notifications.doc(idNotification).delete();
-    }
-
-    await requests.doc(requestModel.requestUID).delete();
-  }
   Future<bool> controlRequest(String requester)async{
     UserModel me = UserModel.fromSnapshot(await users.doc(myId).get());
     for (String notificationID in me.notifications){

@@ -4,6 +4,7 @@ import 'package:actwithy/Models/ReactionModel.dart';
 import 'package:actwithy/Models/RequestModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
 import 'package:actwithy/pages/creatingPage.dart';
+import 'package:actwithy/pages/friendRequestPage.dart';
 import 'package:actwithy/pages/homePage.dart';
 import 'package:actwithy/pages/profilePage.dart';
 import 'package:actwithy/pages/searchPage.dart';
@@ -37,7 +38,10 @@ class _NotificationPageState extends State<NotificationPage> {
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Icon(Icons.person_add_alt_1),
+            child: InkWell(child: Icon(Icons.person_add_alt_1),
+            onTap: (){
+              Navigator.of(context).push(MaterialPageRoute(builder: (context)=> FriendRequestPage()));
+            },),
           ),
         ],
       ),
