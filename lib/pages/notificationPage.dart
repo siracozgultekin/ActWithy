@@ -1,5 +1,7 @@
+import 'package:actwithy/Models/ActivityModel.dart';
 import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/Models/ReactionModel.dart';
+import 'package:actwithy/Models/RequestModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
 import 'package:actwithy/pages/homePage.dart';
 import 'package:actwithy/services/postServices.dart';
@@ -40,9 +42,7 @@ class _NotificationPageState extends State<NotificationPage> {
           Expanded(
               child: isReaction
                   ? ReactionWidget()
-                  : Container(
-                      color: Colors.red,
-                    )),
+                  : RequestWidget()),
         ],
       ),
     );
@@ -68,13 +68,13 @@ class _NotificationPageState extends State<NotificationPage> {
                     width: MediaQuery.of(context).size.width / 2,
                     child: Center(
                         child: Text(
-                          'Reactions',
-                          style: TextStyle(
-                              color: isReaction ? selectedColor : negativeColor,
-                              fontWeight:
+                      'Reactions',
+                      style: TextStyle(
+                          color: isReaction ? selectedColor : negativeColor,
+                          fontWeight:
                               isReaction ? FontWeight.bold : FontWeight.normal,
-                              fontSize: 18),
-                        )),
+                          fontSize: 18),
+                    )),
                     decoration: BoxDecoration(
                       border: Border(
                         bottom: isReaction
@@ -94,13 +94,13 @@ class _NotificationPageState extends State<NotificationPage> {
                     width: MediaQuery.of(context).size.width / 2,
                     child: Center(
                         child: Text(
-                          'Requests',
-                          style: TextStyle(
-                              color: !isReaction ? selectedColor : negativeColor,
-                              fontWeight:
+                      'Requests',
+                      style: TextStyle(
+                          color: !isReaction ? selectedColor : negativeColor,
+                          fontWeight:
                               !isReaction ? FontWeight.bold : FontWeight.normal,
-                              fontSize: 18),
-                        )),
+                          fontSize: 18),
+                    )),
                     decoration: BoxDecoration(
                       border: Border(
                         bottom: !isReaction
@@ -117,7 +117,7 @@ class _NotificationPageState extends State<NotificationPage> {
       ),
     );
   }
-  
+
   Widget ReactionWidget() {
     return SingleChildScrollView(
       physics: BouncingScrollPhysics(),
@@ -146,26 +146,36 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 
   Widget ListViewTile(NotificationActivityModel model) {
-
     PostModel postObj = model.post;
     UserModel userObj = model.user;
     ReactionModel reactionObj = model.reaction;
     String reactionString = "left ";
 
-    switch(reactionObj.type){
-      case 'heart': reactionString+= Emojis.redHeart;
+    switch (reactionObj.type) {
+      case 'heart':
+        reactionString += Emojis.redHeart;
         break;
-      case 'brokenHeart': reactionString+= Emojis.brokenHeart;
+      case 'brokenHeart':
+        reactionString += Emojis.brokenHeart;
         break;
-      case 'joy': reactionString += Emojis.rollingOnTheFloorLaughing;
+      case 'joy':
+        reactionString += Emojis.rollingOnTheFloorLaughing;
         break;
-      case 'sob': reactionString += Emojis.sadButRelievedFace;
+      case 'sob':
+        reactionString += Emojis.sadButRelievedFace;
         break;
-      case 'angry': reactionString += Emojis.angryFace;
+      case 'angry':
+        reactionString += Emojis.angryFace;
         break;
     }
-    reactionString += " to your " + postObj.date.toDate().day.toString() + "/" +postObj.date.toDate().month.toString() + "/" + postObj.date.toDate().year.toString() + " ToDo";
-      return Center(
+    reactionString += " to your " +
+        postObj.date.toDate().day.toString() +
+        "/" +
+        postObj.date.toDate().month.toString() +
+        "/" +
+        postObj.date.toDate().year.toString() +
+        " ToDo";
+    return Center(
       child: Padding(
         padding: const EdgeInsets.only(top: 8.0),
         child: Container(
@@ -209,7 +219,6 @@ class _NotificationPageState extends State<NotificationPage> {
                     "@${userObj.username}",
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
-                  
                 ],
               ),
               Padding(
@@ -217,7 +226,10 @@ class _NotificationPageState extends State<NotificationPage> {
                 child: Container(
                     height: MediaQuery.of(context).size.height * 0.05,
                     width: MediaQuery.of(context).size.width * 0.35,
-                    child: Text(reactionString, maxLines: 3,)),
+                    child: Text(
+                      reactionString,
+                      maxLines: 3,
+                    )),
               ),
             ],
           ),
@@ -225,8 +237,6 @@ class _NotificationPageState extends State<NotificationPage> {
       ),
     );
   }
-<<<<<<< Updated upstream
-=======
 
   Widget RequestWidget() {
     return SingleChildScrollView(
@@ -307,8 +317,8 @@ class _NotificationPageState extends State<NotificationPage> {
                       ],
                     ),
                     Container(
-                        height: MediaQuery.of(context).size.height * 0.12,
-                        width: MediaQuery.of(context).size.width * 0.35,
+                       height: MediaQuery.of(context).size.height * 0.12,
+                       width: MediaQuery.of(context).size.width * 0.35,
                         child: Center(
                           child: Text(
                             "Wants to attend the '${activity.activityType}' event on ${activity.time.toDate().day}/${activity.time.toDate().month}/${activity.time.toDate().year} at ${activity.time.toDate().hour}.${activity.time.toDate().minute} ",style: TextStyle(fontSize: 12.5),
@@ -320,24 +330,24 @@ class _NotificationPageState extends State<NotificationPage> {
                         Icon(Icons.clear,color: Colors.transparent,),
                         Icon(Icons.done, color: Colors.transparent,),
                       ]:  [
-                        InkWell(
-                          child: Icon(Icons.clear,color: Colors.red,),
-                          onTap: ()async{
-                            await PostServices().deleteActivityRequest(activity, request);
-                          },
-                        ),
-                        InkWell(child: Padding(
-                          padding: const EdgeInsets.only(right: 4.0),
-                          child: Icon(Icons.done, color: Colors.green,),
+                          InkWell(
+                            child: Icon(Icons.clear,color: Colors.red,),
+                            onTap: ()async{
+                              await PostServices().deleteActivityRequest(activity, request);
+                            },
+                          ),
+                          InkWell(child: Padding(
+                            padding: const EdgeInsets.only(right: 4.0),
+                            child: Icon(Icons.done, color: Colors.green,),
 
-                        ),
-                          onTap: ()async{
-                            activity.participants.add(user.userUID);
-                            await PostServices().updateActivity(activity);
-                            await PostServices().deleteActivityRequest(activity, request);
-                          },),
-
-
+                          ),
+                            onTap: ()async{
+                              activity.participants.add(user.userUID);
+                              await PostServices().updateActivity(activity);
+                              await PostServices().deleteActivityRequest(activity, request);
+                            },),
+                       
+                        
                       ],
                     ),
                   ],
@@ -357,5 +367,4 @@ class _NotificationPageState extends State<NotificationPage> {
     return false;
 
   }
->>>>>>> Stashed changes
 }

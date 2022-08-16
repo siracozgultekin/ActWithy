@@ -1,4 +1,5 @@
 import 'package:actwithy/Models/UserModel.dart';
+import 'package:actwithy/services/postServices.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -52,6 +53,21 @@ class SearchService{
 
     DocumentSnapshot friendDoc = await users.doc(friendID).get();
     await users.doc(friendID).update({"friends": friendDoc["friends"] + [myId]});
+  }
+
+  Future<void> sendRequest(String id) async {
+    String requestID = await PostServices().createRequest(id, 0);
+    PostServices().createNotification(1, myId, "reactionID", requestID);
+  }
+
+  Future<void> deleteRequest() async {
+    //del request and notification
+
+
+  }
+
+  Future<bool> isPending() async {
+    return false;
   }
 
 }

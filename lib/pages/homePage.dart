@@ -348,11 +348,11 @@ class _HomePageState extends State<HomePage> {
                                         List<UserModel> participantList = snap.data[0].cast<UserModel>();
                                         List<RequestModel> requestList = snap.data[1].cast<RequestModel>();
                                         for(RequestModel req in requestList){
-                                          if (req.requesterUID==user.userUID && req.requestStatus==0){
+                                          if (req.requesterUID==user.userUID && req.requestStatus==0 && controlDate(req.time.toDate())){
                                               amIparticipateList[index][indexx]= 0;
                                           }
                                         }
-                                        print( " asdfasd: ${amIparticipateList}");
+                                        //print( " asdfasd: ${amIparticipateList}");
                                         return Column(
                                           children: [
                                             Padding(
@@ -506,7 +506,7 @@ class _HomePageState extends State<HomePage> {
                                                  InkWell(
                                                   child: Text("Participate! ",style: TextStyle(color: Colors.green),),
                                                 onTap: ()async{
-                                                  String requestID=  await PostServices().createRequest(mod.userObj.userUID, 1);
+                                                  String requestID=  await PostServices().createRequest(mod.userObj.userUID, 1,activity.activityUID);
                                                   activity.requests.add(requestID);
                                                   await PostServices().updateActivity(activity);
                                                   await PostServices().createNotification(1, mod.userObj.userUID, "reactionID", requestID).then((value) {
@@ -532,7 +532,7 @@ class _HomePageState extends State<HomePage> {
                                                        for (RequestModel req in requestList){
                                                          if(req.requesterUID==user.userUID){
                                                            requestList.remove(req);
-                                                           await PostServices().deleteActivityRequest(activity, req, mod.userObj).then((value) {
+                                                           await PostServices().deleteActivityRequest(activity, req).then((value) {
                                                              setState(() {
                                                              });
                                                            });
@@ -1007,7 +1007,10 @@ class _HomePageState extends State<HomePage> {
 
     List<int> list = [];
     for(ActivityModel activityModel in activityList){
-      if (activityModel.participants.contains(user.userUID)) {
+      if (!controlDate(activityModel.time.toDate())){
+        list.add(2);
+      }
+      else if (activityModel.participants.contains(user.userUID)) {
         list.add(1);
       }
       else {
@@ -1015,6 +1018,14 @@ class _HomePageState extends State<HomePage> {
       }
     }
     amIparticipateList.add(list);
+  }
+
+  bool controlDate(DateTime date){
+    DateTime today = DateTime.now();
+    if(date.year == today.year && date.month==today.month&& date.day==today.day){
+      return true;
+    }
+    return false;
   }
 
 }

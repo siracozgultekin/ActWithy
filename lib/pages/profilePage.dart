@@ -31,20 +31,27 @@ class _ProfilePageState extends State<ProfilePage> {
 
   bool isToDo = true;
   bool isMyFriend = false;
+  bool pending = false;
   String buttonText = "";
   final controller = ScrollController();
-
+  bool hidden =true;
   List<bool> boolList = [];
 
 
 
   getIsMyFriend() async {
     bool result = await SearchService().isMyFriend(user.userUID);
+    pending = await SearchService().isPending();
+    //bool isPenging = await ;
     setState(() {
       isMyFriend = result;
       if (isMyFriend) {
         buttonText = "Remove Friend";
-      } else {
+      }
+      else if (pending) {
+        buttonText = "Pending";
+      }
+      else {
         buttonText = "Add Friend";
       }
     });
@@ -60,6 +67,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   initState() {
+    
     //getActList(user.lastPostID);
     getIsMyFriend();
     super.initState();
@@ -76,6 +84,9 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     int selectedIndex = 4;
     bool isMyPage = user.userUID == FirebaseAuth.instance.currentUser!.uid;
+    
+    if (isMyPage) hidden =false;
+    if(!isMyPage && isMyFriend) hidden =false;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -219,10 +230,21 @@ class _ProfilePageState extends State<ProfilePage> {
       body: Column(
         children: [
           ProfileWidget(isMyPage),
-          DividerWidget(),
-          Expanded(child: isToDo ? ToDoWidget() : FriendWidget()),
+          hidden?Divider(thickness: 2, color: textColor,):DividerWidget(),
+          Expanded(child: isToDo ? (hidden ? hiddenWidget():ToDoWidget()) : (hidden ? hiddenWidget() : FriendWidget())),
         ],
+
       ),
+    );
+  }
+  
+  Widget hiddenWidget() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.calendar_month_rounded),
+        Text("You are not friends with ${user.username}.")
+      ],
     );
   }
 
@@ -303,20 +325,34 @@ class _ProfilePageState extends State<ProfilePage> {
                     setState(() {});
                   });
                   //Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfilePage(userModel: user,)));
-                } else if (!isMyPage && isMyFriend) {
+                } else if (pending) {
+
+                  await SearchService().deleteRequest().then((value){
+                    setState((){
+                      hidden = true;
+                      buttonText = "Add Friend";
+                      pending = false;
+                    });
+                  });
+
+                }
+                else if (!isMyPage && isMyFriend) {
                   await SearchService()
                       .removeFriend(user.userUID)
                       .then((value) {
                     setState(() {
                       isMyFriend = !isMyFriend;
                       buttonText = "Add Friend";
+                      pending = false; //gereksiz??
+                      hidden = true;
                     });
                   });
-                } else if (!isMyPage && !isMyFriend) {
-                  await SearchService().addFriend(user.userUID).then((value) {
+                } else if (!isMyPage && !isMyFriend && !pending) {
+                  await SearchService().sendRequest(user.userUID).then((value) {
                     setState(() {
-                      isMyFriend = !isMyFriend;
-                      buttonText = "Remove Friend";
+                      buttonText = "Pending";
+                      pending = true;
+                      hidden = true;
                     });
                   });
                 }
@@ -438,11 +474,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     PosticipantModel posticipant = snap.data[index];
                     PostModel post = posticipant.post;
                     var partList = posticipant.participantList;
-                    bool opened;
-                    (post.postUID == user.lastPostID)
-                        ? opened = true
-                        : opened = false;
-                    boolList.add(opened);
+                    boolList.add(true);
                     //getActList(post.postUID);
                     //DenemeModel denemeModel = DenemeModel(userObj: user, activitiesList: actList[index], postObj: post);
                     return Padding(
@@ -481,12 +513,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                               ListView.builder(
                                                 shrinkWrap: true,
                                                 scrollDirection: Axis.vertical,
-                                                physics:
-                                                    BouncingScrollPhysics(),
+                                                physics: BouncingScrollPhysics(),
                                                 itemCount: snap.data.length,
                                                 itemBuilder: (context, index) {
-                                                  PartivityModel partivity =
-                                                      snap.data[index];
+                                                  PartivityModel partivity = snap.data[index];
                                                   ActivityModel activity = partivity.activity;
                                                   List<UserModel> participantList = partivity.participantList;
                                                   return Padding(
@@ -1015,9 +1045,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                 onExpansionChanged: (state) => setState(() {
                                   boolList[index] = !state;
                                 }),
-                              ) /*selectedPostID==post.postUID ?
-                              OpenPost(denemeModel) : ClosedPost(post), */ //DenemeModel???
                               )
+                          )
                         ],
                       ),
                     );
@@ -1033,42 +1062,17 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget InfoWidget(post){
     return Padding(
-      padding: const EdgeInsets.all(10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      padding: const EdgeInsets.only(left: 10,right: 10,top: 10),
+      child: Column(
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                height: MediaQuery.of(context).size.height*0.06,
-                width: MediaQuery.of(context).size.height*0.06,
-                decoration: BoxDecoration(
-
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                      fit: BoxFit.cover,
-                      image: NetworkImage(user.ppURL)),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      ("${user.name} ${user.surname}"),
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      "@${user.username}",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
+              Icon(Icons.calendar_month_outlined, size: 30, color: textColor,),
+              Text("${post.date.toDate().day}/${post.date.toDate().month}/${post.date.toDate().year}",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 17),),
             ],
           ),
-          Text("${post.date.toDate().day}/${post.date.toDate().month}/${post.date.toDate().year}",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 17),),
+          Divider(thickness: 2,color: textColor,)
         ],
       ),
     );
@@ -1777,26 +1781,155 @@ class _ProfilePageState extends State<ProfilePage> {
     var year = postDate.year;
 
 
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Icon(Icons.calendar_today,
-              color: textColor, size: MediaQuery.of(context).size.width * 0.1),
-          Text(
-            "${formatter.format(day)}-${formatter.format(month)}-${year}",
-            style: TextStyle(
-              color: textColor,
-              fontWeight: FontWeight.bold,
-              fontSize: MediaQuery.of(context).size.width * 0.045,
-            ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Icon(Icons.calendar_today,
+            color: textColor, size: MediaQuery.of(context).size.width * 0.09),
+        Text(
+          "${formatter.format(day)}/${formatter.format(month)}/${year}",
+          style: TextStyle(
+            color: textColor,
+            fontWeight: FontWeight.bold,
+            fontSize: MediaQuery.of(context).size.width * 0.045,
           ),
-          Text(participants.length.toString()),
+        ),
+        InkWell(
+          onTap: () {
+            ParticipantPopUp(
+                participants);
+          },
+          child: Row(
+            children: [
+              if (participants
+                  .length >=
+                  1)
+                Padding(
+                  padding:
+                  const EdgeInsets
+                      .only(
+                      left: 8.0),
+                  child: Container(
+                    height: 20,
+                    width: 20,
+                    decoration:
+                    BoxDecoration(
+                      color:
+                      Colors.green,
+                      shape: BoxShape
+                          .circle,
+                      image:
+                      DecorationImage(
+                        fit: BoxFit.cover,
+                        image: NetworkImage(
+                            participants[
+                            0]
+                                .ppURL),
+                      ),
+                    ),
+                  ),
+                ),
+              if (participants
+                  .length >=
+                  2)
+                Padding(
+                  padding:
+                  const EdgeInsets
+                      .only(
+                    left: 4.0,
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 20,
+                        width: 20,
+                        decoration:
+                        BoxDecoration(
+                            color: Colors
+                                .green,
+                            shape: BoxShape
+                                .circle,
+                            image:
+                            DecorationImage(
+                              fit: BoxFit.cover,
+                              image:
+                              NetworkImage(
+                                  participants[1].ppURL),
+                            )),
+                      ),
+                    ],
+                  ),
+                ),
+              if (participants
+                  .length >
+                  2)
+                Padding(
+                  padding:
+                  const EdgeInsets
+                      .only(
+                      left: 8.0),
+                  child: Column(
+                    crossAxisAlignment:
+                    CrossAxisAlignment
+                        .start,
+                    children: [
+                      Text(
+                          "+${participants.length - 2}"),
+                      Row(
+                        children: [
+                          Container(
+                            height: 5,
+                            width: 5,
+                            decoration:
+                            BoxDecoration(
+                              color: Colors
+                                  .black,
+                              shape: BoxShape
+                                  .circle,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets
+                                .only(
+                                left:
+                                2.0,
+                                right:
+                                2),
+                            child:
+                            Container(
+                              height: 5,
+                              width: 5,
+                              decoration:
+                              BoxDecoration(
+                                color: Colors
+                                    .black,
+                                shape: BoxShape
+                                    .circle,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            height: 5,
+                            width: 5,
+                            decoration:
+                            BoxDecoration(
+                              color: Colors
+                                  .black,
+                              shape: BoxShape
+                                  .circle,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
 
 
-        ],
-      ),
+      ],
     );
   }
 
