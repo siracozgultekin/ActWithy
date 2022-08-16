@@ -2,8 +2,11 @@ import 'package:actwithy/Models/ActivityModel.dart';
 import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
 import 'package:actwithy/pages/editParticipantSearchPage.dart';
+import 'package:actwithy/pages/notificationPage.dart';
 import 'package:actwithy/pages/participantSearchPage.dart';
 import 'package:actwithy/pages/profilePage.dart';
+import 'package:actwithy/pages/searchPage.dart';
+import 'package:actwithy/services/authService.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +20,7 @@ class CreatingPage extends StatefulWidget {
 }
 
 class _CreatingPageState extends State<CreatingPage> {
+  int selectedIndex = 0;
   final controller = ScrollController();
   TextEditingController locationKey = TextEditingController();
   TextEditingController activityKey = TextEditingController();
@@ -71,7 +75,7 @@ class _CreatingPageState extends State<CreatingPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 15.0),
+              padding: const EdgeInsets.only(top: 2.0),
               child: Column(
                 children: [
                   Text(
@@ -79,6 +83,7 @@ class _CreatingPageState extends State<CreatingPage> {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Divider(
+                    height: 8,
                     thickness: 0.8,
                     color: Colors.black,
                     indent: MediaQuery.of(context).size.width * 0.4,
@@ -86,7 +91,7 @@ class _CreatingPageState extends State<CreatingPage> {
                   ),
                   Container(
                     width: MediaQuery.of(context).size.width * 0.9,
-                    height: MediaQuery.of(context).size.height * 0.35,
+                    height: MediaQuery.of(context).size.height * 0.3355,
                     decoration: BoxDecoration(
                         color: Color(0XFFD6E6F1),
                         borderRadius: BorderRadius.all(Radius.circular(10))),
@@ -207,7 +212,7 @@ class _CreatingPageState extends State<CreatingPage> {
                                   ],
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 15.0),
+                                  padding: const EdgeInsets.only(top: 15.0,bottom: 5),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -260,7 +265,7 @@ class _CreatingPageState extends State<CreatingPage> {
                                                 Padding(
                                                   padding:
                                                       const EdgeInsets.fromLTRB(
-                                                          15, 10, 15, 0),
+                                                          15, 0, 15, 10),
                                                   child: InkWell(
                                                     onTap: (){
                                                       Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProfilePage(user: CreatingPage
@@ -408,7 +413,7 @@ class _CreatingPageState extends State<CreatingPage> {
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.red,
-                                fontSize: 20),
+                                fontSize: 17.5),
                           ),
                         ),
                         InkWell(
@@ -443,7 +448,7 @@ class _CreatingPageState extends State<CreatingPage> {
                           child: Text(
                             "Submit",
                             style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 17.5,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.green[600]),
                           ),
@@ -454,9 +459,7 @@ class _CreatingPageState extends State<CreatingPage> {
                 ],
               ),
             ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.035,
-            ),
+
             Column(
               children: [
                 Text(
@@ -464,6 +467,7 @@ class _CreatingPageState extends State<CreatingPage> {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 Divider(
+                  height: 8,
                   thickness: 1,
                   color: Colors.black,
                   indent: MediaQuery.of(context).size.width * 0.4,
@@ -515,6 +519,81 @@ class _CreatingPageState extends State<CreatingPage> {
                       }),
                 ),
               ],
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: NavigationBarTheme(
+        data: NavigationBarThemeData(
+          height: MediaQuery.of(context).size.height * 0.075,
+          indicatorColor: Colors.transparent,
+          backgroundColor: Color(0xFF9AC6C5),
+        ),
+        child: NavigationBar(
+          selectedIndex: selectedIndex,
+          onDestinationSelected: (value) async {
+            bool check = await PostServices().checkDailyPost();
+
+            PostModel postModel;
+
+            if (!check) {
+              postModel = PostModel(
+                  postUID: "postUID",
+                  date: Timestamp.now(),
+                  activityUID: [],
+                  heartCounter: 0,
+                  brokenHeartCounter: 0,
+                  joyCounter: 0,
+                  sobCounter: 0,
+                  angryCounter: 0,
+                  reactionIDs: []);
+            } else {
+              //oluşturulmuş demek
+              postModel = await PostServices().getDailyPost();
+            }
+            UserModel currentUser = await AuthService().getCurrentUser();
+
+            setState(() {
+              selectedIndex = value;
+
+              switch(selectedIndex){
+                case 0: Navigator.of(context).pop();
+                break;
+                case 1: showSearch(context: context, delegate: SearchPage(hintText: "Search", hintTextColor: TextStyle(color: Colors.white)));
+                break;
+                case 3: Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => NotificationPage()));
+                break;
+                case 4: Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => ProfilePage(user: currentUser)));
+                break;
+
+              }
+
+
+
+
+            });
+          },
+          destinations: [
+            NavigationDestination(
+              icon: Icon(Icons.home, color: Colors.white),
+              label: '',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.search, color: Colors.white),
+              label: '',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.post_add, color: Colors.white),
+              label: '',
+            ),
+            NavigationDestination(
+              icon:
+              Icon(Icons.notifications_none_outlined, color: Colors.white),
+              label: '',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.person, color: Colors.white),
+              label: '',
             ),
           ],
         ),

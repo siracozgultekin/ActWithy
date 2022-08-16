@@ -96,45 +96,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         actions: [
-          Row(
-            children: [
-              IconButton(
-                  onPressed: () async {
-                    bool check = await PostServices().checkDailyPost();
-                    PostModel postModel;
 
-                    if (!check) {
-                      postModel = PostModel(
-                          postUID: "postUID",
-                          date: Timestamp.now(),
-                          activityUID: [],
-                          heartCounter: 0,
-                          brokenHeartCounter: 0,
-                          joyCounter: 0,
-                          sobCounter: 0,
-                          angryCounter: 0,
-                      reactionIDs: []);
-                    } else {
-                      //oluşturulmuş demek
-                      postModel = await PostServices().getDailyPost();
-                    }
-
-
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => CreatingPage(
-                              postModel: postModel,
-                            )));
-                  },
-                  icon: Icon(Icons.warning)),
-              Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: Text(
-                  "3",
-                  style: TextStyle(fontSize: 20),
-                ),
-              ),
-            ],
-          ),
         ],
       ),
       body: FutureBuilder(
@@ -289,36 +251,41 @@ class _HomePageState extends State<HomePage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              height: mediaqueryHeight,
-                              width: mediaqueryHeight,
-                              decoration: BoxDecoration(
+                        InkWell(
+                          onTap: (){
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ProfilePage(user: mod.userObj)));
+                          },
+                          child: Row(
+                            children: [
+                              Container(
+                                height: mediaqueryHeight,
+                                width: mediaqueryHeight,
+                                decoration: BoxDecoration(
 
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                    fit: BoxFit.cover,
-                                    image: NetworkImage(mod.userObj.ppURL)),
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: NetworkImage(mod.userObj.ppURL)),
+                                ),
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    ("${mod.userObj.name} ${mod.userObj.surname}"),
-                                    style: TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    "@${mod.userObj.username}",
-                                    style: TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                ],
+                              Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      ("${mod.userObj.name} ${mod.userObj.surname}"),
+                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      "@${mod.userObj.username}",
+                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         Text("${mod.postObj.date.toDate().day}/${mod.postObj.date.toDate().month}/${mod.postObj.date.toDate().year}",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 17),),
                       ],

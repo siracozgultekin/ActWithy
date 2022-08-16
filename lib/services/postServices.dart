@@ -596,7 +596,20 @@ class PostServices {
 
     await requests.doc(requestModel.requestUID).delete();
   }
+  Future<bool> controlRequest(String requester)async{
+    UserModel me = UserModel.fromSnapshot(await users.doc(myId).get());
+    for (String notificationID in me.notifications){
+      DocumentSnapshot doc = await notifications.doc(notificationID).get();
+      if (doc["type"]==1){
+        DocumentSnapshot requestDoc = await requests.doc(doc["requestID"]).get();
+        if (requestDoc["type"]==1 && requestDoc["requesterUID"]==requester){
+          return true;
+        }
+      }
+    }
 
+    return false;
+  }
 }
 
 class PartivityModel {

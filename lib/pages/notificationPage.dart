@@ -3,7 +3,11 @@ import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/Models/ReactionModel.dart';
 import 'package:actwithy/Models/RequestModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
+import 'package:actwithy/pages/creatingPage.dart';
 import 'package:actwithy/pages/homePage.dart';
+import 'package:actwithy/pages/profilePage.dart';
+import 'package:actwithy/pages/searchPage.dart';
+import 'package:actwithy/services/authService.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emojis/emojis.dart';
@@ -19,6 +23,7 @@ class NotificationPage extends StatefulWidget {
 }
 
 class _NotificationPageState extends State<NotificationPage> {
+  int selectedIndex = 0;
   bool isReaction = true;
   Color negativeColor = Color(0xFFD6E6F1); //light blue
   Color selectedColor = Color(0xFF2D3A43); //dark blue
@@ -44,6 +49,81 @@ class _NotificationPageState extends State<NotificationPage> {
                   ? ReactionWidget()
                   : RequestWidget()),
         ],
+      ),
+      bottomNavigationBar: NavigationBarTheme(
+        data: NavigationBarThemeData(
+          height: MediaQuery.of(context).size.height * 0.075,
+          indicatorColor: Colors.transparent,
+          backgroundColor: Color(0xFF9AC6C5),
+        ),
+        child: NavigationBar(
+          selectedIndex: selectedIndex,
+          onDestinationSelected: (value) async {
+            bool check = await PostServices().checkDailyPost();
+
+            PostModel postModel;
+
+            if (!check) {
+              postModel = PostModel(
+                  postUID: "postUID",
+                  date: Timestamp.now(),
+                  activityUID: [],
+                  heartCounter: 0,
+                  brokenHeartCounter: 0,
+                  joyCounter: 0,
+                  sobCounter: 0,
+                  angryCounter: 0,
+                  reactionIDs: []);
+            } else {
+              //oluşturulmuş demek
+              postModel = await PostServices().getDailyPost();
+            }
+            UserModel currentUser = await AuthService().getCurrentUser();
+
+            setState(() {
+              selectedIndex = value;
+
+              switch(selectedIndex){
+                case 0: Navigator.of(context).pop();
+                break;
+                case 1: showSearch(context: context, delegate: SearchPage(hintText: "Search", hintTextColor: TextStyle(color: Colors.white)));
+                break;
+                case 2: Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => CreatingPage(postModel: postModel)));
+                break;
+                case 4: Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => ProfilePage(user: currentUser)));
+                break;
+
+              }
+
+
+
+
+            });
+          },
+          destinations: [
+            NavigationDestination(
+              icon: Icon(Icons.home, color: Colors.white),
+              label: '',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.search, color: Colors.white),
+              label: '',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.post_add, color: Colors.white),
+              label: '',
+            ),
+            NavigationDestination(
+              icon:
+              Icon(Icons.notifications_none_outlined, color: Colors.white),
+              label: '',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.person, color: Colors.white),
+              label: '',
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -342,9 +422,11 @@ class _NotificationPageState extends State<NotificationPage> {
 
                           ),
                             onTap: ()async{
+                            if(await PostServices().controlRequest(user.userUID)){
                               activity.participants.add(user.userUID);
                               await PostServices().updateActivity(activity);
                               await PostServices().deleteActivityRequest(activity, request);
+                            }
                             },),
                        
                         
