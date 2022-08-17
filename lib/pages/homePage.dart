@@ -173,25 +173,20 @@ class _HomePageState extends State<HomePage> {
 
             setState(() {
               selectedIndex = value;
+              });
+            switch(selectedIndex){
+              case 0: scrollUp();
+              break;
+              case 1: showSearch(context: context, delegate: SearchPage(hintText: "Search", hintTextColor: TextStyle(color: Colors.white)));
+              break;
+              case 2: Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreatingPage(postModel: postModel)));
+              break;
+              case 3: Navigator.of(context).push(MaterialPageRoute(builder: (context) => NotificationPage()));
+              break;
+              case 4: Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProfilePage(user: currentUser)));
+              break;
 
-              switch(selectedIndex){
-                case 0: scrollUp();
-                  break;
-                case 1: showSearch(context: context, delegate: SearchPage(hintText: "Search", hintTextColor: TextStyle(color: Colors.white)));
-                  break;
-                case 2: Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreatingPage(postModel: postModel)));
-                  break;
-                case 3: Navigator.of(context).push(MaterialPageRoute(builder: (context) => NotificationPage()));
-                  break;
-                case 4: Navigator.of(context).push(MaterialPageRoute(builder: (context) => ProfilePage(user: currentUser)));
-                  break;
-
-              }
-
-
-             
-
-            });
+            }
           },
           destinations: [
             NavigationDestination(

@@ -555,23 +555,18 @@ class _CreatingPageState extends State<CreatingPage> {
 
             setState(() {
               selectedIndex = value;
-
-              switch(selectedIndex){
-                case 0: Navigator.of(context).pop();
-                break;
-                case 1: showSearch(context: context, delegate: SearchPage(hintText: "Search", hintTextColor: TextStyle(color: Colors.white)));
-                break;
-                case 3: Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => NotificationPage()));
-                break;
-                case 4: Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => ProfilePage(user: currentUser)));
-                break;
-
-              }
-
-
-
-
             });
+            switch(selectedIndex){
+              case 0: Navigator.of(context).pop();
+              break;
+              case 1: showSearch(context: context, delegate: SearchPage(hintText: "Search", hintTextColor: TextStyle(color: Colors.white)));
+              break;
+              case 3: Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => NotificationPage()));
+              break;
+              case 4: Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => ProfilePage(user: currentUser)));
+              break;
+
+            }
           },
           destinations: [
             NavigationDestination(
