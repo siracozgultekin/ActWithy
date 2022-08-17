@@ -526,6 +526,22 @@ class PostServices {
     /// TODO notification ve request objelerini sil
   }
 
+
+  Future<bool> controlRequest(String requester)async{
+    UserModel me = UserModel.fromSnapshot(await users.doc(myId).get());
+    for (String notificationID in me.notifications){
+      DocumentSnapshot doc = await notifications.doc(notificationID).get();
+      if (doc["type"]==1){
+        DocumentSnapshot requestDoc = await requests.doc(doc["requestID"]).get();
+        if (requestDoc["type"]==1 && requestDoc["requesterUID"]==requester){
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   Future<void> deleteActivityRequest(ActivityModel activityModel,
       RequestModel requestModel) async {
     DocumentSnapshot doc1 = await users.doc(requestModel.requesteeUID).get();
@@ -578,12 +594,11 @@ class PostServices {
     return returnList;
   }
 
-  Future<void> deleteFriendRequest(RequestModel requestModel)async{
-    UserModel requestee = UserModel.fromSnapshot(await users.doc(requestModel.requesteeUID).get());
+  Future<void> deleteFriendRequest(UserModel requestee, String requestID)async{
     String idNotification = "";
     for (String notID in requestee.notifications){
       DocumentSnapshot doc = await notifications.doc(notID).get();
-      if (doc["requestID"] == requestModel.requestUID) {
+      if (doc["requestID"] == requestID) {
         idNotification = notID;
         break;
       }
@@ -594,22 +609,31 @@ class PostServices {
       await notifications.doc(idNotification).delete();
     }
 
-    await requests.doc(requestModel.requestUID).delete();
+    await requests.doc(requestID).delete();
   }
-  Future<bool> controlRequest(String requester)async{
-    UserModel me = UserModel.fromSnapshot(await users.doc(myId).get());
-    for (String notificationID in me.notifications){
-      DocumentSnapshot doc = await notifications.doc(notificationID).get();
-      if (doc["type"]==1){
-        DocumentSnapshot requestDoc = await requests.doc(doc["requestID"]).get();
-        if (requestDoc["type"]==1 && requestDoc["requesterUID"]==requester){
-          return true;
+
+  Future<List<List<dynamic>>> getFriendRequests()async{
+    List<List<dynamic>> returnList =[/*requestModel, usermodel,*/];
+    DocumentSnapshot myDoc = await users.doc(myId).get();
+    List<String> notIDs = myDoc["notifications"].cast<String>();
+    for (String id in notIDs) {
+      DocumentSnapshot notDoc = await notifications.doc(id).get();
+      if (notDoc["type"] == 1) {
+        DocumentSnapshot requestDoc = await requests.doc(notDoc["requestID"])
+            .get();
+        if (requestDoc["type"] == 0) {
+          DocumentSnapshot userDoc = await users.doc(requestDoc["requesterUID"]).get();
+          returnList.add([RequestModel.fromSnapshot(requestDoc),
+            UserModel.fromSnapshot(userDoc),]);
         }
       }
     }
-
-    return false;
+    returnList.sort((a, b) => b[0].time.compareTo(a[0].time));
+    return returnList;
   }
+
+
+
 }
 
 class PartivityModel {

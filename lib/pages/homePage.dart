@@ -32,6 +32,7 @@ class _HomePageState extends State<HomePage> {
   var mediaqueryHeight;
   List<bool> isReaction = [];
   List<List<int>> amIparticipateList = [];
+  List<List<bool>> isRequest = [];
 
   @override
   void initState() {
@@ -130,7 +131,11 @@ class _HomePageState extends State<HomePage> {
 
                       /// her post oluşturulduğunda tekrar ekliyor. En yukarıda oluşturulursa çözülebilir.
                       createList(postModelObj.activitiesList);
-
+                      List<bool> add=[];
+                      for (int i=0;i<postModelObj.activitiesList.length;i++){
+                        add.add(false);
+                      }
+                      isRequest.add(add);
                       return mainListTile(postModelObj, index);
                     }),
               );
@@ -460,19 +465,22 @@ class _HomePageState extends State<HomePage> {
                                                ],),
                                                if (amIparticipateList[index][indexx]==1)
                                                  InkWell(
-                                                 child:Text("Çıkra",style: TextStyle(color: Colors.red),),
-                                                 onTap: ()async{
+                                                 child:Text("Leave!",style: TextStyle(color: Colors.red),),
+                                                 onTap: (isRequest[index][indexx])? (){}:()async{
+                                                   setState((){isRequest[index][indexx]=true;});
                                                    await PostServices().deleteMyParticipate(activity).then((value) {
                                                      setState(() {});});
 
                                                    setState(() {
+                                                     isRequest[index][indexx]=false;
                                                      amIparticipateList[index][indexx]=-1;
                                                    });
                                                  },
                                                )else if(amIparticipateList[index][indexx]==-1)
                                                  InkWell(
                                                   child: Text("Participate! ",style: TextStyle(color: Colors.green),),
-                                                onTap: ()async{
+                                                onTap:(isRequest[index][indexx])? (){}: ()async{
+                                                  setState((){isRequest[index][indexx]=true;});
                                                   String requestID=  await PostServices().createRequest(mod.userObj.userUID, 1,activity.activityUID);
                                                   activity.requests.add(requestID);
                                                   await PostServices().updateActivity(activity);
@@ -482,6 +490,7 @@ class _HomePageState extends State<HomePage> {
                                                     });
                                                   });
                                                     setState(() {
+                                                      isRequest[index][indexx]=false;
                                                       amIparticipateList[index][indexx]=0;
                                                     });
 
@@ -490,8 +499,9 @@ class _HomePageState extends State<HomePage> {
                                                 )else if(amIparticipateList[index][indexx]==0)
                                                    InkWell(
                                                      child: Text("Waiting ",style: TextStyle(color: Colors.orangeAccent),),
-                                                     onTap: ()async{
+                                                     onTap:(isRequest[index][indexx])? (){}: ()async{
                                                        setState(() {
+                                                         isRequest[index][indexx]=true;
                                                          amIparticipateList[index][indexx]=-1;
                                                        });
 
@@ -506,7 +516,7 @@ class _HomePageState extends State<HomePage> {
                                                            break;
                                                          }
                                                        }
-
+                                                       setState((){isRequest[index][indexx]=false;});
                                                      },
                                                    )
 

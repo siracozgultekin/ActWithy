@@ -119,7 +119,7 @@ class _FriendRequestPageState extends State<FriendRequestPage> {
                             "@${user.username}",
                             maxLines: 2,
                             style: TextStyle(
-                              fontSize: 13, fontWeight: FontWeight.bold,),
+                                fontSize: 13, fontWeight: FontWeight.bold,),
 
                           ),
                         ],
@@ -145,7 +145,7 @@ class _FriendRequestPageState extends State<FriendRequestPage> {
                             await PostServices().getMyDoc());
                         await PostServices()
                             .deleteFriendRequest(me, request.requestUID).then((value) {
-                          setState((){isClicked[index]=false;});
+                              setState((){isClicked[index]=false;});
                         });
                         //setState((){});
                       },
@@ -166,7 +166,7 @@ class _FriendRequestPageState extends State<FriendRequestPage> {
                             await PostServices().getMyDoc());
                         await PostServices()
                             .deleteFriendRequest(me, request.requestUID).then((value) {
-                          setState((){isClicked[index]=false;});
+                              setState((){isClicked[index]=false;});
                         });
                         //setState((){});
                       },

@@ -4,6 +4,7 @@ import 'package:actwithy/Models/ReactionModel.dart';
 import 'package:actwithy/Models/RequestModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
 import 'package:actwithy/pages/creatingPage.dart';
+import 'package:actwithy/pages/friendRequestPage.dart';
 import 'package:actwithy/pages/homePage.dart';
 import 'package:actwithy/pages/profilePage.dart';
 import 'package:actwithy/pages/searchPage.dart';
@@ -28,6 +29,8 @@ class _NotificationPageState extends State<NotificationPage> {
   Color negativeColor = Color(0xFFD6E6F1); //light blue
   Color selectedColor = Color(0xFF2D3A43); //dark blue
 
+  List<bool> isClicked = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,14 +40,10 @@ class _NotificationPageState extends State<NotificationPage> {
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-<<<<<<< Updated upstream
-            child: Icon(Icons.person_add_alt_1),
-=======
             child: InkWell(child: Icon(Icons.person_add_alt_1),
-              onTap: (){
-                Navigator.of(context).push(MaterialPageRoute(builder: (context)=> FriendRequestPage()));
-              },),
->>>>>>> Stashed changes
+            onTap: (){
+              Navigator.of(context).push(MaterialPageRoute(builder: (context)=> FriendRequestPage()));
+            },),
           ),
         ],
       ),
@@ -155,13 +154,13 @@ class _NotificationPageState extends State<NotificationPage> {
                     width: MediaQuery.of(context).size.width / 2,
                     child: Center(
                         child: Text(
-                          'Reactions',
-                          style: TextStyle(
-                              color: isReaction ? selectedColor : negativeColor,
-                              fontWeight:
+                      'Reactions',
+                      style: TextStyle(
+                          color: isReaction ? selectedColor : negativeColor,
+                          fontWeight:
                               isReaction ? FontWeight.bold : FontWeight.normal,
-                              fontSize: 18),
-                        )),
+                          fontSize: 18),
+                    )),
                     decoration: BoxDecoration(
                       border: Border(
                         bottom: isReaction
@@ -181,13 +180,13 @@ class _NotificationPageState extends State<NotificationPage> {
                     width: MediaQuery.of(context).size.width / 2,
                     child: Center(
                         child: Text(
-                          'Requests',
-                          style: TextStyle(
-                              color: !isReaction ? selectedColor : negativeColor,
-                              fontWeight:
+                      'Requests',
+                      style: TextStyle(
+                          color: !isReaction ? selectedColor : negativeColor,
+                          fontWeight:
                               !isReaction ? FontWeight.bold : FontWeight.normal,
-                              fontSize: 18),
-                        )),
+                          fontSize: 18),
+                    )),
                     decoration: BoxDecoration(
                       border: Border(
                         bottom: !isReaction
@@ -283,8 +282,8 @@ class _NotificationPageState extends State<NotificationPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
-                  height: MediaQuery.of(context).size.height * 0.08,
-                  width: MediaQuery.of(context).size.height * 0.08,
+                  height: MediaQuery.of(context).size.height * 0.07,
+                  width: MediaQuery.of(context).size.height * 0.07,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
@@ -294,21 +293,6 @@ class _NotificationPageState extends State<NotificationPage> {
                   ),
                 ),
               ),
-<<<<<<< Updated upstream
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${userObj.name} ${userObj.surname}",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    "@${userObj.username}",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                  ),
-                ],
-=======
               Container(
                 width: MediaQuery.of(context).size.width * 0.3,
                 child: Column(
@@ -327,7 +311,6 @@ class _NotificationPageState extends State<NotificationPage> {
                     ),
                   ],
                 ),
->>>>>>> Stashed changes
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 10.0),
@@ -364,7 +347,8 @@ class _NotificationPageState extends State<NotificationPage> {
                       physics: ClampingScrollPhysics(),
                       itemCount: notifications.length,
                       itemBuilder: (context, index) {
-                        return ListViewRequests(notifications[index]);
+                        isClicked.add(false);
+                        return ListViewRequests(notifications[index],index);
                       })
                 ],
               );
@@ -373,7 +357,7 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 
-  Widget ListViewRequests(List<dynamic> list) {
+  Widget ListViewRequests(List<dynamic> list, int index) {
     UserModel user = list[1] as UserModel;
     ActivityModel activity = list[2] as ActivityModel;
     RequestModel request = list[0] as RequestModel;
@@ -396,8 +380,8 @@ class _NotificationPageState extends State<NotificationPage> {
             children: [
               Padding(
                 padding: EdgeInsets.all(8),
-                child: Container( height: MediaQuery.of(context).size.height * 0.08,
-                  width: MediaQuery.of(context).size.height * 0.08,
+                child: Container( height: MediaQuery.of(context).size.height * 0.07,
+                  width: MediaQuery.of(context).size.height * 0.07,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
@@ -425,8 +409,8 @@ class _NotificationPageState extends State<NotificationPage> {
                       ],
                     ),
                     Container(
-                        height: MediaQuery.of(context).size.height * 0.12,
-                        width: MediaQuery.of(context).size.width * 0.45,
+                       height: MediaQuery.of(context).size.height * 0.12,
+                       width: MediaQuery.of(context).size.width * 0.45,
                         child: Center(
                           child: Text(
                             "${user.name} wants to attend the '${activity.activityType}' event on ${activity.time.toDate().day}/${activity.time.toDate().month}/${activity.time.toDate().year} at ${activity.time.toDate().hour}.${activity.time.toDate().minute} ",style: TextStyle(fontSize: 12.5),
@@ -438,54 +422,43 @@ class _NotificationPageState extends State<NotificationPage> {
                         Icon(Icons.clear,color: Colors.transparent,),
                         Icon(Icons.done, color: Colors.transparent,),
                       ]:  [
-<<<<<<< Updated upstream
                           InkWell(
-                            child: Icon(Icons.clear,color: Colors.red,),
-                            onTap: ()async{
-                              await PostServices().deleteActivityRequest(activity, request);
+                            child: Icon(Icons.clear,color: Colors.red,size:35),
+                            onTap:(isClicked[index])? (){}: ()async{
+                              setState((){
+                                isClicked[index] = true;
+                              });
+                              await PostServices().deleteActivityRequest(activity, request).then((value) {
+                                setState((){
+                                  isClicked[index] = false;
+                                });
+                              });
                             },
+                          ),
+                          SizedBox(
+                            width:  MediaQuery.of(context).size.width * 0.025,
                           ),
                           InkWell(child: Padding(
                             padding: const EdgeInsets.only(right: 4.0),
-                            child: Icon(Icons.done, color: Colors.green,),
+                            child: Icon(Icons.done, color: Colors.green,size:35),
 
                           ),
-                            onTap: ()async{
-=======
-                        InkWell(
-                          child: Icon(Icons.clear,color: Colors.red,size:35),
-                          onTap:(isClicked[index])? (){}: ()async{
-                            setState((){
-                              isClicked[index] = true;
-                            });
-                            await PostServices().deleteActivityRequest(activity, request).then((value) {
+                            onTap:(isClicked[index])? (){}:  ()async{
                               setState((){
-                                isClicked[index] = false;
+                                isClicked[index] = true;
                               });
-                            });
-                          },
-                        ),
-                        SizedBox(
-                          width:  MediaQuery.of(context).size.width * 0.025,
-                        ),
-                        InkWell(child: Padding(
-                          padding: const EdgeInsets.only(right: 4.0),
-                          child: Icon(Icons.done, color: Colors.green,size:35),
-
-                        ),
-                          onTap:(isClicked[index])? (){}:  ()async{
-                            setState((){
-                              isClicked[index] = true;
-                            });
->>>>>>> Stashed changes
                             if(await PostServices().controlRequest(user.userUID)){
                               activity.participants.add(user.userUID);
                               await PostServices().updateActivity(activity);
-                              await PostServices().deleteActivityRequest(activity, request);
+                              await PostServices().deleteActivityRequest(activity, request).then((value) {
+                                setState((){
+                                  isClicked[index] = false;
+                                });
+                              });
                             }
-                          },),
-
-
+                            },),
+                       
+                        
                       ],
                     ),
                   ],
