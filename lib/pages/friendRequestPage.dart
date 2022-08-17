@@ -20,6 +20,8 @@ class FriendRequestPage extends StatefulWidget {
 }
 
 class _FriendRequestPageState extends State<FriendRequestPage> {
+  List<bool> isClicked = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +52,8 @@ class _FriendRequestPageState extends State<FriendRequestPage> {
                       physics: ClampingScrollPhysics(),
                       itemCount: notifications.length,
                       itemBuilder: (context, index) {
-                        return ListViewTile(notifications[index]);
+                        isClicked.add(false);
+                        return ListViewTile(notifications[index],index);
                       })
                 ],
               );
@@ -61,7 +64,7 @@ class _FriendRequestPageState extends State<FriendRequestPage> {
     );
   }
 
-  Widget ListViewTile(List<dynamic> list) {
+  Widget ListViewTile(List<dynamic> list, int index) {
     UserModel user = list[1] as UserModel;
     RequestModel request = list[0] as RequestModel;
     return Center(
@@ -83,8 +86,8 @@ class _FriendRequestPageState extends State<FriendRequestPage> {
               Padding(
                 padding: EdgeInsets.all(8),
                 child: Container(
-                  height: MediaQuery.of(context).size.height * 0.07,
-                  width: MediaQuery.of(context).size.height * 0.07,
+                  height: MediaQuery.of(context).size.height * 0.065,
+                  width: MediaQuery.of(context).size.height * 0.065,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
@@ -105,7 +108,7 @@ class _FriendRequestPageState extends State<FriendRequestPage> {
                         Text(
                           "${user.name} ${user.surname}",
                           style: TextStyle(
-                              fontSize: 13, fontWeight: FontWeight.bold),
+                              fontSize: 12, fontWeight: FontWeight.bold),
                         ),
                         Text(
                           "@${user.username}",
@@ -120,7 +123,7 @@ class _FriendRequestPageState extends State<FriendRequestPage> {
                       padding: const EdgeInsets.only(left: 10.0),
                       child: Container(
                           height: MediaQuery.of(context).size.height * 0.05,
-                          width: MediaQuery.of(context).size.width * 0.25,
+                          width: MediaQuery.of(context).size.width * 0.23,
                           child: Text(
                             "sent a friend request",
                             maxLines: 2,
@@ -132,14 +135,16 @@ class _FriendRequestPageState extends State<FriendRequestPage> {
                         color: Colors.red,
                         size: 32,
                       ),
-                      onTap: () async {
+                      onTap: (isClicked[index])? (){}: () async {
                         // requesti ve notificationu sil userı güncelle
+                        setState((){isClicked[index]=true;});
                         UserModel me = UserModel.fromSnapshot(
                             await PostServices().getMyDoc());
                         await PostServices()
                             .deleteFriendRequest(me, request.requestUID).then((value) {
-                              setState((){});
+                              setState((){isClicked[index]=false;});
                         });
+                        //setState((){});
                       },
                     ),
                     InkWell(
@@ -151,14 +156,16 @@ class _FriendRequestPageState extends State<FriendRequestPage> {
                           size: 35,
                         ),
                       ),
-                      onTap: () async {
+                      onTap: (isClicked[index])? (){}: () async {
+                        setState((){isClicked[index]=true;});
                         await SearchService().addFriend(user.userUID);
                         UserModel me = UserModel.fromSnapshot(
                             await PostServices().getMyDoc());
                         await PostServices()
                             .deleteFriendRequest(me, request.requestUID).then((value) {
-                              setState((){});
+                              setState((){isClicked[index]=false;});
                         });
+                        //setState((){});
                       },
                     ),
                   ],
