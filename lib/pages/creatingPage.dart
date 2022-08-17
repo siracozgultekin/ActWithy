@@ -829,6 +829,7 @@ class _CreatingPageState extends State<CreatingPage> {
                                         color: Colors.green,
                                         shape: BoxShape.circle,
                                         image: DecorationImage(
+                                          fit: BoxFit.cover,
                                           image: NetworkImage(
                                               participantList[0].ppURL),
                                         ),
@@ -849,6 +850,7 @@ class _CreatingPageState extends State<CreatingPage> {
                                               color: Colors.green,
                                               shape: BoxShape.circle,
                                               image: DecorationImage(
+                                                fit: BoxFit.cover,
                                                 image: NetworkImage(
                                                     participantList[1].ppURL),
                                               )),
