@@ -29,6 +29,8 @@ class _NotificationPageState extends State<NotificationPage> {
   Color negativeColor = Color(0xFFD6E6F1); //light blue
   Color selectedColor = Color(0xFF2D3A43); //dark blue
 
+  List<bool> isClicked = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -280,8 +282,8 @@ class _NotificationPageState extends State<NotificationPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
-                  height: MediaQuery.of(context).size.height * 0.08,
-                  width: MediaQuery.of(context).size.height * 0.08,
+                  height: MediaQuery.of(context).size.height * 0.07,
+                  width: MediaQuery.of(context).size.height * 0.07,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
@@ -297,11 +299,11 @@ class _NotificationPageState extends State<NotificationPage> {
                 children: [
                   Text(
                     "${userObj.name} ${userObj.surname}",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     "@${userObj.username}",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -340,7 +342,8 @@ class _NotificationPageState extends State<NotificationPage> {
                       physics: ClampingScrollPhysics(),
                       itemCount: notifications.length,
                       itemBuilder: (context, index) {
-                        return ListViewRequests(notifications[index]);
+                        isClicked.add(false);
+                        return ListViewRequests(notifications[index],index);
                       })
                 ],
               );
@@ -349,7 +352,7 @@ class _NotificationPageState extends State<NotificationPage> {
     );
   }
 
-  Widget ListViewRequests(List<dynamic> list) {
+  Widget ListViewRequests(List<dynamic> list, int index) {
     UserModel user = list[1] as UserModel;
     ActivityModel activity = list[2] as ActivityModel;
     RequestModel request = list[0] as RequestModel;
@@ -372,8 +375,8 @@ class _NotificationPageState extends State<NotificationPage> {
             children: [
               Padding(
                 padding: EdgeInsets.all(8),
-                child: Container( height: MediaQuery.of(context).size.height * 0.08,
-                  width: MediaQuery.of(context).size.height * 0.08,
+                child: Container( height: MediaQuery.of(context).size.height * 0.07,
+                  width: MediaQuery.of(context).size.height * 0.07,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
@@ -416,8 +419,15 @@ class _NotificationPageState extends State<NotificationPage> {
                       ]:  [
                           InkWell(
                             child: Icon(Icons.clear,color: Colors.red,),
-                            onTap: ()async{
-                              await PostServices().deleteActivityRequest(activity, request);
+                            onTap:(isClicked[index])? (){}: ()async{
+                              setState((){
+                                isClicked[index] = true;
+                              });
+                              await PostServices().deleteActivityRequest(activity, request).then((value) {
+                                setState((){
+                                  isClicked[index] = false;
+                                });
+                              });
                             },
                           ),
                           InkWell(child: Padding(
@@ -425,11 +435,18 @@ class _NotificationPageState extends State<NotificationPage> {
                             child: Icon(Icons.done, color: Colors.green,),
 
                           ),
-                            onTap: ()async{
+                            onTap:(isClicked[index])? (){}:  ()async{
+                              setState((){
+                                isClicked[index] = true;
+                              });
                             if(await PostServices().controlRequest(user.userUID)){
                               activity.participants.add(user.userUID);
                               await PostServices().updateActivity(activity);
-                              await PostServices().deleteActivityRequest(activity, request);
+                              await PostServices().deleteActivityRequest(activity, request).then((value) {
+                                setState((){
+                                  isClicked[index] = false;
+                                });
+                              });
                             }
                             },),
                        
