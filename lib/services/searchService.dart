@@ -103,4 +103,20 @@ class SearchService{
     return requestID;
   }
 
+  Future<String> controlFriendRequest(String id)async{
+    DocumentSnapshot myDoc = await users.doc(myId).get();
+    List<String> notIDs = myDoc["notifications"].cast<String>();
+    for(String notId in notIDs){
+      DocumentSnapshot notDoc = await notifications.doc(notId).get();
+      if (notDoc["type"] == 1) {
+        DocumentSnapshot requestDoc = await requests.doc(notDoc["requestID"]).get();
+        if (requestDoc["type"] == 0 && requestDoc["requesterUID"]==id) {
+          return requestDoc["requestUID"];
+        }
+      }
+    }
+
+    return "";
+  }
+
 }
