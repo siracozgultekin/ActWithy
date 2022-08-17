@@ -293,19 +293,24 @@ class _NotificationPageState extends State<NotificationPage> {
                   ),
                 ),
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${userObj.name} ${userObj.surname}",
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    "@${userObj.username}",
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                  ),
-                ],
+              Container(
+                width: MediaQuery.of(context).size.width * 0.3,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "${userObj.name} ${userObj.surname.toUpperCase().substring(0,1)}.",
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      "@${userObj.username}",
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 10.0),
@@ -392,23 +397,23 @@ class _NotificationPageState extends State<NotificationPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "${user.name} ${user.surname.substring(0,1)}.",
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          "@${user.username}",
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-
-                        ),
+                        // Text(
+                        //   "${user.name} ${user.surname.substring(0,1)}.",
+                        //   style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                        // ),
+                        // Text(
+                        //   "@${user.username}",
+                        //   style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                        //
+                        // ),
                       ],
                     ),
                     Container(
                        height: MediaQuery.of(context).size.height * 0.12,
-                       width: MediaQuery.of(context).size.width * 0.35,
+                       width: MediaQuery.of(context).size.width * 0.45,
                         child: Center(
                           child: Text(
-                            "Wants to attend the '${activity.activityType}' event on ${activity.time.toDate().day}/${activity.time.toDate().month}/${activity.time.toDate().year} at ${activity.time.toDate().hour}.${activity.time.toDate().minute} ",style: TextStyle(fontSize: 12.5),
+                            "${user.name} wants to attend the '${activity.activityType}' event on ${activity.time.toDate().day}/${activity.time.toDate().month}/${activity.time.toDate().year} at ${activity.time.toDate().hour}.${activity.time.toDate().minute} ",style: TextStyle(fontSize: 12.5),
                             maxLines: 5,
                           ),
                         )),
@@ -418,7 +423,7 @@ class _NotificationPageState extends State<NotificationPage> {
                         Icon(Icons.done, color: Colors.transparent,),
                       ]:  [
                           InkWell(
-                            child: Icon(Icons.clear,color: Colors.red,),
+                            child: Icon(Icons.clear,color: Colors.red,size:35),
                             onTap:(isClicked[index])? (){}: ()async{
                               setState((){
                                 isClicked[index] = true;
@@ -430,9 +435,12 @@ class _NotificationPageState extends State<NotificationPage> {
                               });
                             },
                           ),
+                          SizedBox(
+                            width:  MediaQuery.of(context).size.width * 0.025,
+                          ),
                           InkWell(child: Padding(
                             padding: const EdgeInsets.only(right: 4.0),
-                            child: Icon(Icons.done, color: Colors.green,),
+                            child: Icon(Icons.done, color: Colors.green,size:35),
 
                           ),
                             onTap:(isClicked[index])? (){}:  ()async{

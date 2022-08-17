@@ -101,34 +101,37 @@ class _FriendRequestPageState extends State<FriendRequestPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "${user.name} ${user.surname}",
-                          style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          "@${user.username}",
-                          maxLines: 2,
-                          style: TextStyle(
-                              fontSize: 13, fontWeight: FontWeight.bold,),
+                    Container(
+                      width: MediaQuery.of(context).size.width*0.25,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "${user.name} ${user.surname.substring(0,1).toUpperCase()}.",
+                            style: TextStyle(
+                                fontSize: 12, fontWeight: FontWeight.bold),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
 
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10.0),
-                      child: Container(
-                          height: MediaQuery.of(context).size.height * 0.05,
-                          width: MediaQuery.of(context).size.width * 0.23,
-                          child: Text(
-                            "sent a friend request",
+                          ),
+                          Text(
+                            "@${user.username}",
                             maxLines: 2,
-                          )),
+                            style: TextStyle(
+                                fontSize: 13, fontWeight: FontWeight.bold,),
+
+                          ),
+                        ],
+                      ),
                     ),
+                    Container(
+                        height: MediaQuery.of(context).size.height * 0.05,
+                        width: MediaQuery.of(context).size.width * 0.23,
+                        child: Text(
+                          "sent a friend request",
+                          maxLines: 2,
+                        )),
                     InkWell(
                       child: Icon(
                         Icons.clear,
