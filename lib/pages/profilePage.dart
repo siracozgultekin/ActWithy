@@ -44,16 +44,16 @@ class _ProfilePageState extends State<ProfilePage> {
 
   String isRequest = "";
 
+  double containerHeight =0;
 
 
   getIsMyFriend() async {
     bool result = await SearchService().isMyFriend(user.userUID);
     String temp = await SearchService().isPending(user.userUID);
-
+    containerHeight=MediaQuery.of(context).size.height*0.38;
     isRequest = await SearchService().controlFriendRequest(user.userUID);
 
     pending = !temp.isEmpty;
-    print(pending);
     //bool isPenging = await ;
     setState(() {
       isMyFriend = result;
@@ -79,18 +79,68 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   initState() {
-    
+
+
     //getActList(user.lastPostID);
     getIsMyFriend();
     super.initState();
+
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //
+    //   // if(scrollController.hasClients) {
+    //   //       //containerHeight = MediaQuery.of(context).size.height*0.38-scrollController.offset;
+    //   // }
+    //
+    // });
+
+
+
+
+
+    scrollController.addListener(() {
+      double off = scrollController.offset;
+
+
+        if(off>MediaQuery.of(context).size.height*0.38){
+          setState((){ containerHeight=0;});
+        }else{
+          setState((){containerHeight =MediaQuery.of(context).size.height*0.38-off;});
+        }
+
+
+
+      //print("$off   +++ $containerHeight");
+    });
+/*
+    scrollController.addListener(() {
+      setState((){
+        closeTopContainer = scrollController.offset > 13;
+        if(scrollController.offset > 10 && scrollController.offset < 15) {
+          denemeTopContainer = 1;
+        } else if(scrollController.offset >= 15 && scrollController.offset < 25) {
+          denemeTopContainer = 2;
+        } else if(scrollController.offset >= 25) {
+          denemeTopContainer = 3;
+        } else {
+          denemeTopContainer = 0;
+        }
+      });
+
+});*/
+
+
   }
 
+  int denemeTopContainer = 0;
   Color selectedColor = const Color(0xFF4C6170); //dark blue
   Color negativeColor = const Color(0xFFFFFFFF); //white
   Color bgColor = const Color(0xFFD6E6F1); //light blue
   Color appbarColor = const Color(0xFF48B2FA); //neon blue
   Color textColor = const Color(0xFF2D3A43);
   NumberFormat formatter = NumberFormat("00");
+
+  ScrollController scrollController = ScrollController(initialScrollOffset: 0);
+  bool closeTopContainer = false;
 
   @override
   Widget build(BuildContext context) {
@@ -248,7 +298,16 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: Column(
         children: [
-          ProfileWidget(isMyPage),
+            AnimatedContainer(
+
+                duration: Duration(milliseconds: 1),
+                width: MediaQuery.of(context).size.width,
+                alignment: Alignment.topCenter,
+                height: containerHeight,
+              // (scrollController.offset<=MediaQuery.of(context).size.height*0.38) ? MediaQuery.of(context).size.height*0.38-scrollController.offset : 0,
+                //denemeTopContainer == 0 ?  MediaQuery.of(context).size.height*0.38 : denemeTopContainer == 1 ? MediaQuery.of(context).size.height*0.28 : denemeTopContainer == 2 ? MediaQuery.of(context).size.height*0.15 : 0,
+                child: ProfileWidget(isMyPage)),
+
           hidden?Divider(thickness: 2, color: textColor,):DividerWidget(),
           Expanded(child: isToDo ? (hidden ? hiddenWidget():ToDoWidget()) : (hidden ? hiddenWidget() : FriendWidget())),
         ],
@@ -533,7 +592,9 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget ToDoWidget() {
     //String selectedPostID = user.lastPostID;
     return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
+      controller: scrollController,
+
+      physics: ClampingScrollPhysics(),
       child: FutureBuilder(
         future: PostServices().getPosticipants(user.userUID),
         builder: (context, AsyncSnapshot snap) {
@@ -543,6 +604,7 @@ class _ProfilePageState extends State<ProfilePage> {
             return Column(
               children: [
                 ListView.builder(
+
                   shrinkWrap: true,
                   scrollDirection: Axis.vertical,
                   physics: BouncingScrollPhysics(),
@@ -1159,6 +1221,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget FriendWidget() {
     return SingleChildScrollView(
+      controller: scrollController,
       physics: BouncingScrollPhysics(),
       child: FutureBuilder(
         future: PostServices().getFriends(user.friends),
