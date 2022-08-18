@@ -29,16 +29,17 @@ class _ProfilePageState extends State<ProfilePage> {
   //List<List<ActivityModel>> actList = [];
   //TODO emojilerdeki List<bool> gibi yappp
 
+
+
   bool isToDo = true;
   bool isMyFriend = false;
   bool pending = false;
   String buttonText = "";
-<<<<<<< Updated upstream
-=======
   bool isClicked=false;
-
->>>>>>> Stashed changes
+  
   final controller = ScrollController();
+
+
   bool hidden =true;
   List<bool> boolList = [];
 
@@ -102,6 +103,10 @@ class _ProfilePageState extends State<ProfilePage> {
     }
     if(!isMyPage && isMyFriend) hidden =false;
 
+
+    //https://www.youtube.com/watch?v=Cn6VCTaHB-k
+    //https://api.flutter.dev/flutter/widgets/NestedScrollView-class.html
+    //https://api.flutter.dev/flutter/widgets/CustomScrollView-class.html
     return Scaffold(
       backgroundColor: bgColor,
       bottomNavigationBar: NavigationBarTheme(
@@ -135,26 +140,27 @@ class _ProfilePageState extends State<ProfilePage> {
 
             setState(() {
               selectedIndex = value;
-              if (selectedIndex == 0) {
-                Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => HomePage()),
-                    (route) => false);
-              } else if (selectedIndex == 1) {
-                showSearch(
-                    context: context,
-                    delegate: SearchPage(
-                        hintText: "Search",
-                        hintTextColor: TextStyle(color: Colors.white)));
-              } else if (selectedIndex == 2) {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => CreatingPage(postModel: postModel)));
-              } else if (selectedIndex == 3) {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => NotificationPage()));
-              } else if (selectedIndex == 4) {
 
-              }
             });
+            if (selectedIndex == 0) {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => HomePage()),
+                      (route) => false);
+            } else if (selectedIndex == 1) {
+              showSearch(
+                  context: context,
+                  delegate: SearchPage(
+                      hintText: "Search",
+                      hintTextColor: TextStyle(color: Colors.white)));
+            } else if (selectedIndex == 2) {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) => CreatingPage(postModel: postModel)));
+            } else if (selectedIndex == 3) {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) => NotificationPage()));
+            } else if (selectedIndex == 4) {
+
+            }
           },
           /*  if (selected == 0) {
 
@@ -484,6 +490,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 },
                 child: Container(
                   width: MediaQuery.of(context).size.width / 2,
+                  height: MediaQuery.of(context).size.height*0.05,
                   child: Center(
                       child: Text(
                     'ToDo List',
@@ -509,6 +516,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 },
                 child: Container(
                   width: MediaQuery.of(context).size.width / 2,
+                  height: MediaQuery.of(context).size.height*0.05,
                   child: Center(
                       child: Text(
                     'Friends',
@@ -673,6 +681,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                                               color: Colors.green,
                                                                               shape: BoxShape.circle,
                                                                               image: DecorationImage(
+                                                                                fit: BoxFit.cover,
                                                                                 image: NetworkImage(participantList[0].ppURL),
                                                                               ),
                                                                             ),
@@ -698,6 +707,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                                                     color: Colors.green,
                                                                                     shape: BoxShape.circle,
                                                                                     image: DecorationImage(
+                                                                                      fit: BoxFit.cover,
                                                                                       image: NetworkImage(participantList[1].ppURL),
                                                                                     )),
                                                                               ),
@@ -1865,7 +1875,7 @@ class _ProfilePageState extends State<ProfilePage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Icon(Icons.calendar_today,
-            color: textColor, size: MediaQuery.of(context).size.width * 0.09),
+            color: textColor, size: MediaQuery.of(context).size.width * 0.08),
         Text(
           "${formatter.format(day)}/${formatter.format(month)}/${year}",
           style: TextStyle(
