@@ -66,12 +66,17 @@ class SearchService{
 
   Future<void> deleteRequest(String requesteeID) async {
 
-    DocumentSnapshot doc = await users.doc(requesteeID).get();
-    UserModel requestee = UserModel.fromSnapshot(doc);
+    try{
+      DocumentSnapshot doc = await users.doc(requesteeID).get();
+      UserModel requestee = UserModel.fromSnapshot(doc);
 
-    String requestID = await isPending(requesteeID);
+      String requestID = await isPending(requesteeID);
 
-    PostServices().deleteFriendRequest(requestee, requestID);
+      PostServices().deleteFriendRequest(requestee, requestID);
+    }catch(e){
+      print("işlem yapılamadı...");
+    }
+
 
       //TODO del notification 2
   }

@@ -35,7 +35,8 @@ class _ProfilePageState extends State<ProfilePage> {
   bool isMyFriend = false;
   bool pending = false;
   String buttonText = "";
-
+  bool isClicked=false;
+  
   final controller = ScrollController();
 
 
@@ -333,7 +334,8 @@ class _ProfilePageState extends State<ProfilePage> {
             right: 8.0,
             child: (isRequest!="")? Column(children: [
               ElevatedButton(
-              onPressed: () async {
+              onPressed: isClicked?(){}: () async {
+                setState((){isClicked=true;});
                 /// TODO arkadaşlık isteğini kabul et
                 await SearchService().addFriend(user.userUID);
                 UserModel me = UserModel.fromSnapshot(
@@ -342,7 +344,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     .deleteFriendRequest(me, isRequest).then((value) {
                   setState((){isRequest="";
                   isMyFriend =true;
-                  buttonText = "Remove Friend";});
+                  buttonText = "Remove Friend";
+                  isClicked=false;});
                 });
               },
               child: Text(
@@ -358,14 +361,17 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 minimumSize: Size(100, 30),
               ),
-            ),ElevatedButton(
-              onPressed: () async {
-                /// TODO arkadaşlık isteğini kabul et
+            ),
+              ElevatedButton(
+              onPressed: isClicked?(){}: () async {
+                setState((){isClicked=true;});
+                /// TODO arkadaşlık isteğini reddet
                 UserModel me = UserModel.fromSnapshot(
                     await PostServices().getMyDoc());
                 await PostServices()
                     .deleteFriendRequest(me, isRequest).then((value) {
-                  setState((){isRequest ="";});
+                  setState((){isRequest ="";
+                  isClicked=true;});
                 });
               },
               child: Text(
@@ -381,8 +387,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 minimumSize: Size(100, 30),
               ),
-            ),],): ElevatedButton(
-              onPressed: () async {
+            ),],):
+            ElevatedButton(
+              onPressed: isClicked?(){}: () async {
                 if (isMyPage) {
                   print(1);
                   ///TODO editle profili
@@ -396,6 +403,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   });
                   //Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfilePage(userModel: user,)));
                 } else if (!isMyFriend && pending) {
+                  setState((){isClicked=true;});
                   print(2);
 
                   await SearchService().deleteRequest(user.userUID).then((value){
@@ -403,13 +411,14 @@ class _ProfilePageState extends State<ProfilePage> {
                       hidden = true;
                       buttonText = "Add Friend";
                       pending = false;
+                      isClicked =false;
                     });
                   });
 
                 }
                 else if (!isMyPage && isMyFriend) {
                   print(3);
-
+                  setState((){isClicked=true;});
                   await SearchService()
                       .removeFriend(user.userUID)
                       .then((value) {
@@ -418,16 +427,18 @@ class _ProfilePageState extends State<ProfilePage> {
                       buttonText = "Add Friend";
                       pending = false; //gereksiz??
                       hidden = true;
+                      isClicked = false;
                     });
                   });
                 } else if (!isMyPage && !isMyFriend && !pending) {
                   print(4);
-
+                  setState((){isClicked=true;});
                   await SearchService().sendRequest(user.userUID).then((value) {
                     setState(() {
                       buttonText = "Pending";
                       pending = true;
                       hidden = true;
+                      isClicked = false;
                     });
                   });
                 }
