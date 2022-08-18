@@ -100,6 +100,7 @@ class _HomePageState extends State<HomePage> {
 
         ],
       ),
+<<<<<<< Updated upstream
       body: FutureBuilder(
 
           future: PostServices().getFriendsPosts(),
@@ -141,6 +142,52 @@ class _HomePageState extends State<HomePage> {
               );
             }
           }),
+=======
+      body: RefreshIndicator(
+        onRefresh: yenile,
+        child: FutureBuilder(
+
+            future: PostServices().getFriendsPosts(),
+            builder: (context, AsyncSnapshot snap) {
+              if (!snap.hasData) {
+                return Container(
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage("assets/images/mev.png"),
+                      )),
+                );
+              } else {
+                return Container(
+                  height: MediaQuery.of(context).size.height * 0.8,
+                  child: ListView.separated(
+                      controller: controller,
+                      shrinkWrap: true,
+                      separatorBuilder: (context, index) => Divider(
+                        color: Colors.grey,
+                        height: 0.15,
+                      ),
+                      scrollDirection: Axis.vertical,
+                      itemCount: snap.data.length, //TODO snap.data.length,
+                      itemBuilder: (context, index) {
+                        mediaqueryHeight=MediaQuery.of(context).size.height*0.06;
+                        isReaction.add(false);
+                        DenemeModel postModelObj =
+                        snap.data[index] as DenemeModel;
+
+                        /// her post oluşturulduğunda tekrar ekliyor. En yukarıda oluşturulursa çözülebilir.
+                        createList(postModelObj.activitiesList);
+                        List<bool> add=[];
+                        for (int i=0;i<postModelObj.activitiesList.length;i++){
+                          add.add(false);
+                        }
+                        isRequest.add(add);
+                        return mainListTile(postModelObj, index);
+                      }),
+                );
+              }
+            }),
+      ),
+>>>>>>> Stashed changes
       bottomNavigationBar: NavigationBarTheme(
         data: NavigationBarThemeData(
           height: MediaQuery.of(context).size.height * 0.075,
@@ -175,8 +222,12 @@ class _HomePageState extends State<HomePage> {
               selectedIndex = value;
               });
             switch(selectedIndex){
-              case 0: scrollUp();
-              break;
+              case 0:
+                {
+                  setState(() {});
+                  scrollUp();
+                }
+                break;
               case 1: showSearch(context: context, delegate: SearchPage(hintText: "Search", hintTextColor: TextStyle(color: Colors.white)));
               break;
               case 2: Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreatingPage(postModel: postModel)));
@@ -999,5 +1050,9 @@ class _HomePageState extends State<HomePage> {
     }
     return false;
   }
+ Future<void>yenile ()async{
+    setState(() {
 
+    });
+ }
 }
