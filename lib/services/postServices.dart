@@ -16,13 +16,13 @@ class PostServices {
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   CollectionReference posts = FirebaseFirestore.instance.collection('posts');
   CollectionReference activities =
-      FirebaseFirestore.instance.collection('activities');
+  FirebaseFirestore.instance.collection('activities');
   CollectionReference reactions =
-      FirebaseFirestore.instance.collection('reactions');
+  FirebaseFirestore.instance.collection('reactions');
   CollectionReference notifications =
-      FirebaseFirestore.instance.collection('notifications');
+  FirebaseFirestore.instance.collection('notifications');
   CollectionReference requests =
-      FirebaseFirestore.instance.collection('requests');
+  FirebaseFirestore.instance.collection('requests');
 
   Future<String> createActivity(String selectedItem, Timestamp time,
       String location, List<String> participants) async {
@@ -133,7 +133,7 @@ class PostServices {
       List<UserModel> parts = await getAllParticipants(post.activityUID);
 
       PosticipantModel posticipantModel =
-          PosticipantModel(post: post, participantList: parts);
+      PosticipantModel(post: post, participantList: parts);
       posticipant.add(posticipantModel);
     }
 
@@ -237,7 +237,7 @@ class PostServices {
       DocumentSnapshot friendDoc = await users.doc(friendID).get();
 
       List<String> friendsPosts =
-          friendDoc["posts"].cast<String>(); //friend's post ids
+      friendDoc["posts"].cast<String>(); //friend's post ids
       for (String postID in friendsPosts) {
         DocumentSnapshot postDoc = await posts.doc(postID).get();
         //  DenemeModel deneme = DenemeModel(postObj: PostModel.fromSnapshot(postDoc));
@@ -397,11 +397,11 @@ class PostServices {
   }
 
   Future<void> createNotification(
-    int type,
-    String userID,
-    String reactionID,
-    String requestID,
-  ) async {
+      int type,
+      String userID,
+      String reactionID,
+      String requestID,
+      ) async {
     String notificationId = "";
     await notifications.add({
       'time': Timestamp.now(),
@@ -444,10 +444,10 @@ class PostServices {
       DocumentSnapshot notDoc = await notifications.doc(id).get();
       if (notDoc["type"] == 0) {
         DocumentSnapshot reactionDoc =
-            await reactions.doc(notDoc["reactionID"]).get();
+        await reactions.doc(notDoc["reactionID"]).get();
         DocumentSnapshot postDoc = await posts.doc(reactionDoc["postID"]).get();
         DocumentSnapshot userDoc =
-            await users.doc(reactionDoc["reacterID"]).get();
+        await users.doc(reactionDoc["reacterID"]).get();
         reactionsList.add(NotificationActivityModel(
             user: UserModel.fromSnapshot(userDoc),
             reaction: ReactionModel.fromSnapshot(reactionDoc),
@@ -493,7 +493,7 @@ class PostServices {
         partList.add(part);
       }
       PartivityModel model =
-          PartivityModel(activity: act, participantList: partList);
+      PartivityModel(activity: act, participantList: partList);
       list.add(model);
     }
 
@@ -576,12 +576,12 @@ class PostServices {
       DocumentSnapshot notDoc = await notifications.doc(id).get();
       if (notDoc["type"] == 1) {
         DocumentSnapshot requestDoc =
-            await requests.doc(notDoc["requestID"]).get();
+        await requests.doc(notDoc["requestID"]).get();
         if (requestDoc["type"] == 1) {
           DocumentSnapshot userDoc =
-              await users.doc(requestDoc["requesterUID"]).get();
+          await users.doc(requestDoc["requesterUID"]).get();
           DocumentSnapshot activityDoc =
-              await activities.doc(requestDoc["activityUID"]).get();
+          await activities.doc(requestDoc["activityUID"]).get();
           returnList.add([
             RequestModel.fromSnapshot(requestDoc),
             UserModel.fromSnapshot(userDoc),
@@ -673,8 +673,8 @@ class DenemeModel {
 
   DenemeModel(
       {required this.userObj,
-      required this.activitiesList,
-      required this.postObj});
+        required this.activitiesList,
+        required this.postObj});
 
   void setUser(UserModel muser) {
     this.userObj = muser;
