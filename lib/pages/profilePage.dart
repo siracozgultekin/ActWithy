@@ -42,11 +42,15 @@ class _ProfilePageState extends State<ProfilePage> {
   bool hidden =true;
   List<bool> boolList = [];
 
+  String isRequest = "";
+
 
 
   getIsMyFriend() async {
     bool result = await SearchService().isMyFriend(user.userUID);
     String temp = await SearchService().isPending(user.userUID);
+
+    isRequest = await SearchService().controlFriendRequest(user.userUID);
 
     pending = !temp.isEmpty;
     print(pending);
@@ -327,7 +331,57 @@ class _ProfilePageState extends State<ProfilePage> {
           Positioned(
             top: MediaQuery.of(context).size.height * 0.21,
             right: 8.0,
-            child: ElevatedButton(
+            child: (isRequest!="")? Column(children: [
+              ElevatedButton(
+              onPressed: () async {
+                /// TODO arkadaşlık isteğini kabul et
+                await SearchService().addFriend(user.userUID);
+                UserModel me = UserModel.fromSnapshot(
+                    await PostServices().getMyDoc());
+                await PostServices()
+                    .deleteFriendRequest(me, isRequest).then((value) {
+                  setState((){isRequest="";
+                  isMyFriend =true;
+                  buttonText = "Remove Friend";});
+                });
+              },
+              child: Text(
+               "Accept",
+                style: TextStyle(
+                    color: negativeColor,
+                    fontSize: MediaQuery.of(context).size.width * 0.028),
+              ),
+              style: ElevatedButton.styleFrom(
+                primary: selectedColor,
+                shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(30.0),
+                ),
+                minimumSize: Size(100, 30),
+              ),
+            ),ElevatedButton(
+              onPressed: () async {
+                /// TODO arkadaşlık isteğini kabul et
+                UserModel me = UserModel.fromSnapshot(
+                    await PostServices().getMyDoc());
+                await PostServices()
+                    .deleteFriendRequest(me, isRequest).then((value) {
+                  setState((){isRequest ="";});
+                });
+              },
+              child: Text(
+                "Reject",
+                style: TextStyle(
+                    color: selectedColor,
+                    fontSize: MediaQuery.of(context).size.width * 0.028),
+              ),
+              style: ElevatedButton.styleFrom(
+                primary: negativeColor,
+                shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(30.0),
+                ),
+                minimumSize: Size(100, 30),
+              ),
+            ),],): ElevatedButton(
               onPressed: () async {
                 if (isMyPage) {
                   print(1);
