@@ -1,7 +1,10 @@
 import 'package:actwithy/Models/ActivityModel.dart';
+import 'package:actwithy/Models/NotificationModel.dart';
 import 'package:actwithy/Models/PostModel.dart';
 import 'package:actwithy/Models/ReactionModel.dart';
+import 'package:actwithy/Models/RequestModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
+import 'package:actwithy/pages/notificationPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,10 +15,14 @@ class PostServices {
 
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   CollectionReference posts = FirebaseFirestore.instance.collection('posts');
-  CollectionReference activities = FirebaseFirestore.instance.collection('activities');
-  CollectionReference reactions = FirebaseFirestore.instance.collection('reactions');
-  CollectionReference notifications = FirebaseFirestore.instance.collection('notifications');
-  CollectionReference requests = FirebaseFirestore.instance.collection('requests');
+  CollectionReference activities =
+  FirebaseFirestore.instance.collection('activities');
+  CollectionReference reactions =
+  FirebaseFirestore.instance.collection('reactions');
+  CollectionReference notifications =
+  FirebaseFirestore.instance.collection('notifications');
+  CollectionReference requests =
+  FirebaseFirestore.instance.collection('requests');
 
   Future<String> createActivity(String selectedItem, Timestamp time,
       String location, List<String> participants) async {
@@ -26,7 +33,7 @@ class PostServices {
       "time": time,
       //TODO participant parametresi oluşturup CreatingPage'den participants'a değer yolla.
       "participants": participants,
-      "requests":[],
+      "requests": [],
     }).then((value) async {
       returnID = value.id;
       await activities.doc(value.id).update({"activityUID": value.id});
@@ -38,7 +45,7 @@ class PostServices {
     await posts.doc(postModel.postUID).set(postModel.createMap());
   }
 
-  Future<void> updateUser(UserModel userModel)async{
+  Future<void> updateUser(UserModel userModel) async {
     await users.doc(userModel.userUID).set(userModel.createMap());
   }
 
@@ -114,19 +121,19 @@ class PostServices {
   Future<List<PosticipantModel>> getPosticipants(String profileID) async {
     List<PosticipantModel> posticipant = [];
 
-     //TODO getPost
+    //TODO getPost
 
     DocumentSnapshot dc = await users.doc(profileID).get();
     UserModel user = UserModel.fromSnapshot(dc);
 
     for (String postID in user.posts.reversed) {
-
       DocumentSnapshot doc = await posts.doc(postID).get();
       PostModel post = PostModel.fromSnapshot(doc);
 
       List<UserModel> parts = await getAllParticipants(post.activityUID);
 
-      PosticipantModel posticipantModel = PosticipantModel(post: post, participantList: parts);
+      PosticipantModel posticipantModel =
+      PosticipantModel(post: post, participantList: parts);
       posticipant.add(posticipantModel);
     }
 
@@ -174,6 +181,24 @@ class PostServices {
       usersList.add(UserModel.fromSnapshot(myDoc));
     }
     return usersList;
+  }
+
+  Future<List<List<dynamic>>> getParticipantsAndRequest(
+      ActivityModel activityModel) async {
+    List<List<dynamic>> result = [];
+    List<UserModel> usersList = [];
+    for (String userID in activityModel.participants) {
+      DocumentSnapshot myDoc = await users.doc(userID).get();
+      usersList.add(UserModel.fromSnapshot(myDoc));
+    }
+    result.add(usersList);
+    List<RequestModel> requestList = [];
+    for (String id in activityModel.requests) {
+      DocumentSnapshot doc = await requests.doc(id).get();
+      requestList.add(RequestModel.fromSnapshot(doc));
+    }
+    result.add(requestList);
+    return result;
   }
 
   Future<Map<ActivityModel, List<UserModel>>> getParticipantsByID(
@@ -295,10 +320,10 @@ class PostServices {
         bool notIn = true;
 
         for (UserModel model in participants) {
-          if(model.userUID==user.userUID) notIn = false;
+          if (model.userUID == user.userUID) notIn = false;
         }
 
-        if(notIn) {
+        if (notIn) {
           participants.add(user);
         }
       }
@@ -315,8 +340,6 @@ class PostServices {
   Future<UserModel> returnUser(String uid) async {
     return UserModel.fromSnapshot(await users.doc(uid).get());
   }
-
-
 
   Future<String> createReaction(
       String reacteeID, String postID, String reactType) async {
@@ -345,20 +368,19 @@ class PostServices {
   Future<bool> checkReaction(PostModel postModel) async {
     List<String> reactionsList = postModel.reactionIDs;
     String currentUser = await FirebaseAuth.instance.currentUser!.uid;
-    for (String reaction in reactionsList){
+    for (String reaction in reactionsList) {
       DocumentSnapshot documentSnapshot = await reactions.doc(reaction).get();
-      if(documentSnapshot["reacterID"]==currentUser)
-        return true;
+      if (documentSnapshot["reacterID"] == currentUser) return true;
     }
     return false;
   }
 
-  Future<ReactionModel> getReaction(PostModel postModel)async{
+  Future<ReactionModel> getReaction(PostModel postModel) async {
     String currentUser = await FirebaseAuth.instance.currentUser!.uid;
-    String reactID ="";
-    for (String reactionId in postModel.reactionIDs){
+    String reactID = "";
+    for (String reactionId in postModel.reactionIDs) {
       DocumentSnapshot documentSnapshot = await reactions.doc(reactionId).get();
-      if (documentSnapshot["reacterID"] == currentUser){
+      if (documentSnapshot["reacterID"] == currentUser) {
         reactID = documentSnapshot["reactionUID"];
         break;
       }
@@ -368,14 +390,21 @@ class PostServices {
     return ReactionModel.fromSnapshot(doc);
   }
 
-  Future<void> updateReaction(ReactionModel reactionModel)async {
-    await reactions.doc(reactionModel.reactionUID).set(reactionModel.createMap());
+  Future<void> updateReaction(ReactionModel reactionModel) async {
+    await reactions
+        .doc(reactionModel.reactionUID)
+        .set(reactionModel.createMap());
   }
 
-  Future<void> createNotification(int type, String userID, String reactionID ,String requestID,)async{
+  Future<void> createNotification(
+      int type,
+      String userID,
+      String reactionID,
+      String requestID,
+      ) async {
     String notificationId = "";
     await notifications.add({
-      'time' : Timestamp.now(),
+      'time': Timestamp.now(),
       "type": type,
       "userID": userID, // bildirimi alan kişi
       "reactionID": reactionID,
@@ -391,11 +420,12 @@ class PostServices {
     //return notificationId;
   }
 
-  Future<void> deleteReactionNotification(String rectionId, UserModel userModel) async {
+  Future<void> deleteReactionNotification(
+      String rectionId, UserModel userModel) async {
     if (rectionId != "") {
-      for (String id in userModel.notifications){
+      for (String id in userModel.notifications) {
         DocumentSnapshot doc = await notifications.doc(id).get();
-        if(doc["reactionID"]==rectionId){
+        if (doc["reactionID"] == rectionId) {
           userModel.notifications.remove(doc["notificationUID"]);
           await updateUser(userModel);
           await notifications.doc(doc["notificationUID"]).delete();
@@ -405,7 +435,7 @@ class PostServices {
     }
   }
 
-  Future<List<NotificationActivityModel>> getNotificationReactions()async {
+  Future<List<NotificationActivityModel>> getNotificationReactions() async {
     List<NotificationActivityModel> reactionsList = [];
     String myID = await FirebaseAuth.instance.currentUser!.uid;
     DocumentSnapshot myDoc = await users.doc(myID).get();
@@ -413,23 +443,21 @@ class PostServices {
     for (String id in notIDs) {
       DocumentSnapshot notDoc = await notifications.doc(id).get();
       if (notDoc["type"] == 0) {
-        DocumentSnapshot reactionDoc = await reactions.doc(notDoc["reactionID"]).get();
+        DocumentSnapshot reactionDoc =
+        await reactions.doc(notDoc["reactionID"]).get();
         DocumentSnapshot postDoc = await posts.doc(reactionDoc["postID"]).get();
-        DocumentSnapshot userDoc = await users.doc(reactionDoc["reacterID"]).get();
+        DocumentSnapshot userDoc =
+        await users.doc(reactionDoc["reacterID"]).get();
         reactionsList.add(NotificationActivityModel(
             user: UserModel.fromSnapshot(userDoc),
             reaction: ReactionModel.fromSnapshot(reactionDoc),
             post: PostModel.fromSnapshot(postDoc)));
-      }
-      else if(notDoc["type"] == 1){
-
-      }
+      } else if (notDoc["type"] == 1) {}
     }
     return reactionsList;
   }
 
   Future<List<ActivityModel>> getPostsActivities(String postID) async {
-
     DocumentSnapshot postDoc = await posts.doc(postID).get();
     PostModel post = PostModel.fromSnapshot(postDoc);
 
@@ -442,16 +470,13 @@ class PostServices {
     }
 
     return activityList;
-
   }
 
-
   Future<List<PartivityModel>> getActPart(PostModel post) async {
-
     List<PartivityModel> list = [];
-    List<ActivityModel> activityList= [];
+    List<ActivityModel> activityList = [];
 
-    for (String actID in post.activityUID){
+    for (String actID in post.activityUID) {
       DocumentSnapshot actDoc = await activities.doc(actID).get();
       ActivityModel act = ActivityModel.fromSnapshot(actDoc);
       activityList.add(act);
@@ -467,17 +492,16 @@ class PostServices {
         part = UserModel.fromSnapshot(dc);
         partList.add(part);
       }
-      PartivityModel model = PartivityModel(activity: act, participantList: partList);
+      PartivityModel model =
+      PartivityModel(activity: act, participantList: partList);
       list.add(model);
     }
 
     return list;
-
   }
 
-
-
-  Future<String> createRequest(String requesteeUID, int requestType) async {
+  Future<String> createRequest(
+      String requesteeUID, int requestType, String activityId) async {
     String requestId = "";
     await requests.add({
       "requestUID": "requestUID",
@@ -486,7 +510,7 @@ class PostServices {
       "requesteeUID": requesteeUID,
       "requestStatus": 0,
       "time": Timestamp.now(),
-      "activityUID": "activityUID",
+      "activityUID": activityId,
     }).then((value) async {
       requestId = value.id;
       await requests.doc(requestId).update({"requestUID": requestId});
@@ -495,14 +519,28 @@ class PostServices {
     return requestId;
   }
 
-  Future<void> deleteMyParticipate(ActivityModel activityModel)async{
+  Future<void> deleteMyParticipate(ActivityModel activityModel) async {
     activityModel.participants.remove(myId);
     await updateActivity(activityModel);
-     /// TODO notification ve request objelerini sil
 
+    /// TODO notification ve request objelerini sil
   }
-<<<<<<< Updated upstream
-=======
+
+
+  Future<bool> controlRequest(String requester)async{
+    UserModel me = UserModel.fromSnapshot(await users.doc(myId).get());
+    for (String notificationID in me.notifications){
+      DocumentSnapshot doc = await notifications.doc(notificationID).get();
+      if (doc["type"]==1){
+        DocumentSnapshot requestDoc = await requests.doc(doc["requestID"]).get();
+        if (requestDoc["type"]==1 && requestDoc["requesterUID"]==requester){
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
 
   Future<void> deleteActivityRequest(ActivityModel activityModel,
       RequestModel requestModel) async {
@@ -538,12 +576,12 @@ class PostServices {
       DocumentSnapshot notDoc = await notifications.doc(id).get();
       if (notDoc["type"] == 1) {
         DocumentSnapshot requestDoc =
-            await requests.doc(notDoc["requestID"]).get();
+        await requests.doc(notDoc["requestID"]).get();
         if (requestDoc["type"] == 1) {
           DocumentSnapshot userDoc =
-              await users.doc(requestDoc["requesterUID"]).get();
+          await users.doc(requestDoc["requesterUID"]).get();
           DocumentSnapshot activityDoc =
-              await activities.doc(requestDoc["activityUID"]).get();
+          await activities.doc(requestDoc["activityUID"]).get();
           returnList.add([
             RequestModel.fromSnapshot(requestDoc),
             UserModel.fromSnapshot(userDoc),
@@ -574,42 +612,58 @@ class PostServices {
     await requests.doc(requestID).delete();
   }
 
->>>>>>> Stashed changes
+  Future<List<List<dynamic>>> getFriendRequests()async{
+    List<List<dynamic>> returnList =[/*requestModel, usermodel,*/];
+    DocumentSnapshot myDoc = await users.doc(myId).get();
+    List<String> notIDs = myDoc["notifications"].cast<String>();
+    for (String id in notIDs) {
+      DocumentSnapshot notDoc = await notifications.doc(id).get();
+      if (notDoc["type"] == 1) {
+        DocumentSnapshot requestDoc = await requests.doc(notDoc["requestID"])
+            .get();
+        if (requestDoc["type"] == 0) {
+          DocumentSnapshot userDoc = await users.doc(requestDoc["requesterUID"]).get();
+          returnList.add([RequestModel.fromSnapshot(requestDoc),
+            UserModel.fromSnapshot(userDoc),]);
+        }
+      }
+    }
+    returnList.sort((a, b) => b[0].time.compareTo(a[0].time));
+    return returnList;
+  }
+
+
+
 }
 
 class PartivityModel {
   ActivityModel activity;
   List<UserModel> participantList;
 
-  PartivityModel(
-      {required this.activity,
-    required this.participantList
-  });
+  PartivityModel({required this.activity, required this.participantList});
 
   void setAct(ActivityModel act) {
     this.activity = act;
   }
+
   void setParts(List<UserModel> m) {
     this.participantList = m;
   }
 }
 
-class PosticipantModel{
+class PosticipantModel {
   PostModel post;
   List<UserModel> participantList;
 
-  PosticipantModel(
-      {required this.post,
-        required this.participantList
-      });
+  PosticipantModel({required this.post, required this.participantList});
 
   void setPost(PostModel postModel) {
     this.post = postModel;
   }
+
   void setParts(List<UserModel> m) {
     this.participantList = m;
   }
-
 }
 
 class DenemeModel {
@@ -631,10 +685,11 @@ class DenemeModel {
   }
 }
 
-class NotificationActivityModel{
+class NotificationActivityModel {
   UserModel user;
   ReactionModel reaction;
   PostModel post;
 
-  NotificationActivityModel({required this.user,required this.reaction,required this.post});
+  NotificationActivityModel(
+      {required this.user, required this.reaction, required this.post});
 }
