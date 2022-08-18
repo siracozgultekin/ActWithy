@@ -43,6 +43,14 @@ class PostServices {
 
   Future<void> updatePost(PostModel postModel) async {
     await posts.doc(postModel.postUID).set(postModel.createMap());
+    if(postModel.activityUID.isEmpty){
+      DocumentSnapshot myDoc = await users.doc(myId).get();
+      UserModel userModel = UserModel.fromSnapshot(myDoc);
+      userModel.posts.remove(postModel.postUID);
+      userModel.lastPostStamp=Timestamp.fromDate(DateTime(2010));
+      updateUser(userModel);
+      posts.doc(postModel.postUID).delete();
+    }
   }
 
   Future<void> updateUser(UserModel userModel) async {
