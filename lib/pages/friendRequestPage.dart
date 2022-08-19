@@ -4,6 +4,7 @@ import 'package:actwithy/Models/ReactionModel.dart';
 import 'package:actwithy/Models/RequestModel.dart';
 import 'package:actwithy/Models/UserModel.dart';
 import 'package:actwithy/pages/homePage.dart';
+import 'package:actwithy/pages/profilePage.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:actwithy/services/searchService.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -31,7 +32,13 @@ class _FriendRequestPageState extends State<FriendRequestPage> {
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Icon(Icons.person_add_alt_1),
+            child: InkWell(
+                onTap: (){
+                  setState(() {
+
+                  });
+                },
+                child: Icon(Icons.person_add_alt_1)),
           ),
         ],
       ),
@@ -89,14 +96,18 @@ class _FriendRequestPageState extends State<FriendRequestPage> {
             children: [
               Padding(
                 padding: EdgeInsets.all(8),
-                child: Container(
-                  height: MediaQuery.of(context).size.height * 0.065,
-                  width: MediaQuery.of(context).size.height * 0.065,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      fit: BoxFit.cover,
-                      image: NetworkImage(user.ppURL),
+                child: InkWell(
+                  onTap:()
+                  {Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>ProfilePage(user: user)));},
+                  child: Container(
+                    height: MediaQuery.of(context).size.height * 0.065,
+                    width: MediaQuery.of(context).size.height * 0.065,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        fit: BoxFit.cover,
+                        image: NetworkImage(user.ppURL),
+                      ),
                     ),
                   ),
                 ),
@@ -105,28 +116,32 @@ class _FriendRequestPageState extends State<FriendRequestPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width*0.25,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "${user.name} ${user.surname.substring(0,1).toUpperCase()}.",
-                            style: TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.bold),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                    InkWell(
+                      onTap:()
+                    {Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>ProfilePage(user: user)));},
+                      child: Container(
+                        width: MediaQuery.of(context).size.width*0.25,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "${user.name} ${user.surname.substring(0,1).toUpperCase()}.",
+                              style: TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.bold),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
 
-                          ),
-                          Text(
-                            "@${user.username}",
-                            maxLines: 2,
-                            style: TextStyle(
-                                fontSize: 13, fontWeight: FontWeight.bold,),
+                            ),
+                            Text(
+                              "@${user.username}",
+                              maxLines: 2,
+                              style: TextStyle(
+                                  fontSize: 13, fontWeight: FontWeight.bold,),
 
-                          ),
-                        ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     Container(
