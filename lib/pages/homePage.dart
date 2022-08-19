@@ -33,6 +33,7 @@ class _HomePageState extends State<HomePage> {
   List<bool> isReaction = [];
   List<List<int>> amIparticipateList = [];
   List<List<bool>> isRequest = [];
+  bool destinationClicked =false;
 
   @override
   void initState() {
@@ -153,7 +154,8 @@ class _HomePageState extends State<HomePage> {
         ),
         child: NavigationBar(
           selectedIndex: selectedIndex,
-          onDestinationSelected: (value) async {
+          onDestinationSelected:destinationClicked? (value){}: (value) async {
+            setState((){destinationClicked=true;});
             bool check = await PostServices().checkDailyPost();
 
             PostModel postModel;
@@ -195,6 +197,7 @@ class _HomePageState extends State<HomePage> {
               break;
 
             }
+            setState((){destinationClicked=false;});
           },
           destinations: [
             NavigationDestination(
