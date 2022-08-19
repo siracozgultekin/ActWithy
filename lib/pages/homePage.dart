@@ -13,6 +13,7 @@ import 'package:actwithy/services/postServices.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:emojis/emojis.dart';
+import 'package:intl/intl.dart';
 import 'package:emojis/emoji.dart';
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -33,7 +34,12 @@ class _HomePageState extends State<HomePage> {
   List<bool> isReaction = [];
   List<List<int>> amIparticipateList = [];
   List<List<bool>> isRequest = [];
+
+  NumberFormat formatter = NumberFormat("00");
+
+
   bool destinationClicked =false;
+
 
   @override
   void initState() {
@@ -299,7 +305,7 @@ class _HomePageState extends State<HomePage> {
                                 ],
                               ),
                             ),
-                            Text("${mod.postObj.date.toDate().day}/${mod.postObj.date.toDate().month}/${mod.postObj.date.toDate().year}",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 17),),
+                            Text("${formatter.format(mod.postObj.date.toDate().day)}/${formatter.format(mod.postObj.date.toDate().month)}/${mod.postObj.date.toDate().year}",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 17),),
                           ],
                         ),
                       ),
@@ -353,7 +359,7 @@ class _HomePageState extends State<HomePage> {
                                                                     .watch_later_outlined)),
                                                           ),
                                                           Text(
-                                                              "${activity.time.toDate().hour}:${mod.activitiesList[indexx].time.toDate().minute}"),
+                                                              "${formatter.format(activity.time.toDate().hour)}:${formatter.format(mod.activitiesList[indexx].time.toDate().minute)}"),
                                                         ],
                                                       )
                                                     ],
@@ -925,6 +931,7 @@ class _HomePageState extends State<HomePage> {
                                       color: Colors.green,
                                       shape: BoxShape.circle,
                                       image: DecorationImage(
+                                        fit: BoxFit.cover,
                                         image: NetworkImage(user.ppURL),
                                       ),
                                     ),

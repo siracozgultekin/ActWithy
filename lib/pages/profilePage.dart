@@ -28,48 +28,59 @@ class _ProfilePageState extends State<ProfilePage> {
   int selectedIndex = 4;
   UserModel user;
   _ProfilePageState(this.user);
-  //List<List<ActivityModel>> actList = [];
-  //TODO emojilerdeki List<bool> gibi yappp
-
-
 
   bool isToDo = true;
   bool isMyFriend = false;
   bool pending = false;
   String buttonText = "";
+
+  
+  bool initial=true;
+
+  
+
   bool isClicked=false;
 
   bool destinationClicked =false;
   
+
   final controller = ScrollController();
 
 
-  bool hidden =true;
+  late bool hidden;
   List<bool> boolList = [];
 
   String isRequest = "";
 
-  double containerHeight =0;
+  late double containerHeight;
 
 
   getIsMyFriend() async {
     bool result = await SearchService().isMyFriend(user.userUID);
+
     String temp = await SearchService().isPending(user.userUID);
     containerHeight=MediaQuery.of(context).size.height*0.38;
     isRequest = await SearchService().controlFriendRequest(user.userUID);
 
     pending = !temp.isEmpty;
+
     //bool isPenging = await ;
     setState(() {
       isMyFriend = result;
+      if(result){
+        hidden=false;
+      }
       if (isMyFriend) {
         buttonText = "Remove Friend";
+        hidden=false;
       }
       else if (pending) {
         buttonText = "Pending";
+        hidden = true;
       }
       else {
         buttonText = "Add Friend";
+        hidden=true;
       }
     });
   }
@@ -98,12 +109,9 @@ class _ProfilePageState extends State<ProfilePage> {
     //
     // });
 
-
-
-
-
     scrollController.addListener(() {
       double off = scrollController.offset;
+      initial=false;
 
 
         if(off>MediaQuery.of(context).size.height*0.38){
@@ -151,11 +159,15 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
 
     bool isMyPage = user.userUID == FirebaseAuth.instance.currentUser!.uid;
-    
+
     if (isMyPage) {
       hidden = false;
     }
-    if(!isMyPage && isMyFriend) hidden =false;
+
+    if(isMyFriend) {
+      hidden=false;
+    }
+
 
 
     //https://www.youtube.com/watch?v=Cn6VCTaHB-k
@@ -316,20 +328,23 @@ class _ProfilePageState extends State<ProfilePage> {
                 duration: Duration(milliseconds: 1),
                 width: MediaQuery.of(context).size.width,
                 alignment: Alignment.topCenter,
-                height: containerHeight,
+                height: initial?MediaQuery.of(context).size.height*0.38:containerHeight,
               // (scrollController.offset<=MediaQuery.of(context).size.height*0.38) ? MediaQuery.of(context).size.height*0.38-scrollController.offset : 0,
                 //denemeTopContainer == 0 ?  MediaQuery.of(context).size.height*0.38 : denemeTopContainer == 1 ? MediaQuery.of(context).size.height*0.28 : denemeTopContainer == 2 ? MediaQuery.of(context).size.height*0.15 : 0,
                 child: ProfileWidget(isMyPage)),
+                
+          (hidden?Divider(thickness: 2, color: textColor,):DividerWidget()),
+          Expanded(child: isToDo ? (hidden ? hiddenWidget():ToDoWidget()) : (hidden ? hiddenWidget() : FriendWidget())),
+          //hidden?Divider(thickness: 2, color: textColor,):DividerWidget(),
+          //Expanded(child: isToDo ? (hidden ? hiddenWidget():ToDoWidget()) : (hidden ? hiddenWidget() : FriendWidget())),
 
-          hidden?Divider(thickness: 2, color: textColor,):DividerWidget(),
-          Expanded(child: isToDo ? (hidden ? hiddenWidget():ToDoWidget()) : (hidden ? hiddenWidget() : RefreshIndicator(
-              onRefresh: func,
-              child: FriendWidget()))),
         ],
 
       ),
     );
   }
+
+
   
   Widget hiddenWidget() {
     return Column(
@@ -472,6 +487,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       MaterialPageRoute(
                           builder: (context) =>
                               EditProfilePage(userModel: user))).then((value) {
+
                   });
                   //Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfilePage(userModel: user,)));
                 } else if (!isMyFriend && pending) {
@@ -715,7 +731,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                                                 Icon(Icons.watch_later_outlined)),
                                                                       ),
                                                                       Text(
-                                                                          "${activity.time.toDate().hour}:${activity.time.toDate().minute}"),
+                                                                          "${formatter.format(activity.time.toDate().hour)}:${formatter.format(activity.time.toDate().minute)}"),
                                                                     ],
                                                                   )
                                                                 ],
@@ -1234,7 +1250,7 @@ class _ProfilePageState extends State<ProfilePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Icon(Icons.calendar_month_outlined, size: 30, color: textColor,),
-              Text("${post.date.toDate().day}/${post.date.toDate().month}/${post.date.toDate().year}",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 17),),
+              Text("${formatter.format(post.date.toDate().day)}/${formatter.format(post.date.toDate().month)}/${post.date.toDate().year}",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 17,color: textColor),),
             ],
           ),
           Divider(thickness: 2,color: textColor,)
@@ -1395,7 +1411,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                                 .watch_later_outlined)),
                                                       ),
                                                       Text(
-                                                          "${activity.time.toDate().hour}:${mod.activitiesList[index].time.toDate().minute}"),
+                                                          "${formatter.format(activity.time.toDate().hour)}:${formatter.format(mod.activitiesList[index].time.toDate().minute)}"),
                                                     ],
                                                   )
                                                 ],
@@ -2168,6 +2184,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           color: Colors.green,
                                           shape: BoxShape.circle,
                                           image: DecorationImage(
+                                            fit: BoxFit.cover,
                                             image: NetworkImage(user.ppURL),
                                           ),
                                         ),
