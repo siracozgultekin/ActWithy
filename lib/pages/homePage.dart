@@ -100,9 +100,8 @@ class _HomePageState extends State<HomePage> {
 
         ],
       ),
-<<<<<<< Updated upstream
-      body: FutureBuilder(
 
+<<<<<<< Updated upstream
           future: PostServices().getFriendsPosts(),
           builder: (context, AsyncSnapshot snap) {
             if (!snap.hasData) {
@@ -143,6 +142,8 @@ class _HomePageState extends State<HomePage> {
             }
           }),
 =======
+=======
+>>>>>>> Stashed changes
       body: RefreshIndicator(
         onRefresh: yenile,
         child: FutureBuilder(
@@ -187,7 +188,7 @@ class _HomePageState extends State<HomePage> {
               }
             }),
       ),
->>>>>>> Stashed changes
+
       bottomNavigationBar: NavigationBarTheme(
         data: NavigationBarThemeData(
           height: MediaQuery.of(context).size.height * 0.075,
