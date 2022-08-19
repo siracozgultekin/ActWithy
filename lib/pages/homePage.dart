@@ -39,6 +39,9 @@ class _HomePageState extends State<HomePage> {
     getMe();
     super.initState();
   }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,7 +104,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: yenile,
+        onRefresh: func,
         child: FutureBuilder(
 
             future: PostServices().getFriendsPosts(),
@@ -110,7 +113,7 @@ class _HomePageState extends State<HomePage> {
                 return Container(
                   decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage("assets/images/mev.png"),
+                        image: AssetImage("assets/images/twirl-dance.gif"),
                       )),
                 );
               } else {
@@ -144,7 +147,6 @@ class _HomePageState extends State<HomePage> {
               }
             }),
       ),
-
       bottomNavigationBar: NavigationBarTheme(
         data: NavigationBarThemeData(
           height: MediaQuery.of(context).size.height * 0.075,
@@ -179,12 +181,8 @@ class _HomePageState extends State<HomePage> {
               selectedIndex = value;
             });
             switch(selectedIndex){
-              case 0:
-                {
-                  setState(() {});
-                  scrollUp();
-                }
-                break;
+              case 0: scrollUp();
+              break;
               case 1: showSearch(context: context, delegate: SearchPage(hintText: "Search", hintTextColor: TextStyle(color: Colors.white)));
               break;
               case 2: Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreatingPage(postModel: postModel)));
@@ -982,6 +980,12 @@ class _HomePageState extends State<HomePage> {
           ],
         ));
   }
+  Future<void> func() async {
+
+    setState(() {
+
+    });
+  }
 
   void createList(List<ActivityModel> activityList){
 
@@ -1007,9 +1011,5 @@ class _HomePageState extends State<HomePage> {
     }
     return false;
   }
- Future<void>yenile ()async{
-    setState(() {
 
-    });
- }
 }

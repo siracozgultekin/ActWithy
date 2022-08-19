@@ -47,14 +47,17 @@ class _NotificationPageState extends State<NotificationPage> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          DividerWidget(),
-          Expanded(
-              child: isReaction
-                  ? ReactionWidget()
-                  : RequestWidget()),
-        ],
+      body: RefreshIndicator(
+        onRefresh: func,
+        child: Column(
+          children: [
+            DividerWidget(),
+            Expanded(
+                child: isReaction
+                    ? ReactionWidget()
+                    : RequestWidget()),
+          ],
+        ),
       ),
       bottomNavigationBar: NavigationBarTheme(
         data: NavigationBarThemeData(
@@ -201,7 +204,7 @@ class _NotificationPageState extends State<NotificationPage> {
 
   Widget ReactionWidget() {
     return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
+      physics: AlwaysScrollableScrollPhysics(),
       child: FutureBuilder(
           future: PostServices().getNotificationReactions(),
           builder: (context, AsyncSnapshot snap) {
@@ -326,7 +329,7 @@ class _NotificationPageState extends State<NotificationPage> {
 
   Widget RequestWidget() {
     return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
+      physics: AlwaysScrollableScrollPhysics(),
       child: FutureBuilder(
           future: PostServices().getActivityRequestNotification(),
           builder: (context, AsyncSnapshot snap) {
@@ -465,6 +468,12 @@ class _NotificationPageState extends State<NotificationPage> {
       ),
     );
   }
+
+  Future<void> func() async {
+    setState(() {
+
+    });
+ }
 
   bool controlDate(DateTime dateTime){
     DateTime today = DateTime.now();
