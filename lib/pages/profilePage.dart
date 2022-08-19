@@ -310,7 +310,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: ProfileWidget(isMyPage)),
 
           hidden?Divider(thickness: 2, color: textColor,):DividerWidget(),
-          Expanded(child: isToDo ? (hidden ? hiddenWidget():ToDoWidget()) : (hidden ? hiddenWidget() : FriendWidget())),
+          Expanded(child: isToDo ? (hidden ? hiddenWidget():ToDoWidget()) : (hidden ? hiddenWidget() : RefreshIndicator(
+              onRefresh: func,
+              child: FriendWidget()))),
         ],
 
       ),
@@ -1233,7 +1235,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget FriendWidget() {
     return SingleChildScrollView(
       controller: scrollController,
-      physics: BouncingScrollPhysics(),
+      physics: AlwaysScrollableScrollPhysics(),
       child: FutureBuilder(
         future: PostServices().getFriends(user.friends),
         builder: (context, AsyncSnapshot snap) {
@@ -2090,7 +2092,11 @@ class _ProfilePageState extends State<ProfilePage> {
     final double start = 0;
     controller.jumpTo(start);
   }
+  Future<void> func()async{
+  setState(() {
 
+  });
+}
   ParticipantPopUp(List<UserModel> participantList) {
     return showDialog(
         context: context,

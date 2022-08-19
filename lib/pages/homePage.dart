@@ -47,9 +47,12 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Color(0XFFD6E6F1),
       drawer: isLoading
-          ? CircularProgressIndicator(
+          ? Container(
+        height: 50,width: 50,
+            child: CircularProgressIndicator(
         backgroundColor: Color(0xFF15202B),
-      )
+      ),
+          )
           : DrawerPage(
         userProf: user,
       ),
@@ -315,7 +318,9 @@ class _HomePageState extends State<HomePage> {
                                             .getParticipantsAndRequest(mod.activitiesList[indexx]),
                                         builder: (context, AsyncSnapshot snap) {
                                           if (!snap.hasData) {
-                                            return CircularProgressIndicator();
+                                            return Container(
+                                                height: 50,width: 50,
+                                                child: Center(child: CircularProgressIndicator()));
                                           }else{
                                             ActivityModel activity = mod.activitiesList[indexx];
                                             List<UserModel> participantList = snap.data[0].cast<UserModel>();
