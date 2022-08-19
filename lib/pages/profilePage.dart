@@ -47,7 +47,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final controller = ScrollController();
 
 
-  late bool hidden;
+  bool hidden = true;
   List<bool> boolList = [];
 
   String isRequest = "";
@@ -97,7 +97,6 @@ class _ProfilePageState extends State<ProfilePage> {
   initState() {
 
 
-    //getActList(user.lastPostID);
     getIsMyFriend();
     super.initState();
 
@@ -121,8 +120,6 @@ class _ProfilePageState extends State<ProfilePage> {
         }
 
 
-
-      //print("$off   +++ $containerHeight");
     });
 /*
     scrollController.addListener(() {
@@ -167,7 +164,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if(isMyFriend) {
       hidden=false;
     }
-
+    print ("${user.username}    $hidden");
 
 
     //https://www.youtube.com/watch?v=Cn6VCTaHB-k
