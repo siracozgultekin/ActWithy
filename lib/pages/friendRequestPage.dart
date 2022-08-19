@@ -36,29 +36,33 @@ class _FriendRequestPageState extends State<FriendRequestPage> {
         ],
       ),
       body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        child: FutureBuilder(
-          future: PostServices().getFriendRequests(),
-          builder: (context, AsyncSnapshot snap) {
-            if (!snap.hasData) {
-              return CircularProgressIndicator();
-            } else {
-              List<List<dynamic>> notifications = snap.data;
-              return Column(
-                children: [
-                  ListView.builder(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.vertical,
-                      physics: ClampingScrollPhysics(),
-                      itemCount: notifications.length,
-                      itemBuilder: (context, index) {
-                        isClicked.add(false);
-                        return ListViewTile(notifications[index],index);
-                      })
-                ],
-              );
-            }
-          },
+        physics: ClampingScrollPhysics(),
+        child: RefreshIndicator(
+          displacement: 1,
+          onRefresh: func,
+          child: FutureBuilder(
+            future: PostServices().getFriendRequests(),
+            builder: (context, AsyncSnapshot snap) {
+              if (!snap.hasData) {
+                return CircularProgressIndicator();
+              } else {
+                List<List<dynamic>> notifications = snap.data;
+                return Column(
+                  children: [
+                    ListView.builder(
+                        shrinkWrap: true,
+                        scrollDirection: Axis.vertical,
+                        physics: AlwaysScrollableScrollPhysics(),
+                        itemCount: notifications.length,
+                        itemBuilder: (context, index) {
+                          isClicked.add(false);
+                          return ListViewTile(notifications[index],index);
+                        })
+                  ],
+                );
+              }
+            },
+          ),
         ),
       ),
     );
@@ -179,5 +183,10 @@ class _FriendRequestPageState extends State<FriendRequestPage> {
         ),
       ),
     );
+  }
+  Future<void> func() async {
+    setState(() {
+
+    });
   }
 }
