@@ -37,7 +37,7 @@ class _ProfilePageState extends State<ProfilePage> {
   
   bool initial=true;
 
-  
+  bool empty = true;
 
   bool isClicked=false;
 
@@ -82,6 +82,8 @@ class _ProfilePageState extends State<ProfilePage> {
         buttonText = "Add Friend";
         hidden=true;
       }
+
+      empty = false;
     });
   }
 
@@ -164,7 +166,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if(isMyFriend) {
       hidden=false;
     }
-    print ("${user.username}    $hidden");
+
 
 
     //https://www.youtube.com/watch?v=Cn6VCTaHB-k
@@ -329,8 +331,9 @@ class _ProfilePageState extends State<ProfilePage> {
               // (scrollController.offset<=MediaQuery.of(context).size.height*0.38) ? MediaQuery.of(context).size.height*0.38-scrollController.offset : 0,
                 //denemeTopContainer == 0 ?  MediaQuery.of(context).size.height*0.38 : denemeTopContainer == 1 ? MediaQuery.of(context).size.height*0.28 : denemeTopContainer == 2 ? MediaQuery.of(context).size.height*0.15 : 0,
                 child: ProfileWidget(isMyPage)),
-                
+               empty ? Container():
           (hidden?Divider(thickness: 2, color: textColor,):DividerWidget()),
+          empty ? Container():
           Expanded(child: isToDo ? (hidden ? hiddenWidget():ToDoWidget()) : (hidden ? hiddenWidget() : FriendWidget())),
           //hidden?Divider(thickness: 2, color: textColor,):DividerWidget(),
           //Expanded(child: isToDo ? (hidden ? hiddenWidget():ToDoWidget()) : (hidden ? hiddenWidget() : FriendWidget())),
