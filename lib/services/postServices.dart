@@ -47,6 +47,7 @@ class PostServices {
       DocumentSnapshot myDoc = await users.doc(myId).get();
       UserModel userModel = UserModel.fromSnapshot(myDoc);
       userModel.posts.remove(postModel.postUID);
+      userModel.postCount--;
       userModel.lastPostStamp=Timestamp.fromDate(DateTime(2010));
       updateUser(userModel);
       posts.doc(postModel.postUID).delete();
