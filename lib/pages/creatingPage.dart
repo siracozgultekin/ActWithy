@@ -42,6 +42,8 @@ class _CreatingPageState extends State<CreatingPage> {
 
   List<ActivityModel> activities = [];
 
+  bool destinationClicked =false;
+
   initState() {
     length = widget.postModel.activityUID.length;
     CreatingPage.participants = CreatingPage.participants;
@@ -531,7 +533,8 @@ class _CreatingPageState extends State<CreatingPage> {
         ),
         child: NavigationBar(
           selectedIndex: selectedIndex,
-          onDestinationSelected: (value) async {
+          onDestinationSelected: destinationClicked? (value){}:  (value) async {
+            setState((){destinationClicked=true;});
             bool check = await PostServices().checkDailyPost();
 
             PostModel postModel;
@@ -567,6 +570,7 @@ class _CreatingPageState extends State<CreatingPage> {
               break;
 
             }
+            setState((){destinationClicked=false;});
           },
           destinations: [
             NavigationDestination(
@@ -769,33 +773,36 @@ class _CreatingPageState extends State<CreatingPage> {
                                 ],
                               ),
                             ), // activity and clock
-                            Row(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.only(left: 10),
-                                  child: InkWell(
-                                      onTap: () async{
-                                        widget.postModel.activityUID.remove(activityObj.activityUID);
-                                        await PostServices().updatePost(widget.postModel).then((value) {
+                            Container(
+                              width: MediaQuery.of(context).size.width*0.22,
+                              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.only(left: 10),
+                                    child: InkWell(
+                                        onTap: () async{
+                                          widget.postModel.activityUID.remove(activityObj.activityUID);
+                                          await PostServices().updatePost(widget.postModel).then((value) {
+                                            setState(() {});
+                                          });
+                                        }, child: Icon(Icons.close,size: 31,)),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.all(0.0),
+                                    child: InkWell(
+                                      child: Icon(Icons.edit,size: 31,),
+                                      onTap: () async {
+                                        EditingPopUp(activityObj).then((value) {
                                           setState(() {});
                                         });
-                                      }, child: Icon(Icons.close)),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.all(0.0),
-                                  child: InkWell(
-                                    child: Icon(Icons.edit),
-                                    onTap: () async {
-                                      EditingPopUp(activityObj).then((value) {
-                                        setState(() {});
-                                      });
-                                      participantList = await PostServices()
-                                          .getParticipants(activityObj);
+                                        participantList = await PostServices()
+                                            .getParticipants(activityObj);
 
-                                    },
+                                      },
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ), // delete and edit icons
                           ],
                         ),

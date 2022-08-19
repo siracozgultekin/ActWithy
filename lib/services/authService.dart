@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'package:actwithy/Models/UserModel.dart';
+import 'package:actwithy/pages/editProfilePage.dart';
 import 'package:actwithy/pages/homePage.dart';
 import 'package:actwithy/pages/welcomePage.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 class AuthService{
@@ -91,17 +93,23 @@ class AuthService{
       return userUrl;
     }
 
-    final file = File(image.path);
+    var file = File(image.path);
+    CroppedFile? crp = await imageCropper(file, isPP);
+    if(crp != null) {
+      file = File(crp.path);
+      FirebaseStorage storage = FirebaseStorage.instance;
+      Reference reference = storage.ref().child('userProfiles/${userId}/${Timestamp.now()}');
+      UploadTask task = reference.putFile(file);
+      await task.whenComplete(() {
+        print("uploaded");
+      });
+      String url = await reference.getDownloadURL();
+      return url;
+    }
+    return "";
 
-    FirebaseStorage storage = FirebaseStorage.instance;
-    Reference reference = storage.ref().child('userProfiles/${userId}/${Timestamp.now()}');
-    UploadTask task = reference.putFile(file);
-    await task.whenComplete(() {
-      print("uploaded");
-    });
-    String url = await reference.getDownloadURL();
-    return url;
   }
+
 
   Future approveImage(String url, bool isPP) async{
     String userId = FirebaseAuth.instance.currentUser!.uid;
@@ -138,5 +146,21 @@ class AuthService{
 
   }
 
-}
+  Future<CroppedFile?> imageCropper(File file, bool isPP) async {
+    CroppedFile? croppedphoto = await ImageCropper().cropImage(
+      sourcePath: file.path,
+      aspectRatioPresets: (isPP) ?[
+        CropAspectRatioPreset.square,
+      ] :  [
+        CropAspectRatioPreset.ratio16x9
+      ],
+      maxWidth: 800,
+    );
+
+    return croppedphoto;
+
+    }
+  }
+
+
 

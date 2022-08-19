@@ -30,6 +30,7 @@ class _NotificationPageState extends State<NotificationPage> {
   Color selectedColor = Color(0xFF2D3A43); //dark blue
 
   List<bool> isClicked = [];
+  bool destinationClicked =false;
 
   @override
   Widget build(BuildContext context) {
@@ -47,14 +48,17 @@ class _NotificationPageState extends State<NotificationPage> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          DividerWidget(),
-          Expanded(
-              child: isReaction
-                  ? ReactionWidget()
-                  : RequestWidget()),
-        ],
+      body: RefreshIndicator(
+        onRefresh: func,
+        child: Column(
+          children: [
+            DividerWidget(),
+            Expanded(
+                child: isReaction
+                    ? ReactionWidget()
+                    : RequestWidget()),
+          ],
+        ),
       ),
       bottomNavigationBar: NavigationBarTheme(
         data: NavigationBarThemeData(
@@ -64,7 +68,8 @@ class _NotificationPageState extends State<NotificationPage> {
         ),
         child: NavigationBar(
           selectedIndex: selectedIndex,
-          onDestinationSelected: (value) async {
+          onDestinationSelected: destinationClicked? (value){}: (value) async {
+            setState((){destinationClicked=true;});
             bool check = await PostServices().checkDailyPost();
 
             PostModel postModel;
@@ -100,6 +105,7 @@ class _NotificationPageState extends State<NotificationPage> {
               break;
 
             }
+            setState((){destinationClicked=false;});
           },
           destinations: [
             NavigationDestination(
@@ -201,7 +207,7 @@ class _NotificationPageState extends State<NotificationPage> {
 
   Widget ReactionWidget() {
     return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
+      physics: AlwaysScrollableScrollPhysics(),
       child: FutureBuilder(
           future: PostServices().getNotificationReactions(),
           builder: (context, AsyncSnapshot snap) {
@@ -326,7 +332,7 @@ class _NotificationPageState extends State<NotificationPage> {
 
   Widget RequestWidget() {
     return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
+      physics: AlwaysScrollableScrollPhysics(),
       child: FutureBuilder(
           future: PostServices().getActivityRequestNotification(),
           builder: (context, AsyncSnapshot snap) {
@@ -465,6 +471,12 @@ class _NotificationPageState extends State<NotificationPage> {
       ),
     );
   }
+
+  Future<void> func() async {
+    setState(() {
+
+    });
+ }
 
   bool controlDate(DateTime dateTime){
     DateTime today = DateTime.now();

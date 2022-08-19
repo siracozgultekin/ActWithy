@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:actwithy/Models/UserModel.dart';
 import 'package:actwithy/pages/imagePickerPage.dart';
 import 'package:actwithy/pages/profilePage.dart';
 import 'package:actwithy/services/postServices.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class EditProfilePage extends StatefulWidget {
 
@@ -240,7 +243,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ],
           ),
       ),
-      
+
     );
+
   }
+
 }

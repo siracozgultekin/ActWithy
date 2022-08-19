@@ -14,6 +14,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../services/authService.dart';
 import 'notificationPage.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -24,6 +25,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  int selectedIndex = 4;
   UserModel user;
   _ProfilePageState(this.user);
 
@@ -31,14 +33,17 @@ class _ProfilePageState extends State<ProfilePage> {
   bool isMyFriend = false;
   bool pending = false;
   String buttonText = "";
-<<<<<<< Updated upstream
 
-=======
-  bool isClicked=false;
+  
   bool initial=true;
 
   
->>>>>>> Stashed changes
+
+  bool isClicked=false;
+
+  bool destinationClicked =false;
+  
+
   final controller = ScrollController();
 
 
@@ -152,7 +157,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    int selectedIndex = 4;
+
     bool isMyPage = user.userUID == FirebaseAuth.instance.currentUser!.uid;
 
     if (isMyPage) {
@@ -178,7 +183,8 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         child: NavigationBar(
           selectedIndex: selectedIndex,
-          onDestinationSelected: (value) async {
+          onDestinationSelected: destinationClicked? (value){}: (value) async {
+            setState((){destinationClicked=true;});
             bool check = await PostServices().checkDailyPost();
 
             PostModel postModel;
@@ -198,30 +204,37 @@ class _ProfilePageState extends State<ProfilePage> {
               //oluşturulmuş demek
               postModel = await PostServices().getDailyPost();
             }
+            UserModel currentUser = await AuthService().getCurrentUser();
 
             setState(() {
               selectedIndex = value;
 
             });
-            if (selectedIndex == 0) {
-              Navigator.of(context).pushAndRemoveUntil(
+
+            switch(selectedIndex){
+              case 0: Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => HomePage()),
                       (route) => false);
-            } else if (selectedIndex == 1) {
-              showSearch(
+              break;
+              case 1: showSearch(
                   context: context,
                   delegate: SearchPage(
                       hintText: "Search",
                       hintTextColor: TextStyle(color: Colors.white)));
-            } else if (selectedIndex == 2) {
-              Navigator.of(context).pushReplacement(MaterialPageRoute(
+              break;
+              case 2: Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (context) => CreatingPage(postModel: postModel)));
-            } else if (selectedIndex == 3) {
-              Navigator.of(context).pushReplacement(MaterialPageRoute(
+              break;
+              case 3: Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (context) => NotificationPage()));
-            } else if (selectedIndex == 4) {
-
+              break;
+              case 4:
+                //if(!isMyPage)
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => ProfilePage(user: currentUser)));
+                break;
             }
+
+            setState((){destinationClicked=false;});
           },
           /*  if (selected == 0) {
 
@@ -319,13 +332,12 @@ class _ProfilePageState extends State<ProfilePage> {
               // (scrollController.offset<=MediaQuery.of(context).size.height*0.38) ? MediaQuery.of(context).size.height*0.38-scrollController.offset : 0,
                 //denemeTopContainer == 0 ?  MediaQuery.of(context).size.height*0.38 : denemeTopContainer == 1 ? MediaQuery.of(context).size.height*0.28 : denemeTopContainer == 2 ? MediaQuery.of(context).size.height*0.15 : 0,
                 child: ProfileWidget(isMyPage)),
-
+                
           (hidden?Divider(thickness: 2, color: textColor,):DividerWidget()),
-
-
           Expanded(child: isToDo ? (hidden ? hiddenWidget():ToDoWidget()) : (hidden ? hiddenWidget() : FriendWidget())),
           //hidden?Divider(thickness: 2, color: textColor,):DividerWidget(),
           //Expanded(child: isToDo ? (hidden ? hiddenWidget():ToDoWidget()) : (hidden ? hiddenWidget() : FriendWidget())),
+
         ],
 
       ),
@@ -410,7 +422,8 @@ class _ProfilePageState extends State<ProfilePage> {
             right: 8.0,
             child: (isRequest!="")? Column(children: [
               ElevatedButton(
-              onPressed: () async {
+              onPressed: isClicked?(){}: () async {
+                setState((){isClicked=true;});
                 /// TODO arkadaşlık isteğini kabul et
                 await SearchService().addFriend(user.userUID);
                 UserModel me = UserModel.fromSnapshot(
@@ -419,7 +432,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     .deleteFriendRequest(me, isRequest).then((value) {
                   setState((){isRequest="";
                   isMyFriend =true;
-                  buttonText = "Remove Friend";});
+                  buttonText = "Remove Friend";
+                  isClicked=false;});
                 });
               },
               child: Text(
@@ -435,14 +449,17 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 minimumSize: Size(100, 30),
               ),
-            ),ElevatedButton(
-              onPressed: () async {
-                /// TODO arkadaşlık isteğini kabul et
+            ),
+              ElevatedButton(
+              onPressed: isClicked?(){}: () async {
+                setState((){isClicked=true;});
+                /// TODO arkadaşlık isteğini reddet
                 UserModel me = UserModel.fromSnapshot(
                     await PostServices().getMyDoc());
                 await PostServices()
                     .deleteFriendRequest(me, isRequest).then((value) {
-                  setState((){isRequest ="";});
+                  setState((){isRequest ="";
+                  isClicked=true;});
                 });
               },
               child: Text(
@@ -458,8 +475,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 minimumSize: Size(100, 30),
               ),
-            ),],): ElevatedButton(
-              onPressed: () async {
+            ),],):
+            ElevatedButton(
+              onPressed: isClicked?(){}: () async {
                 if (isMyPage) {
                   print(1);
                   ///TODO editle profili
@@ -473,6 +491,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   });
                   //Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfilePage(userModel: user,)));
                 } else if (!isMyFriend && pending) {
+                  setState((){isClicked=true;});
                   print(2);
 
                   await SearchService().deleteRequest(user.userUID).then((value){
@@ -480,13 +499,14 @@ class _ProfilePageState extends State<ProfilePage> {
                       hidden = true;
                       buttonText = "Add Friend";
                       pending = false;
+                      isClicked =false;
                     });
                   });
 
                 }
                 else if (!isMyPage && isMyFriend) {
                   print(3);
-
+                  setState((){isClicked=true;});
                   await SearchService()
                       .removeFriend(user.userUID)
                       .then((value) {
@@ -495,16 +515,18 @@ class _ProfilePageState extends State<ProfilePage> {
                       buttonText = "Add Friend";
                       pending = false; //gereksiz??
                       hidden = true;
+                      isClicked = false;
                     });
                   });
                 } else if (!isMyPage && !isMyFriend && !pending) {
                   print(4);
-
+                  setState((){isClicked=true;});
                   await SearchService().sendRequest(user.userUID).then((value) {
                     setState(() {
                       buttonText = "Pending";
                       pending = true;
                       hidden = true;
+                      isClicked = false;
                     });
                   });
                 }
@@ -1240,7 +1262,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget FriendWidget() {
     return SingleChildScrollView(
       controller: scrollController,
-      physics: BouncingScrollPhysics(),
+      physics: AlwaysScrollableScrollPhysics(),
       child: FutureBuilder(
         future: PostServices().getFriends(user.friends),
         builder: (context, AsyncSnapshot snap) {
@@ -2097,7 +2119,11 @@ class _ProfilePageState extends State<ProfilePage> {
     final double start = 0;
     controller.jumpTo(start);
   }
+  Future<void> func()async{
+  setState(() {
 
+  });
+}
   ParticipantPopUp(List<UserModel> participantList) {
     return showDialog(
         context: context,

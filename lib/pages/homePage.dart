@@ -34,7 +34,11 @@ class _HomePageState extends State<HomePage> {
   List<bool> isReaction = [];
   List<List<int>> amIparticipateList = [];
   List<List<bool>> isRequest = [];
+
   NumberFormat formatter = NumberFormat("00");
+
+
+  bool destinationClicked =false;
 
 
   @override
@@ -42,14 +46,20 @@ class _HomePageState extends State<HomePage> {
     getMe();
     super.initState();
   }
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0XFFD6E6F1),
       drawer: isLoading
-          ? CircularProgressIndicator(
+          ? Container(
+        height: 50,width: 50,
+            child: CircularProgressIndicator(
         backgroundColor: Color(0xFF15202B),
-      )
+      ),
+          )
           : DrawerPage(
         userProf: user,
       ),
@@ -103,47 +113,50 @@ class _HomePageState extends State<HomePage> {
 
         ],
       ),
-      body: FutureBuilder(
+      body: RefreshIndicator(
+        onRefresh: func,
+        child: FutureBuilder(
 
-          future: PostServices().getFriendsPosts(),
-          builder: (context, AsyncSnapshot snap) {
-            if (!snap.hasData) {
-              return Container(
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage("assets/images/mev.png"),
-                    )),
-              );
-            } else {
-              return Container(
-                height: MediaQuery.of(context).size.height * 0.8,
-                child: ListView.separated(
-                    controller: controller,
-                    shrinkWrap: true,
-                    separatorBuilder: (context, index) => Divider(
-                      color: Colors.grey,
-                      height: 0.15,
-                    ),
-                    scrollDirection: Axis.vertical,
-                    itemCount: snap.data.length, //TODO snap.data.length,
-                    itemBuilder: (context, index) {
-                      mediaqueryHeight=MediaQuery.of(context).size.height*0.06;
-                      isReaction.add(false);
-                      DenemeModel postModelObj =
-                      snap.data[index] as DenemeModel;
+            future: PostServices().getFriendsPosts(),
+            builder: (context, AsyncSnapshot snap) {
+              if (!snap.hasData) {
+                return Container(
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage("assets/images/twirl-dance.gif"),
+                      )),
+                );
+              } else {
+                return Container(
+                  height: MediaQuery.of(context).size.height * 0.8,
+                  child: ListView.separated(
+                      controller: controller,
+                      shrinkWrap: true,
+                      separatorBuilder: (context, index) => Divider(
+                        color: Colors.grey,
+                        height: 0.15,
+                      ),
+                      scrollDirection: Axis.vertical,
+                      itemCount: snap.data.length, //TODO snap.data.length,
+                      itemBuilder: (context, index) {
+                        mediaqueryHeight=MediaQuery.of(context).size.height*0.06;
+                        isReaction.add(false);
+                        DenemeModel postModelObj =
+                        snap.data[index] as DenemeModel;
 
-                      /// her post oluşturulduğunda tekrar ekliyor. En yukarıda oluşturulursa çözülebilir.
-                      createList(postModelObj.activitiesList);
-                      List<bool> add=[];
-                      for (int i=0;i<postModelObj.activitiesList.length;i++){
-                        add.add(false);
-                      }
-                      isRequest.add(add);
-                      return mainListTile(postModelObj, index);
-                    }),
-              );
-            }
-          }),
+                        /// her post oluşturulduğunda tekrar ekliyor. En yukarıda oluşturulursa çözülebilir.
+                        createList(postModelObj.activitiesList);
+                        List<bool> add=[];
+                        for (int i=0;i<postModelObj.activitiesList.length;i++){
+                          add.add(false);
+                        }
+                        isRequest.add(add);
+                        return mainListTile(postModelObj, index);
+                      }),
+                );
+              }
+            }),
+      ),
       bottomNavigationBar: NavigationBarTheme(
         data: NavigationBarThemeData(
           height: MediaQuery.of(context).size.height * 0.075,
@@ -152,7 +165,8 @@ class _HomePageState extends State<HomePage> {
         ),
         child: NavigationBar(
           selectedIndex: selectedIndex,
-          onDestinationSelected: (value) async {
+          onDestinationSelected:destinationClicked? (value){}: (value) async {
+            setState((){destinationClicked=true;});
             bool check = await PostServices().checkDailyPost();
 
             PostModel postModel;
@@ -190,6 +204,7 @@ class _HomePageState extends State<HomePage> {
               break;
 
             }
+            setState((){destinationClicked=false;});
           },
           destinations: [
             NavigationDestination(
@@ -312,7 +327,9 @@ class _HomePageState extends State<HomePage> {
                                             .getParticipantsAndRequest(mod.activitiesList[indexx]),
                                         builder: (context, AsyncSnapshot snap) {
                                           if (!snap.hasData) {
-                                            return CircularProgressIndicator();
+                                            return Container(
+                                                height: 50,width: 50,
+                                                child: Center(child: CircularProgressIndicator()));
                                           }else{
                                             ActivityModel activity = mod.activitiesList[indexx];
                                             List<UserModel> participantList = snap.data[0].cast<UserModel>();
@@ -977,6 +994,12 @@ class _HomePageState extends State<HomePage> {
                 child: Text("Ok")),
           ],
         ));
+  }
+  Future<void> func() async {
+
+    setState(() {
+
+    });
   }
 
   void createList(List<ActivityModel> activityList){

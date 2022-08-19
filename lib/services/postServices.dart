@@ -43,6 +43,14 @@ class PostServices {
 
   Future<void> updatePost(PostModel postModel) async {
     await posts.doc(postModel.postUID).set(postModel.createMap());
+    if(postModel.activityUID.isEmpty){
+      DocumentSnapshot myDoc = await users.doc(myId).get();
+      UserModel userModel = UserModel.fromSnapshot(myDoc);
+      userModel.posts.remove(postModel.postUID);
+      userModel.lastPostStamp=Timestamp.fromDate(DateTime(2010));
+      updateUser(userModel);
+      posts.doc(postModel.postUID).delete();
+    }
   }
 
   Future<void> updateUser(UserModel userModel) async {
@@ -360,9 +368,14 @@ class PostServices {
   }
 
   Future<void> deleteReaction(String reactionUID) async {
-    if (reactionUID != "") {
-      await reactions.doc(reactionUID).delete();
+    try{
+      if (reactionUID != "") {
+        await reactions.doc(reactionUID).delete();
+      }
+    }catch(e){
+      print("işlemde hata oluştu...");
     }
+
   }
 
   Future<bool> checkReaction(PostModel postModel) async {
@@ -422,17 +435,22 @@ class PostServices {
 
   Future<void> deleteReactionNotification(
       String rectionId, UserModel userModel) async {
-    if (rectionId != "") {
-      for (String id in userModel.notifications) {
-        DocumentSnapshot doc = await notifications.doc(id).get();
-        if (doc["reactionID"] == rectionId) {
-          userModel.notifications.remove(doc["notificationUID"]);
-          await updateUser(userModel);
-          await notifications.doc(doc["notificationUID"]).delete();
-          return;
+    try{
+      if (rectionId != "") {
+        for (String id in userModel.notifications) {
+          DocumentSnapshot doc = await notifications.doc(id).get();
+          if (doc["reactionID"] == rectionId) {
+            userModel.notifications.remove(doc["notificationUID"]);
+            await updateUser(userModel);
+            await notifications.doc(doc["notificationUID"]).delete();
+            return;
+          }
         }
       }
+    }catch(e){
+      print("işlemde hata oluştu...");
     }
+
   }
 
   Future<List<NotificationActivityModel>> getNotificationReactions() async {
@@ -520,10 +538,12 @@ class PostServices {
   }
 
   Future<void> deleteMyParticipate(ActivityModel activityModel) async {
-    activityModel.participants.remove(myId);
-    await updateActivity(activityModel);
+    try{
+      activityModel.participants.remove(myId);
+      await updateActivity(activityModel);
+    }catch(e){
 
-    /// TODO notification ve request objelerini sil
+    }
   }
 
 
@@ -544,26 +564,32 @@ class PostServices {
 
   Future<void> deleteActivityRequest(ActivityModel activityModel,
       RequestModel requestModel) async {
-    DocumentSnapshot doc1 = await users.doc(requestModel.requesteeUID).get();
-    UserModel userModel = UserModel.fromSnapshot(doc1) ;
-    activityModel.requests.remove(requestModel.requestUID);
-    await updateActivity(activityModel);
+    try{
+      DocumentSnapshot doc1 = await users.doc(requestModel.requesteeUID).get();
+      UserModel userModel = UserModel.fromSnapshot(doc1) ;
+      activityModel.requests.remove(requestModel.requestUID);
+      await updateActivity(activityModel);
 
-    String idNotification = "";
-    for (String notificationId in userModel.notifications) {
-      DocumentSnapshot doc = await notifications.doc(notificationId).get();
-      if (doc["requestID"] == requestModel.requestUID) {
-        idNotification = notificationId;
-        break;
+      String idNotification = "";
+      for (String notificationId in userModel.notifications) {
+        DocumentSnapshot doc = await notifications.doc(notificationId).get();
+        if (doc["requestID"] == requestModel.requestUID) {
+          idNotification = notificationId;
+          break;
+        }
       }
-    }
-    if (idNotification != "") {
-      userModel.notifications.remove(idNotification);
-      await updateUser(userModel);
-      await notifications.doc(idNotification).delete();
+      if (idNotification != "") {
+        userModel.notifications.remove(idNotification);
+        await updateUser(userModel);
+        await notifications.doc(idNotification).delete();
+      }
+
+      await requests.doc(requestModel.requestUID).delete();
+    }catch(e){
+      print("işlemde hata oluştu...");
+
     }
 
-    await requests.doc(requestModel.requestUID).delete();
   }
 
   Future<List<List<dynamic>>> getActivityRequestNotification() async {
@@ -595,21 +621,27 @@ class PostServices {
   }
 
   Future<void> deleteFriendRequest(UserModel requestee, String requestID)async{
-    String idNotification = "";
-    for (String notID in requestee.notifications){
-      DocumentSnapshot doc = await notifications.doc(notID).get();
-      if (doc["requestID"] == requestID) {
-        idNotification = notID;
-        break;
+    try{
+      String idNotification = "";
+      for (String notID in requestee.notifications){
+        DocumentSnapshot doc = await notifications.doc(notID).get();
+        if (doc["requestID"] == requestID) {
+          idNotification = notID;
+          break;
+        }
       }
-    }
-    if (idNotification != "") {
-      requestee.notifications.remove(idNotification);
-      await updateUser(requestee);
-      await notifications.doc(idNotification).delete();
+      if (idNotification != "") {
+        requestee.notifications.remove(idNotification);
+        await updateUser(requestee);
+        await notifications.doc(idNotification).delete();
+      }
+
+      await requests.doc(requestID).delete();
+
+    }catch(e){
+      print("işlemde hata oluştu...");
     }
 
-    await requests.doc(requestID).delete();
   }
 
   Future<List<List<dynamic>>> getFriendRequests()async{
