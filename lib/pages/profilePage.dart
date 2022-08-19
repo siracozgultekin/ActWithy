@@ -14,6 +14,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../services/authService.dart';
 import 'notificationPage.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -24,6 +25,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  int selectedIndex = 4;
   UserModel user;
   _ProfilePageState(this.user);
   //List<List<ActivityModel>> actList = [];
@@ -36,6 +38,8 @@ class _ProfilePageState extends State<ProfilePage> {
   bool pending = false;
   String buttonText = "";
   bool isClicked=false;
+
+  bool destinationClicked =false;
   
   final controller = ScrollController();
 
@@ -95,7 +99,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    int selectedIndex = 4;
+
     bool isMyPage = user.userUID == FirebaseAuth.instance.currentUser!.uid;
     
     if (isMyPage) {
@@ -117,7 +121,8 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         child: NavigationBar(
           selectedIndex: selectedIndex,
-          onDestinationSelected: (value) async {
+          onDestinationSelected: destinationClicked? (value){}: (value) async {
+            setState((){destinationClicked=true;});
             bool check = await PostServices().checkDailyPost();
 
             PostModel postModel;
@@ -137,30 +142,37 @@ class _ProfilePageState extends State<ProfilePage> {
               //oluşturulmuş demek
               postModel = await PostServices().getDailyPost();
             }
+            UserModel currentUser = await AuthService().getCurrentUser();
 
             setState(() {
               selectedIndex = value;
 
             });
-            if (selectedIndex == 0) {
-              Navigator.of(context).pushAndRemoveUntil(
+
+            switch(selectedIndex){
+              case 0: Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => HomePage()),
                       (route) => false);
-            } else if (selectedIndex == 1) {
-              showSearch(
+              break;
+              case 1: showSearch(
                   context: context,
                   delegate: SearchPage(
                       hintText: "Search",
                       hintTextColor: TextStyle(color: Colors.white)));
-            } else if (selectedIndex == 2) {
-              Navigator.of(context).pushReplacement(MaterialPageRoute(
+              break;
+              case 2: Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (context) => CreatingPage(postModel: postModel)));
-            } else if (selectedIndex == 3) {
-              Navigator.of(context).pushReplacement(MaterialPageRoute(
+              break;
+              case 3: Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (context) => NotificationPage()));
-            } else if (selectedIndex == 4) {
-
+              break;
+              case 4:
+                //if(!isMyPage)
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => ProfilePage(user: currentUser)));
+                break;
             }
+
+            setState((){destinationClicked=false;});
           },
           /*  if (selected == 0) {
 
@@ -399,7 +411,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       MaterialPageRoute(
                           builder: (context) =>
                               EditProfilePage(userModel: user))).then((value) {
-                    setState(() {});
                   });
                   //Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfilePage(userModel: user,)));
                 } else if (!isMyFriend && pending) {

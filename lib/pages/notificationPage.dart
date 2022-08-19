@@ -30,6 +30,7 @@ class _NotificationPageState extends State<NotificationPage> {
   Color selectedColor = Color(0xFF2D3A43); //dark blue
 
   List<bool> isClicked = [];
+  bool destinationClicked =false;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +65,8 @@ class _NotificationPageState extends State<NotificationPage> {
         ),
         child: NavigationBar(
           selectedIndex: selectedIndex,
-          onDestinationSelected: (value) async {
+          onDestinationSelected: destinationClicked? (value){}: (value) async {
+            setState((){destinationClicked=true;});
             bool check = await PostServices().checkDailyPost();
 
             PostModel postModel;
@@ -100,6 +102,7 @@ class _NotificationPageState extends State<NotificationPage> {
               break;
 
             }
+            setState((){destinationClicked=false;});
           },
           destinations: [
             NavigationDestination(
