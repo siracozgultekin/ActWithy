@@ -16,13 +16,13 @@ class PostServices {
   CollectionReference users = FirebaseFirestore.instance.collection('users');
   CollectionReference posts = FirebaseFirestore.instance.collection('posts');
   CollectionReference activities =
-      FirebaseFirestore.instance.collection('activities');
+  FirebaseFirestore.instance.collection('activities');
   CollectionReference reactions =
-      FirebaseFirestore.instance.collection('reactions');
+  FirebaseFirestore.instance.collection('reactions');
   CollectionReference notifications =
-      FirebaseFirestore.instance.collection('notifications');
+  FirebaseFirestore.instance.collection('notifications');
   CollectionReference requests =
-      FirebaseFirestore.instance.collection('requests');
+  FirebaseFirestore.instance.collection('requests');
 
   Future<String> createActivity(String selectedItem, Timestamp time,
       String location, List<String> participants) async {
@@ -43,6 +43,14 @@ class PostServices {
 
   Future<void> updatePost(PostModel postModel) async {
     await posts.doc(postModel.postUID).set(postModel.createMap());
+    if(postModel.activityUID.isEmpty){
+      DocumentSnapshot myDoc = await users.doc(myId).get();
+      UserModel userModel = UserModel.fromSnapshot(myDoc);
+      userModel.posts.remove(postModel.postUID);
+      userModel.lastPostStamp=Timestamp.fromDate(DateTime(2010));
+      updateUser(userModel);
+      posts.doc(postModel.postUID).delete();
+    }
   }
 
   Future<void> updateUser(UserModel userModel) async {
@@ -133,7 +141,7 @@ class PostServices {
       List<UserModel> parts = await getAllParticipants(post.activityUID);
 
       PosticipantModel posticipantModel =
-          PosticipantModel(post: post, participantList: parts);
+      PosticipantModel(post: post, participantList: parts);
       posticipant.add(posticipantModel);
     }
 
@@ -237,7 +245,7 @@ class PostServices {
       DocumentSnapshot friendDoc = await users.doc(friendID).get();
 
       List<String> friendsPosts =
-          friendDoc["posts"].cast<String>(); //friend's post ids
+      friendDoc["posts"].cast<String>(); //friend's post ids
       for (String postID in friendsPosts) {
         DocumentSnapshot postDoc = await posts.doc(postID).get();
         //  DenemeModel deneme = DenemeModel(postObj: PostModel.fromSnapshot(postDoc));
@@ -360,9 +368,14 @@ class PostServices {
   }
 
   Future<void> deleteReaction(String reactionUID) async {
-    if (reactionUID != "") {
-      await reactions.doc(reactionUID).delete();
+    try{
+      if (reactionUID != "") {
+        await reactions.doc(reactionUID).delete();
+      }
+    }catch(e){
+      print("işlemde hata oluştu...");
     }
+
   }
 
   Future<bool> checkReaction(PostModel postModel) async {
@@ -397,11 +410,11 @@ class PostServices {
   }
 
   Future<void> createNotification(
-    int type,
-    String userID,
-    String reactionID,
-    String requestID,
-  ) async {
+      int type,
+      String userID,
+      String reactionID,
+      String requestID,
+      ) async {
     String notificationId = "";
     await notifications.add({
       'time': Timestamp.now(),
@@ -422,17 +435,22 @@ class PostServices {
 
   Future<void> deleteReactionNotification(
       String rectionId, UserModel userModel) async {
-    if (rectionId != "") {
-      for (String id in userModel.notifications) {
-        DocumentSnapshot doc = await notifications.doc(id).get();
-        if (doc["reactionID"] == rectionId) {
-          userModel.notifications.remove(doc["notificationUID"]);
-          await updateUser(userModel);
-          await notifications.doc(doc["notificationUID"]).delete();
-          return;
+    try{
+      if (rectionId != "") {
+        for (String id in userModel.notifications) {
+          DocumentSnapshot doc = await notifications.doc(id).get();
+          if (doc["reactionID"] == rectionId) {
+            userModel.notifications.remove(doc["notificationUID"]);
+            await updateUser(userModel);
+            await notifications.doc(doc["notificationUID"]).delete();
+            return;
+          }
         }
       }
+    }catch(e){
+      print("işlemde hata oluştu...");
     }
+
   }
 
   Future<List<NotificationActivityModel>> getNotificationReactions() async {
@@ -444,10 +462,10 @@ class PostServices {
       DocumentSnapshot notDoc = await notifications.doc(id).get();
       if (notDoc["type"] == 0) {
         DocumentSnapshot reactionDoc =
-            await reactions.doc(notDoc["reactionID"]).get();
+        await reactions.doc(notDoc["reactionID"]).get();
         DocumentSnapshot postDoc = await posts.doc(reactionDoc["postID"]).get();
         DocumentSnapshot userDoc =
-            await users.doc(reactionDoc["reacterID"]).get();
+        await users.doc(reactionDoc["reacterID"]).get();
         reactionsList.add(NotificationActivityModel(
             user: UserModel.fromSnapshot(userDoc),
             reaction: ReactionModel.fromSnapshot(reactionDoc),
@@ -493,7 +511,7 @@ class PostServices {
         partList.add(part);
       }
       PartivityModel model =
-          PartivityModel(activity: act, participantList: partList);
+      PartivityModel(activity: act, participantList: partList);
       list.add(model);
     }
 
@@ -520,10 +538,12 @@ class PostServices {
   }
 
   Future<void> deleteMyParticipate(ActivityModel activityModel) async {
-    activityModel.participants.remove(myId);
-    await updateActivity(activityModel);
+    try{
+      activityModel.participants.remove(myId);
+      await updateActivity(activityModel);
+    }catch(e){
 
-    /// TODO notification ve request objelerini sil
+    }
   }
 
 
@@ -544,26 +564,32 @@ class PostServices {
 
   Future<void> deleteActivityRequest(ActivityModel activityModel,
       RequestModel requestModel) async {
-    DocumentSnapshot doc1 = await users.doc(requestModel.requesteeUID).get();
-    UserModel userModel = UserModel.fromSnapshot(doc1) ;
-    activityModel.requests.remove(requestModel.requestUID);
-    await updateActivity(activityModel);
+    try{
+      DocumentSnapshot doc1 = await users.doc(requestModel.requesteeUID).get();
+      UserModel userModel = UserModel.fromSnapshot(doc1) ;
+      activityModel.requests.remove(requestModel.requestUID);
+      await updateActivity(activityModel);
 
-    String idNotification = "";
-    for (String notificationId in userModel.notifications) {
-      DocumentSnapshot doc = await notifications.doc(notificationId).get();
-      if (doc["requestID"] == requestModel.requestUID) {
-        idNotification = notificationId;
-        break;
+      String idNotification = "";
+      for (String notificationId in userModel.notifications) {
+        DocumentSnapshot doc = await notifications.doc(notificationId).get();
+        if (doc["requestID"] == requestModel.requestUID) {
+          idNotification = notificationId;
+          break;
+        }
       }
-    }
-    if (idNotification != "") {
-      userModel.notifications.remove(idNotification);
-      await updateUser(userModel);
-      await notifications.doc(idNotification).delete();
+      if (idNotification != "") {
+        userModel.notifications.remove(idNotification);
+        await updateUser(userModel);
+        await notifications.doc(idNotification).delete();
+      }
+
+      await requests.doc(requestModel.requestUID).delete();
+    }catch(e){
+      print("işlemde hata oluştu...");
+
     }
 
-    await requests.doc(requestModel.requestUID).delete();
   }
 
   Future<List<List<dynamic>>> getActivityRequestNotification() async {
@@ -576,12 +602,12 @@ class PostServices {
       DocumentSnapshot notDoc = await notifications.doc(id).get();
       if (notDoc["type"] == 1) {
         DocumentSnapshot requestDoc =
-            await requests.doc(notDoc["requestID"]).get();
+        await requests.doc(notDoc["requestID"]).get();
         if (requestDoc["type"] == 1) {
           DocumentSnapshot userDoc =
-              await users.doc(requestDoc["requesterUID"]).get();
+          await users.doc(requestDoc["requesterUID"]).get();
           DocumentSnapshot activityDoc =
-              await activities.doc(requestDoc["activityUID"]).get();
+          await activities.doc(requestDoc["activityUID"]).get();
           returnList.add([
             RequestModel.fromSnapshot(requestDoc),
             UserModel.fromSnapshot(userDoc),
@@ -595,21 +621,27 @@ class PostServices {
   }
 
   Future<void> deleteFriendRequest(UserModel requestee, String requestID)async{
-    String idNotification = "";
-    for (String notID in requestee.notifications){
-      DocumentSnapshot doc = await notifications.doc(notID).get();
-      if (doc["requestID"] == requestID) {
-        idNotification = notID;
-        break;
+    try{
+      String idNotification = "";
+      for (String notID in requestee.notifications){
+        DocumentSnapshot doc = await notifications.doc(notID).get();
+        if (doc["requestID"] == requestID) {
+          idNotification = notID;
+          break;
+        }
       }
-    }
-    if (idNotification != "") {
-      requestee.notifications.remove(idNotification);
-      await updateUser(requestee);
-      await notifications.doc(idNotification).delete();
+      if (idNotification != "") {
+        requestee.notifications.remove(idNotification);
+        await updateUser(requestee);
+        await notifications.doc(idNotification).delete();
+      }
+
+      await requests.doc(requestID).delete();
+
+    }catch(e){
+      print("işlemde hata oluştu...");
     }
 
-    await requests.doc(requestID).delete();
   }
 
   Future<List<List<dynamic>>> getFriendRequests()async{
@@ -673,8 +705,8 @@ class DenemeModel {
 
   DenemeModel(
       {required this.userObj,
-      required this.activitiesList,
-      required this.postObj});
+        required this.activitiesList,
+        required this.postObj});
 
   void setUser(UserModel muser) {
     this.userObj = muser;

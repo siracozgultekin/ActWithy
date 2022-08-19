@@ -66,12 +66,17 @@ class SearchService{
 
   Future<void> deleteRequest(String requesteeID) async {
 
-    DocumentSnapshot doc = await users.doc(requesteeID).get();
-    UserModel requestee = UserModel.fromSnapshot(doc);
+    try{
+      DocumentSnapshot doc = await users.doc(requesteeID).get();
+      UserModel requestee = UserModel.fromSnapshot(doc);
 
-    String requestID = await isPending(requesteeID);
+      String requestID = await isPending(requesteeID);
 
-    PostServices().deleteFriendRequest(requestee, requestID);
+      PostServices().deleteFriendRequest(requestee, requestID);
+    }catch(e){
+      print("işlem yapılamadı...");
+    }
+
 
       //TODO del notification 2
   }
@@ -101,6 +106,22 @@ class SearchService{
 
     }
     return requestID;
+  }
+
+  Future<String> controlFriendRequest(String id)async{
+    DocumentSnapshot myDoc = await users.doc(myId).get();
+    List<String> notIDs = myDoc["notifications"].cast<String>();
+    for(String notId in notIDs){
+      DocumentSnapshot notDoc = await notifications.doc(notId).get();
+      if (notDoc["type"] == 1) {
+        DocumentSnapshot requestDoc = await requests.doc(notDoc["requestID"]).get();
+        if (requestDoc["type"] == 0 && requestDoc["requesterUID"]==id) {
+          return requestDoc["requestUID"];
+        }
+      }
+    }
+
+    return "";
   }
 
 }

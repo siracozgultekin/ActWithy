@@ -29,22 +29,32 @@ class _ProfilePageState extends State<ProfilePage> {
   //List<List<ActivityModel>> actList = [];
   //TODO emojilerdeki List<bool> gibi yappp
 
+
+
   bool isToDo = true;
   bool isMyFriend = false;
   bool pending = false;
   String buttonText = "";
+  bool isClicked=false;
+  
   final controller = ScrollController();
+
+
   bool hidden =true;
   List<bool> boolList = [];
 
+  String isRequest = "";
+
+  double containerHeight =0;
 
 
   getIsMyFriend() async {
     bool result = await SearchService().isMyFriend(user.userUID);
     String temp = await SearchService().isPending(user.userUID);
+    containerHeight=MediaQuery.of(context).size.height*0.38;
+    isRequest = await SearchService().controlFriendRequest(user.userUID);
 
     pending = !temp.isEmpty;
-    print(pending);
     //bool isPenging = await ;
     setState(() {
       isMyFriend = result;
@@ -70,18 +80,68 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   initState() {
-    
+
+
     //getActList(user.lastPostID);
     getIsMyFriend();
     super.initState();
+
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //
+    //   // if(scrollController.hasClients) {
+    //   //       //containerHeight = MediaQuery.of(context).size.height*0.38-scrollController.offset;
+    //   // }
+    //
+    // });
+
+
+
+
+
+    scrollController.addListener(() {
+      double off = scrollController.offset;
+
+
+        if(off>MediaQuery.of(context).size.height*0.38){
+          setState((){ containerHeight=0;});
+        }else{
+          setState((){containerHeight =MediaQuery.of(context).size.height*0.38-off;});
+        }
+
+
+
+      //print("$off   +++ $containerHeight");
+    });
+/*
+    scrollController.addListener(() {
+      setState((){
+        closeTopContainer = scrollController.offset > 13;
+        if(scrollController.offset > 10 && scrollController.offset < 15) {
+          denemeTopContainer = 1;
+        } else if(scrollController.offset >= 15 && scrollController.offset < 25) {
+          denemeTopContainer = 2;
+        } else if(scrollController.offset >= 25) {
+          denemeTopContainer = 3;
+        } else {
+          denemeTopContainer = 0;
+        }
+      });
+
+});*/
+
+
   }
 
+  int denemeTopContainer = 0;
   Color selectedColor = const Color(0xFF4C6170); //dark blue
   Color negativeColor = const Color(0xFFFFFFFF); //white
   Color bgColor = const Color(0xFFD6E6F1); //light blue
   Color appbarColor = const Color(0xFF48B2FA); //neon blue
   Color textColor = const Color(0xFF2D3A43);
   NumberFormat formatter = NumberFormat("00");
+
+  ScrollController scrollController = ScrollController(initialScrollOffset: 0);
+  bool closeTopContainer = false;
 
   @override
   Widget build(BuildContext context) {
@@ -93,6 +153,10 @@ class _ProfilePageState extends State<ProfilePage> {
     }
     if(!isMyPage && isMyFriend) hidden =false;
 
+
+    //https://www.youtube.com/watch?v=Cn6VCTaHB-k
+    //https://api.flutter.dev/flutter/widgets/NestedScrollView-class.html
+    //https://api.flutter.dev/flutter/widgets/CustomScrollView-class.html
     return Scaffold(
       backgroundColor: bgColor,
       bottomNavigationBar: NavigationBarTheme(
@@ -126,26 +190,27 @@ class _ProfilePageState extends State<ProfilePage> {
 
             setState(() {
               selectedIndex = value;
-              if (selectedIndex == 0) {
-                Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => HomePage()),
-                    (route) => false);
-              } else if (selectedIndex == 1) {
-                showSearch(
-                    context: context,
-                    delegate: SearchPage(
-                        hintText: "Search",
-                        hintTextColor: TextStyle(color: Colors.white)));
-              } else if (selectedIndex == 2) {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => CreatingPage(postModel: postModel)));
-              } else if (selectedIndex == 3) {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => NotificationPage()));
-              } else if (selectedIndex == 4) {
 
-              }
             });
+            if (selectedIndex == 0) {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => HomePage()),
+                      (route) => false);
+            } else if (selectedIndex == 1) {
+              showSearch(
+                  context: context,
+                  delegate: SearchPage(
+                      hintText: "Search",
+                      hintTextColor: TextStyle(color: Colors.white)));
+            } else if (selectedIndex == 2) {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) => CreatingPage(postModel: postModel)));
+            } else if (selectedIndex == 3) {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) => NotificationPage()));
+            } else if (selectedIndex == 4) {
+
+            }
           },
           /*  if (selected == 0) {
 
@@ -234,7 +299,16 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: Column(
         children: [
-          ProfileWidget(isMyPage),
+            AnimatedContainer(
+
+                duration: Duration(milliseconds: 1),
+                width: MediaQuery.of(context).size.width,
+                alignment: Alignment.topCenter,
+                height: containerHeight,
+              // (scrollController.offset<=MediaQuery.of(context).size.height*0.38) ? MediaQuery.of(context).size.height*0.38-scrollController.offset : 0,
+                //denemeTopContainer == 0 ?  MediaQuery.of(context).size.height*0.38 : denemeTopContainer == 1 ? MediaQuery.of(context).size.height*0.28 : denemeTopContainer == 2 ? MediaQuery.of(context).size.height*0.15 : 0,
+                child: ProfileWidget(isMyPage)),
+
           hidden?Divider(thickness: 2, color: textColor,):DividerWidget(),
           Expanded(child: isToDo ? (hidden ? hiddenWidget():ToDoWidget()) : (hidden ? hiddenWidget() : FriendWidget())),
         ],
@@ -317,8 +391,64 @@ class _ProfilePageState extends State<ProfilePage> {
           Positioned(
             top: MediaQuery.of(context).size.height * 0.21,
             right: 8.0,
-            child: ElevatedButton(
-              onPressed: () async {
+            child: (isRequest!="")? Column(children: [
+              ElevatedButton(
+              onPressed: isClicked?(){}: () async {
+                setState((){isClicked=true;});
+                /// TODO arkadaşlık isteğini kabul et
+                await SearchService().addFriend(user.userUID);
+                UserModel me = UserModel.fromSnapshot(
+                    await PostServices().getMyDoc());
+                await PostServices()
+                    .deleteFriendRequest(me, isRequest).then((value) {
+                  setState((){isRequest="";
+                  isMyFriend =true;
+                  buttonText = "Remove Friend";
+                  isClicked=false;});
+                });
+              },
+              child: Text(
+               "Accept",
+                style: TextStyle(
+                    color: negativeColor,
+                    fontSize: MediaQuery.of(context).size.width * 0.028),
+              ),
+              style: ElevatedButton.styleFrom(
+                primary: selectedColor,
+                shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(30.0),
+                ),
+                minimumSize: Size(100, 30),
+              ),
+            ),
+              ElevatedButton(
+              onPressed: isClicked?(){}: () async {
+                setState((){isClicked=true;});
+                /// TODO arkadaşlık isteğini reddet
+                UserModel me = UserModel.fromSnapshot(
+                    await PostServices().getMyDoc());
+                await PostServices()
+                    .deleteFriendRequest(me, isRequest).then((value) {
+                  setState((){isRequest ="";
+                  isClicked=true;});
+                });
+              },
+              child: Text(
+                "Reject",
+                style: TextStyle(
+                    color: selectedColor,
+                    fontSize: MediaQuery.of(context).size.width * 0.028),
+              ),
+              style: ElevatedButton.styleFrom(
+                primary: negativeColor,
+                shape: new RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(30.0),
+                ),
+                minimumSize: Size(100, 30),
+              ),
+            ),],):
+            ElevatedButton(
+              onPressed: isClicked?(){}: () async {
                 if (isMyPage) {
                   print(1);
                   ///TODO editle profili
@@ -332,6 +462,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   });
                   //Navigator.of(context).push(MaterialPageRoute(builder: (context)=>EditProfilePage(userModel: user,)));
                 } else if (!isMyFriend && pending) {
+                  setState((){isClicked=true;});
                   print(2);
 
                   await SearchService().deleteRequest(user.userUID).then((value){
@@ -339,13 +470,14 @@ class _ProfilePageState extends State<ProfilePage> {
                       hidden = true;
                       buttonText = "Add Friend";
                       pending = false;
+                      isClicked =false;
                     });
                   });
 
                 }
                 else if (!isMyPage && isMyFriend) {
                   print(3);
-
+                  setState((){isClicked=true;});
                   await SearchService()
                       .removeFriend(user.userUID)
                       .then((value) {
@@ -354,16 +486,18 @@ class _ProfilePageState extends State<ProfilePage> {
                       buttonText = "Add Friend";
                       pending = false; //gereksiz??
                       hidden = true;
+                      isClicked = false;
                     });
                   });
                 } else if (!isMyPage && !isMyFriend && !pending) {
                   print(4);
-
+                  setState((){isClicked=true;});
                   await SearchService().sendRequest(user.userUID).then((value) {
                     setState(() {
                       buttonText = "Pending";
                       pending = true;
                       hidden = true;
+                      isClicked = false;
                     });
                   });
                 }
@@ -415,6 +549,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 },
                 child: Container(
                   width: MediaQuery.of(context).size.width / 2,
+                  height: MediaQuery.of(context).size.height*0.05,
                   child: Center(
                       child: Text(
                     'ToDo List',
@@ -440,6 +575,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 },
                 child: Container(
                   width: MediaQuery.of(context).size.width / 2,
+                  height: MediaQuery.of(context).size.height*0.05,
                   child: Center(
                       child: Text(
                     'Friends',
@@ -467,7 +603,9 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget ToDoWidget() {
     //String selectedPostID = user.lastPostID;
     return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
+      controller: scrollController,
+
+      physics: ClampingScrollPhysics(),
       child: FutureBuilder(
         future: PostServices().getPosticipants(user.userUID),
         builder: (context, AsyncSnapshot snap) {
@@ -477,6 +615,7 @@ class _ProfilePageState extends State<ProfilePage> {
             return Column(
               children: [
                 ListView.builder(
+
                   shrinkWrap: true,
                   scrollDirection: Axis.vertical,
                   physics: BouncingScrollPhysics(),
@@ -604,6 +743,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                                               color: Colors.green,
                                                                               shape: BoxShape.circle,
                                                                               image: DecorationImage(
+                                                                                fit: BoxFit.cover,
                                                                                 image: NetworkImage(participantList[0].ppURL),
                                                                               ),
                                                                             ),
@@ -629,6 +769,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                                                     color: Colors.green,
                                                                                     shape: BoxShape.circle,
                                                                                     image: DecorationImage(
+                                                                                      fit: BoxFit.cover,
                                                                                       image: NetworkImage(participantList[1].ppURL),
                                                                                     )),
                                                                               ),
@@ -1091,6 +1232,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget FriendWidget() {
     return SingleChildScrollView(
+      controller: scrollController,
       physics: BouncingScrollPhysics(),
       child: FutureBuilder(
         future: PostServices().getFriends(user.friends),
@@ -1796,7 +1938,7 @@ class _ProfilePageState extends State<ProfilePage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Icon(Icons.calendar_today,
-            color: textColor, size: MediaQuery.of(context).size.width * 0.09),
+            color: textColor, size: MediaQuery.of(context).size.width * 0.08),
         Text(
           "${formatter.format(day)}/${formatter.format(month)}/${year}",
           style: TextStyle(
