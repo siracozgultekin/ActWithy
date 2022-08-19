@@ -42,6 +42,8 @@ class _CreatingPageState extends State<CreatingPage> {
 
   List<ActivityModel> activities = [];
 
+  bool destinationClicked =false;
+
   initState() {
     length = widget.postModel.activityUID.length;
     CreatingPage.participants = CreatingPage.participants;
@@ -531,7 +533,8 @@ class _CreatingPageState extends State<CreatingPage> {
         ),
         child: NavigationBar(
           selectedIndex: selectedIndex,
-          onDestinationSelected: (value) async {
+          onDestinationSelected: destinationClicked? (value){}:  (value) async {
+            setState((){destinationClicked=true;});
             bool check = await PostServices().checkDailyPost();
 
             PostModel postModel;
@@ -567,6 +570,7 @@ class _CreatingPageState extends State<CreatingPage> {
               break;
 
             }
+            setState((){destinationClicked=false;});
           },
           destinations: [
             NavigationDestination(
