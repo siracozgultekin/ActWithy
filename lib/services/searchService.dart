@@ -27,7 +27,8 @@ class SearchService{
 
       if(temp.contains(search)){
         print('iceriyor: $search');
-        models.add(UserModel.fromSnapshot(doc));
+        if(doc["userUID"]!=myId)
+          models.add(UserModel.fromSnapshot(doc));
       }
     }
     return models;
