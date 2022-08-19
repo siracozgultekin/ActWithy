@@ -236,7 +236,10 @@ class _HomePageState extends State<HomePage> {
 
   void scrollUp() {
     final double start = 0;
-    controller.jumpTo(start);
+    if(controller.hasClients) {
+      controller.jumpTo(start);
+    }
+
   }
 
   getMe() async {
